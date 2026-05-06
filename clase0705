@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 4 · ChatGPT con archivos, imágenes y datos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --night: #080e1a;
+  --deep: #0d1b35;
+  --navy: #132347;
+  --steel: #2563a8;
+  --sky: #3b82c4;
+  --ice: #7bb3e0;
+  --frost: #bdd8f0;
+  --mist: #deeef9;
+  --white: #f0f7ff;
+  --paper: #f8fbff;
+  --accent: #38bdf8;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #0f2040;
+  --muted: #4a6b8a;
+  --border: #c5ddf0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--paper); color: var(--text); font-size: 15px; line-height: 1.7; }
+
+/* HEADER */
+.header { background: var(--night); padding: 0; position: relative; overflow: hidden; }
+.header-bg { position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 70% at 15% 50%, rgba(37,99,168,0.4) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 60% at 85% 20%, rgba(56,189,248,0.12) 0%, transparent 55%),
+              radial-gradient(ellipse 40% 50% at 60% 90%, rgba(16,185,129,0.08) 0%, transparent 55%); }
+.header-bg::after { content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(59,130,196,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,196,0.06) 1px, transparent 1px);
+  background-size: 32px 32px; }
+.header-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 44px 48px 38px; }
+.header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 20px; }
+.session-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+.session-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+.btn-classroom { display: inline-flex; align-items: center; gap: 7px; background: #1a73e8; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; font-family: 'DM Sans', sans-serif; transition: background 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+.btn-classroom:hover { background: #1557b0; }
+.header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(26px,5vw,44px); font-weight: 400; color: var(--white); line-height: 1.15; margin-bottom: 10px; }
+.header h1 em { font-style: italic; color: var(--accent); }
+.header-sub { color: rgba(176,210,240,0.7); font-size: 14px; margin-bottom: 24px; }
+.header-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 5px 14px; border-radius: 4px; font-size: 12px; color: rgba(176,210,240,0.85); font-weight: 500; }
+
+/* SAVE BAR */
+.save-bar { background: var(--deep); border-bottom: 1px solid rgba(56,189,248,0.15); padding: 8px 48px; }
+.save-bar-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+.save-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; transition: background 0.3s; }
+.save-dot.saving { animation: pulse 1s infinite; }
+.save-text { font-size: 12px; color: rgba(176,210,240,0.5); flex: 1; }
+.unsaved-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); margin-left: 4px; animation: pulse 1.5s infinite; }
+.unsaved-dot.hidden { display: none; }
+.btn-clear { background: none; border: 1px solid rgba(255,100,100,0.3); color: rgba(255,130,130,0.6); padding: 4px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.btn-clear:hover { border-color: rgba(255,100,100,0.6); color: rgba(255,130,130,0.9); }
+
+/* RELOAD BANNER */
+.reload-banner { background: linear-gradient(90deg, #7c3700 0%, #92400e 100%); border-bottom: 2px solid var(--gold); padding: 10px 48px; }
+.reload-banner-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.reload-icon { font-size: 18px; flex-shrink: 0; }
+.reload-text { font-size: 12.5px; color: rgba(255,237,180,0.95); line-height: 1.4; flex: 1; min-width: 200px; }
+.reload-text strong { color: #fef3c7; display: block; margin-bottom: 2px; }
+
+/* NAV */
+.nav-wrapper { background: var(--deep); border-bottom: 1px solid rgba(59,130,196,0.25); padding: 0 48px; overflow-x: auto; }
+.nav-tabs { display: flex; max-width: 860px; margin: 0 auto; }
+.tab-btn { padding: 15px 16px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: rgba(176,210,240,0.5); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: all 0.2s; }
+.tab-btn:hover { color: var(--ice); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* MAIN */
+.main { max-width: 860px; margin: 0 auto; padding: 40px 48px 120px; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* SECTION HEADER */
+.sec-head { margin-bottom: 32px; }
+.sec-kicker { font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--sky); margin-bottom: 8px; }
+.sec-head h2 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; color: var(--text); margin-bottom: 6px; }
+.sec-head p { color: var(--muted); font-size: 14px; }
+
+/* CALLOUT */
+.callout { background: linear-gradient(135deg, var(--deep) 0%, var(--navy) 100%); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 20px 24px; margin-bottom: 28px; color: var(--mist); font-size: 13.5px; line-height: 1.65; }
+.callout strong { display: block; color: var(--accent); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+.callout.warning { border-left-color: var(--red); }
+.callout.warning strong { color: #fca5a5; }
+.callout.tip { border-left-color: var(--green); }
+.callout.tip strong { color: #6ee7b7; }
+
+/* PROMPT BOX */
+.prompt-box { background: var(--night); border: 1px solid rgba(59,130,196,0.3); border-radius: 8px; padding: 18px 22px; margin: 14px 0 20px; font-size: 13.5px; color: var(--frost); line-height: 1.7; font-style: italic; position: relative; }
+.prompt-box::before { content: 'PROMPT'; display: block; font-style: normal; font-size: 9px; font-weight: 600; letter-spacing: 2.5px; color: var(--accent); margin-bottom: 8px; }
+.prompt-box .bracket { color: var(--gold); font-style: normal; }
+.prompt-box .copy-btn { position: absolute; top: 12px; right: 14px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 1px; transition: all 0.2s; font-style: normal; }
+.prompt-box .copy-btn:hover { background: rgba(56,189,248,0.25); }
+
+/* CARD */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 28px 32px; margin-bottom: 24px; }
+.card.accent-top { border-top: 3px solid var(--steel); }
+.card.accent-left { border-left: 3px solid var(--sky); }
+.card.green-left { border-left: 3px solid var(--green); }
+.card.red-left { border-left: 3px solid var(--red); }
+.card.gold-left { border-left: 3px solid var(--gold); }
+.card-label { font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--sky); margin-bottom: 10px; }
+.card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; font-weight: 400; margin-bottom: 8px; color: var(--text); }
+.card > p { color: var(--muted); font-size: 13.5px; margin-bottom: 16px; line-height: 1.6; }
+
+/* FORM FIELDS */
+.field-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; margin-top: 20px; }
+.field-label:first-of-type { margin-top: 0; }
+.field-hint { font-size: 12px; color: var(--sky); font-style: italic; margin-bottom: 7px; margin-top: -4px; display: block; font-weight: 400; text-transform: none; letter-spacing: 0; }
+textarea, input[type="text"] { width: 100%; border: 1.5px solid var(--border); border-radius: 6px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--paper); resize: vertical; transition: border-color 0.2s, box-shadow 0.2s; line-height: 1.6; }
+textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--steel); box-shadow: 0 0 0 3px rgba(37,99,168,0.1); }
+textarea { min-height: 88px; }
+textarea.tall { min-height: 130px; }
+
+/* DOCUMENT TYPE SELECTOR */
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px; margin: 14px 0 20px; }
+.doc-card { background: var(--white); border: 2px solid var(--border); border-radius: 8px; padding: 14px 12px; cursor: pointer; transition: all 0.15s; text-align: center; user-select: none; }
+.doc-card:hover { border-color: var(--sky); transform: translateY(-2px); }
+.doc-card.selected { border-color: var(--accent); background: var(--mist); }
+.doc-card .doc-emoji { font-size: 22px; margin-bottom: 6px; display: block; }
+.doc-card .doc-name { font-size: 12.5px; font-weight: 600; color: var(--text); display: block; }
+
+/* CHECKLIST */
+.check-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--mist); }
+.check-row:last-child { border-bottom: none; }
+.chk { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; margin-top: 2px; background: var(--white); }
+.chk:hover { border-color: var(--steel); }
+.chk.on { background: var(--green); border-color: var(--green); }
+.chk.on::after { content: '✓'; color: white; font-size: 13px; font-weight: 700; }
+.chk-content strong { font-size: 14px; font-weight: 600; display: block; margin-bottom: 3px; }
+.chk-content span { font-size: 13px; color: var(--muted); }
+
+/* ALUCINACIONES / ERRORES TRACKER */
+.error-tracker { background: #fff8f0; border: 1.5px solid #fed7aa; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
+.error-tracker-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #c2410c; margin-bottom: 12px; display: block; }
+.error-item { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+.error-num { width: 24px; height: 24px; background: #c2410c; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+.error-fields { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.error-fields input { font-size: 13px; padding: 9px 12px; }
+
+/* COMPARISON TABLE */
+.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+.compare-table th { background: var(--navy); color: var(--frost); padding: 10px 14px; text-align: left; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
+.compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--mist); vertical-align: top; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child { font-weight: 600; color: var(--steel); width: 35%; }
+.compare-table td textarea { min-height: 60px; font-size: 13px; margin: 0; }
+
+/* BADGE */
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #d1fae5; color: #065f46; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+.badge-gold { background: #fef3c7; color: #92400e; }
+
+/* DIVIDER */
+.divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 36px 0; }
+
+/* REFLECTION */
+.reflection { background: var(--mist); border: 1px solid var(--frost); border-radius: 8px; padding: 24px 28px; margin-bottom: 24px; }
+.reflection h3 { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 14px; color: var(--deep); }
+
+/* BOTTOM BAR */
+.dl-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--night); border-top: 1px solid rgba(56,189,248,0.2); padding: 12px 48px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; z-index: 200; }
+.dl-note { color: rgba(176,210,240,0.35); font-size: 12px; margin-right: auto; }
+.btn { padding: 10px 20px; border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: var(--steel); color: white; }
+.btn-primary:hover { background: var(--sky); }
+.btn-accent { background: var(--accent); color: var(--night); }
+.btn-accent:hover { background: #5dcffc; }
+.btn-store { background: rgba(56,189,248,0.12); border: 1.5px solid rgba(56,189,248,0.35); color: var(--accent); text-decoration: none; padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+.btn-store:hover { background: rgba(56,189,248,0.2); }
+
+/* TOAST */
+.toast { position: fixed; top: 20px; right: 20px; background: var(--deep); border: 1px solid var(--green); color: var(--frost); padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 999; transform: translateY(-60px); opacity: 0; transition: all 0.3s; pointer-events: none; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(8,14,26,0.75); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal-box { background: var(--white); border-radius: 12px; padding: 32px 36px; max-width: 440px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.4); border-top: 4px solid var(--gold); }
+.modal-icon { font-size: 32px; margin-bottom: 12px; }
+.modal-box h3 { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); margin-bottom: 8px; }
+.modal-box p { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+.modal-box p strong { color: var(--text); }
+.modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.modal-btn-stay { background: var(--steel); color: white; border: none; padding: 11px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.modal-btn-stay:hover { background: var(--sky); }
+.modal-btn-leave { background: none; border: 1.5px solid var(--border); color: var(--muted); padding: 11px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.modal-btn-leave:hover { border-color: var(--muted); }
+
+@media (max-width: 640px) {
+  .header-inner, .main { padding-left: 20px; padding-right: 20px; }
+  .nav-wrapper, .save-bar, .reload-banner { padding-left: 16px; padding-right: 16px; }
+  .dl-bar { padding: 12px 20px; flex-wrap: wrap; gap: 8px; }
+  .dl-note { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-bg"></div>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="session-badge">Módulo 2 · Sesión 4 · Jueves</div>
+      <a href="https://classroom.google.com/u/1/c/ODE5MzExOTc3MzAw" target="_blank" class="btn-classroom" onclick="warnLeave(event,this.href)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ir a Classroom
+      </a>
+    </div>
+    <h1>ChatGPT con archivos,<br><em>imágenes y datos</em></h1>
+    <div class="header-sub">Cuaderno de trabajo del alumno · 15:30–18:30</div>
+    <div class="header-chips">
+      <span class="chip">📄 Análisis de documentos</span>
+      <span class="chip">🖼️ Análisis de imágenes</span>
+      <span class="chip">📊 Tablas y datos</span>
+      <span class="chip">🔍 Pensamiento crítico</span>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-bar-inner">
+    <div class="save-dot" id="saveDot"></div>
+    <span class="save-text" id="saveText">Empieza a escribir — tu progreso se guardará automáticamente</span>
+    <span class="unsaved-dot hidden" id="unsavedDot"></span>
+    <button class="btn-clear" onclick="confirmClear()">Borrar todo</button>
+  </div>
+</div>
+
+<!-- RELOAD WARNING BANNER -->
+<div class="reload-banner">
+  <div class="reload-banner-inner">
+    <span class="reload-icon">💾</span>
+    <span class="reload-text">
+      <strong>¿Vas a cerrar o cambiar de página?</strong>
+      Descarga el cuaderno antes de salir para no perder tu trabajo.
+    </span>
+    <button class="btn btn-accent" onclick="downloadFullHTML()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora</button>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-wrapper">
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('reto',this)">🎯 Reto inicial</button>
+    <button class="tab-btn" onclick="showTab('imagenes',this)">🖼️ Imágenes</button>
+    <button class="tab-btn" onclick="showTab('tablas',this)">📊 Tablas</button>
+    <button class="tab-btn" onclick="showTab('oferta',this)">💼 Oferta de empleo</button>
+    <button class="tab-btn" onclick="showTab('critica',this)">🧠 Reflexión crítica</button>
+    <button class="tab-btn" onclick="showTab('cierre',this)">✅ Cierre</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== RETO INICIAL ===== -->
+<div id="tab-reto" class="section active">
+  <div class="sec-head">
+    <div class="sec-kicker">Reto inicial · 15:30</div>
+    <h2>Extrae 5 datos clave sin leer el documento</h2>
+    <p>Tienes 20 minutos. Solo con ChatGPT. Sin leer el documento tú mismo.</p>
+  </div>
+
+  <div class="callout">
+    <strong>El reto</strong>
+    Coge el documento que has traído (o uno de los que reparte el docente) y súbelo a ChatGPT. Tu misión: extraer 5 datos clave en 20 minutos usando solo prompts. Sin leerlo tú directamente.
+  </div>
+
+  <div class="prompt-box">
+    "Lee este documento y dime: 1) de qué trata en 3 líneas, 2) los 5 puntos más importantes, 3) si hay algo que debería revisar con atención antes de firmarlo o usarlo."
+    <button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button>
+  </div>
+
+  <!-- Tipo de documento -->
+  <div class="card accent-top">
+    <div class="card-label">Tu documento</div>
+    <h3>¿Qué tipo de documento has usado?</h3>
+    <div class="doc-grid">
+      <div class="doc-card" data-key="reto_doctype" data-val="contrato" onclick="selectDoc(this)"><span class="doc-emoji">📜</span><span class="doc-name">Contrato</span></div>
+      <div class="doc-card" data-key="reto_doctype" data-val="factura" onclick="selectDoc(this)"><span class="doc-emoji">🧾</span><span class="doc-name">Factura</span></div>
+      <div class="doc-card" data-key="reto_doctype" data-val="oferta" onclick="selectDoc(this)"><span class="doc-emoji">💼</span><span class="doc-name">Oferta de empleo</span></div>
+      <div class="doc-card" data-key="reto_doctype" data-val="nomina" onclick="selectDoc(this)"><span class="doc-emoji">💰</span><span class="doc-name">Nómina</span></div>
+      <div class="doc-card" data-key="reto_doctype" data-val="articulo" onclick="selectDoc(this)"><span class="doc-emoji">📰</span><span class="doc-name">Artículo</span></div>
+      <div class="doc-card" data-key="reto_doctype" data-val="otro" onclick="selectDoc(this)"><span class="doc-emoji">📂</span><span class="doc-name">Otro</span></div>
+    </div>
+    <span class="field-label">¿De qué trata el documento? (en una línea)</span>
+    <input type="text" data-key="reto_doc_desc" placeholder="Ej: contrato de alquiler de un piso en Bilbao, 12 meses…">
+  </div>
+
+  <!-- Los 5 datos -->
+  <div class="card accent-left">
+    <div class="card-label">Los 5 datos que ha extraído ChatGPT</div>
+    <h3>¿Qué encontró la IA?</h3>
+    <p>Anota los 5 datos que ChatGPT extrajo del documento. Luego verifica si son correctos.</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:center;">
+        <span style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);">Dato extraído por la IA</span>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);">¿Es correcto? (verifica tú)</span>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);">✓/✗</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:center;">
+        <input type="text" data-key="reto_d1" placeholder="Dato 1…">
+        <input type="text" data-key="reto_v1" placeholder="Lo que dice el doc realmente…">
+        <select data-key="reto_c1" style="border:1.5px solid var(--border);border-radius:6px;padding:11px 10px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);cursor:pointer;">
+          <option value="">—</option><option value="correcto">✓ Correcto</option><option value="error">✗ Error</option><option value="parcial">~ Parcial</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:center;">
+        <input type="text" data-key="reto_d2" placeholder="Dato 2…">
+        <input type="text" data-key="reto_v2" placeholder="Lo que dice el doc realmente…">
+        <select data-key="reto_c2" style="border:1.5px solid var(--border);border-radius:6px;padding:11px 10px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);cursor:pointer;">
+          <option value="">—</option><option value="correcto">✓ Correcto</option><option value="error">✗ Error</option><option value="parcial">~ Parcial</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:center;">
+        <input type="text" data-key="reto_d3" placeholder="Dato 3…">
+        <input type="text" data-key="reto_v3" placeholder="Lo que dice el doc realmente…">
+        <select data-key="reto_c3" style="border:1.5px solid var(--border);border-radius:6px;padding:11px 10px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);cursor:pointer;">
+          <option value="">—</option><option value="correcto">✓ Correcto</option><option value="error">✗ Error</option><option value="parcial">~ Parcial</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:center;">
+        <input type="text" data-key="reto_d4" placeholder="Dato 4…">
+        <input type="text" data-key="reto_v4" placeholder="Lo que dice el doc realmente…">
+        <select data-key="reto_c4" style="border:1.5px solid var(--border);border-radius:6px;padding:11px 10px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);cursor:pointer;">
+          <option value="">—</option><option value="correcto">✓ Correcto</option><option value="error">✗ Error</option><option value="parcial">~ Parcial</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:center;">
+        <input type="text" data-key="reto_d5" placeholder="Dato 5…">
+        <input type="text" data-key="reto_v5" placeholder="Lo que dice el doc realmente…">
+        <select data-key="reto_c5" style="border:1.5px solid var(--border);border-radius:6px;padding:11px 10px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);cursor:pointer;">
+          <option value="">—</option><option value="correcto">✓ Correcto</option><option value="error">✗ Error</option><option value="parcial">~ Parcial</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Puesta en común -->
+  <div class="card green-left">
+    <div class="card-label">Puesta en común · 15:50</div>
+    <h3>¿Ha alucinado ChatGPT?</h3>
+
+    <span class="field-label">¿Hubo algún error o alucinación en los datos extraídos?</span>
+    <textarea data-key="reto_aluc" placeholder="Describe qué inventó o confundió la IA. Ej: leyó mal la fecha, inventó una cláusula que no existía, confundió el importe…"></textarea>
+
+    <span class="field-label">¿Cómo lo detectaste?</span>
+    <input type="text" data-key="reto_deteccion" placeholder="Ej: comparé con el original, el dato no tenía sentido, el número era imposible…">
+
+    <span class="field-label">¿Qué habría pasado si hubieras usado ese dato sin verificar?</span>
+    <textarea data-key="reto_consecuencia" placeholder="Reflexiona sobre el riesgo real: ¿qué decisión errónea podrías haber tomado?…"></textarea>
+  </div>
+</div>
+
+<!-- ===== IMÁGENES ===== -->
+<div id="tab-imagenes" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Taller 1 · 16:05</div>
+    <h2>Análisis de imágenes con ChatGPT</h2>
+    <p>Sube una foto y usa prompts para extraer información sin escribirla tú.</p>
+  </div>
+
+  <div class="callout">
+    <strong>¿Qué imágenes puedes analizar?</strong>
+    Tickets de compra, capturas de pantalla, mapas conceptuales escritos a mano, carteles, pizarras, facturas fotografiadas, tablas en papel, diagramas. Cualquier imagen con información visible.
+  </div>
+
+  <div class="prompt-box">
+    "Describe esta imagen con detalle. Si hay texto visible, transcríbelo completo. Si hay datos, cifras o tablas, resúmelos de forma clara."
+    <button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button>
+  </div>
+
+  <!-- PRÁCTICA 1 -->
+  <div class="card accent-top">
+    <div class="card-label">Práctica 1 · Imagen que has analizado</div>
+    <h3>¿Qué imagen has subido?</h3>
+    <p>Describe la imagen que has usado y anota el resultado.</p>
+
+    <span class="field-label">¿Qué imagen has subido? (descríbela brevemente)</span>
+    <input type="text" data-key="img1_desc" placeholder="Ej: foto de un ticket del supermercado, captura de una tabla de Excel, foto de mi pizarra con notas…">
+
+    <span class="field-label">¿Qué le pediste que hiciera con ella?</span>
+    <input type="text" data-key="img1_peticion" placeholder="Ej: que transcribiera el texto, que sumara los importes, que identificara los productos…">
+
+    <span class="field-label">Resultado de ChatGPT — pega aquí la respuesta</span>
+    <textarea data-key="img1_resultado" class="tall" placeholder="Pega aquí lo que respondió ChatGPT sobre tu imagen…"></textarea>
+
+    <span class="field-label">¿Fue preciso? ¿Qué falló?</span>
+    <textarea data-key="img1_precision" placeholder="Ej: transcribió bien casi todo pero confundió un 3 con un 8 en el precio. O: fue sorprendentemente preciso…"></textarea>
+  </div>
+
+  <!-- PRÁCTICA 2: texto en imagen -->
+  <div class="card accent-left">
+    <div class="card-label">Práctica 2 · Texto en imágenes</div>
+    <h3>Transcripción de texto visible</h3>
+    <p>Sube una imagen con texto escrito (a mano o impreso) y pide a ChatGPT que lo transcriba.</p>
+
+    <div class="prompt-box" style="margin-top:0;">
+      "Transcribe exactamente todo el texto que aparece en esta imagen, sin interpretar ni resumir. Mantén el formato original en la medida de lo posible."
+      <button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button>
+    </div>
+
+    <span class="field-label">¿Qué imagen has usado para la transcripción?</span>
+    <input type="text" data-key="img2_desc" placeholder="Ej: foto de mis apuntes escritos a mano, imagen de un cartel informativo…">
+
+    <span class="field-label">¿La transcripción fue fiel al original?</span>
+    <textarea data-key="img2_fidelidad" placeholder="¿Qué errores cometió? ¿Qué acertó? ¿Confundió palabras o letras?…"></textarea>
+  </div>
+
+  <!-- Reflexión -->
+  <div class="card green-left">
+    <div class="card-label">Reflexión del taller</div>
+    <h3>¿Para qué usarías el análisis de imágenes?</h3>
+
+    <span class="field-label">Un caso real de tu vida donde esto te ahorraría tiempo</span>
+    <input type="text" data-key="img_caso_real" placeholder="Ej: fotografiar contratos que me llegan en papel, analizar tickets para gastos del trabajo…">
+
+    <span class="field-label">¿Cuándo NO confiarías en el análisis de imágenes sin verificar?</span>
+    <textarea data-key="img_no_confiar" placeholder="Ej: si los números son importantes para firmar algo, si la imagen es de baja calidad, si hay letra manuscrita difícil de leer…"></textarea>
+  </div>
+</div>
+
+<!-- ===== TABLAS ===== -->
+<div id="tab-tablas" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Taller 2 · 16:30</div>
+    <h2>Análisis de tablas y datos</h2>
+    <p>Sube una tabla (Excel, imagen o texto) y extrae información sin calcular nada tú.</p>
+  </div>
+
+  <div class="callout">
+    <strong>¿Qué tipos de tabla puedes analizar?</strong>
+    Tablas de Excel pegadas como texto, imágenes de tablas, CSV, listas de precios, horarios, comparativas, resultados de encuestas, presupuestos. Cualquier dato estructurado en filas y columnas.
+  </div>
+
+  <div class="prompt-box">
+    "Analiza esta tabla de datos. Dime: cuál es la fila con mayor valor en la columna <span class="bracket">[X]</span>, cuál es la tendencia general, y si hay algún dato que destaque o parezca anómalo."
+    <button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button>
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Tu práctica con tablas</div>
+    <h3>¿Qué tabla has analizado?</h3>
+
+    <span class="field-label">¿Qué tabla has usado? Descríbela</span>
+    <input type="text" data-key="tab_desc" placeholder="Ej: tabla de gastos del mes, lista de ofertas de empleo con requisitos, horario de turnos del trabajo…">
+
+    <span class="field-label">¿Qué preguntaste sobre los datos?</span>
+    <input type="text" data-key="tab_pregunta" placeholder="Ej: cuál es el gasto mayor, qué oferta tiene más requisitos que no cumplo, cuántas horas suman…">
+
+    <span class="field-label">Respuesta de ChatGPT</span>
+    <textarea data-key="tab_resultado" class="tall" placeholder="Pega o resume lo que te respondió…"></textarea>
+
+    <span class="field-label">¿Habría tardado más en obtener esa información manualmente?</span>
+    <input type="text" data-key="tab_tiempo" placeholder="Ej: sí, me habría costado 10 minutos revisar todo. O: más o menos lo mismo pero sin el riesgo de error…">
+  </div>
+
+  <div class="card gold-left">
+    <div class="card-label">Reto extra: pide un gráfico</div>
+    <h3>De tabla a visualización</h3>
+    <p>Si tienes datos numéricos, prueba a pedirle que los represente visualmente.</p>
+    <div class="prompt-box" style="margin-top:0;">
+      "Con estos datos, genera el código Python o una descripción de un gráfico de barras que muestre <span class="bracket">[qué quieres comparar]</span>. Explícame también qué conclusión visual saca el gráfico."
+      <button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button>
+    </div>
+    <span class="field-label">¿Lo has probado? ¿Qué resultado obtuviste?</span>
+    <textarea data-key="tab_grafico" placeholder="Describe qué pasó. Si generó código, ¿lo pudiste usar? Si describió el gráfico, ¿fue útil?…"></textarea>
+  </div>
+</div>
+
+<!-- ===== OFERTA DE EMPLEO ===== -->
+<div id="tab-oferta" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Caso complejo · 17:15</div>
+    <h2>Oferta de empleo vs. tu perfil</h2>
+    <p>El análisis más práctico de la sesión: ¿encajas en esta oferta? ¿Cómo lo presentas?</p>
+  </div>
+
+  <div class="callout">
+    <strong>Para qué sirve este análisis</strong>
+    En lugar de leer una oferta y hacerte una idea vaga de si encajas, la IA hace el análisis punto por punto: qué requisitos cumples, cuáles te faltan, y cómo enfocar tu candidatura para destacar lo que sí tienes.
+  </div>
+
+  <div class="prompt-box">
+    "Aquí tienes una oferta de trabajo: <span class="bracket">[pegar texto de la oferta]</span>. Mi perfil profesional: <span class="bracket">[descripción]</span>. Dime: qué requisitos cumplo, cuáles no tengo, y cómo presentaría mi candidatura destacando mis puntos fuertes."
+    <button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button>
+  </div>
+
+  <!-- La oferta -->
+  <div class="card accent-top">
+    <div class="card-label">La oferta que has analizado</div>
+    <h3>Introduce los datos de tu análisis</h3>
+
+    <span class="field-label">Puesto y empresa de la oferta</span>
+    <input type="text" data-key="oferta_puesto" placeholder="Ej: Auxiliar Administrativo en Clínica Euskalzain, Bilbao…">
+
+    <span class="field-label">Requisitos principales que pide la oferta</span>
+    <textarea data-key="oferta_requisitos" placeholder="Lista los requisitos que has visto en la oferta: titulación, experiencia, idiomas, habilidades específicas…"></textarea>
+  </div>
+
+  <!-- El análisis -->
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Requisito de la oferta</th>
+          <th>¿Lo cumples? ¿Cómo?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="text" data-key="req1_nombre" placeholder="Requisito 1…" style="border:none;background:transparent;padding:4px 0;font-size:13.5px;"></td><td><textarea data-key="req1_resp" style="min-height:60px;border:none;background:transparent;font-size:13px;" placeholder="Sí/No/Parcial — explica cómo…"></textarea></td></tr>
+        <tr><td><input type="text" data-key="req2_nombre" placeholder="Requisito 2…" style="border:none;background:transparent;padding:4px 0;font-size:13.5px;"></td><td><textarea data-key="req2_resp" style="min-height:60px;border:none;background:transparent;font-size:13px;" placeholder="Sí/No/Parcial — explica cómo…"></textarea></td></tr>
+        <tr><td><input type="text" data-key="req3_nombre" placeholder="Requisito 3…" style="border:none;background:transparent;padding:4px 0;font-size:13.5px;"></td><td><textarea data-key="req3_resp" style="min-height:60px;border:none;background:transparent;font-size:13px;" placeholder="Sí/No/Parcial — explica cómo…"></textarea></td></tr>
+        <tr><td><input type="text" data-key="req4_nombre" placeholder="Requisito 4…" style="border:none;background:transparent;padding:4px 0;font-size:13.5px;"></td><td><textarea data-key="req4_resp" style="min-height:60px;border:none;background:transparent;font-size:13px;" placeholder="Sí/No/Parcial — explica cómo…"></textarea></td></tr>
+        <tr><td><input type="text" data-key="req5_nombre" placeholder="Requisito 5…" style="border:none;background:transparent;padding:4px 0;font-size:13.5px;"></td><td><textarea data-key="req5_resp" style="min-height:60px;border:none;background:transparent;font-size:13px;" placeholder="Sí/No/Parcial — explica cómo…"></textarea></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Estrategia -->
+  <div class="card green-left">
+    <div class="card-label">Estrategia de candidatura</div>
+    <h3>¿Cómo enfocarías tu candidatura?</h3>
+
+    <span class="field-label">Lo que ChatGPT dice que deberías destacar</span>
+    <textarea data-key="oferta_destacar" placeholder="Pega o resume el consejo de la IA sobre cómo presentar tu candidatura…"></textarea>
+
+    <span class="field-label">¿Estás de acuerdo? ¿Cambiarías algo?</span>
+    <textarea data-key="oferta_desacuerdo" placeholder="Tu criterio propio: ¿la IA ha entendido bien tu perfil? ¿Ha sugerido algo que no encaja contigo?…"></textarea>
+
+    <span class="field-label">¿Presentarías tu candidatura a esta oferta? ¿Por qué?</span>
+    <input type="text" data-key="oferta_decision" placeholder="Ej: sí, porque cumplo 4 de 5 requisitos y puedo compensar el que falta con mi experiencia en X…">
+  </div>
+</div>
+
+<!-- ===== REFLEXIÓN CRÍTICA ===== -->
+<div id="tab-critica" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Reflexión crítica · 17:55</div>
+    <h2>¿Cuándo hay que verificar?</h2>
+    <p>La IA comete errores con documentos. Aprender a detectarlos es tan importante como saber usarla.</p>
+  </div>
+
+  <div class="callout warning">
+    <strong>⚠ Los errores más peligrosos no son los obvios</strong>
+    Un error grosero lo ves enseguida. El peligro real son los errores plausibles: datos que parecen correctos, cifras ligeramente distintas, fechas casi bien. Esos son los que se cuelan.
+  </div>
+
+  <!-- Checklist de verificación -->
+  <div class="card accent-top">
+    <div class="card-label">Checklist de verificación crítica</div>
+    <h3>Antes de usar lo que ha extraído la IA de un documento</h3>
+
+    <div class="check-row">
+      <div class="chk" data-key="crit_check1" onclick="toggleChk(this)"></div>
+      <div class="chk-content">
+        <strong>¿He verificado los datos numéricos?</strong>
+        <span>Cifras, importes, fechas, porcentajes — siempre comprueba con el original</span>
+      </div>
+    </div>
+    <div class="check-row">
+      <div class="chk" data-key="crit_check2" onclick="toggleChk(this)"></div>
+      <div class="chk-content">
+        <strong>¿Ha inventado algún dato que no estaba en el documento?</strong>
+        <span>Las alucinaciones en documentos suelen ser información "plausible" que la IA añade por su cuenta</span>
+      </div>
+    </div>
+    <div class="check-row">
+      <div class="chk" data-key="crit_check3" onclick="toggleChk(this)"></div>
+      <div class="chk-content">
+        <strong>¿La IA ha interpretado o solo ha leído?</strong>
+        <span>Hay diferencia entre "dice X" (lectura) y "significa Y" (interpretación). La segunda puede ser incorrecta</span>
+      </div>
+    </div>
+    <div class="check-row">
+      <div class="chk" data-key="crit_check4" onclick="toggleChk(this)"></div>
+      <div class="chk-content">
+        <strong>¿El documento es legible? ¿La imagen tenía buena calidad?</strong>
+        <span>Una imagen borrosa o un PDF escaneado mal generan muchos más errores</span>
+      </div>
+    </div>
+    <div class="check-row">
+      <div class="chk" data-key="crit_check5" onclick="toggleChk(this)"></div>
+      <div class="chk-content">
+        <strong>¿Las consecuencias de un error serían graves?</strong>
+        <span>Para firmar algo, para tomar una decisión económica o legal: siempre verifica por ti mismo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tipos de error -->
+  <div class="card red-left">
+    <div class="card-label">Debate · Tipos de error más peligrosos</div>
+    <h3>¿Qué errores son más difíciles de detectar?</h3>
+    <p>Después del debate en clase, anota tus conclusiones.</p>
+
+    <span class="field-label">El tipo de error más peligroso que has identificado</span>
+    <input type="text" data-key="crit_error_tipo" placeholder="Ej: cuando inventa una cláusula que suena real en un contrato, cuando cambia una cifra por otra similar…">
+
+    <span class="field-label">¿En qué situación de tu vida real sería más arriesgado confiar sin verificar?</span>
+    <textarea data-key="crit_situacion" placeholder="Ej: si analizo el contrato de mi piso, si reviso mi nómina, si me fío del análisis de una oferta de empleo sin contrastar…"></textarea>
+
+    <span class="field-label">¿Cuándo SÍ confiarías sin verificar? (si existe ese caso)</span>
+    <textarea data-key="crit_si_confiar" placeholder="Ej: para una primera impresión general del documento, para decidir si merece la pena leerlo entero, para buscar una sección específica…"></textarea>
+  </div>
+
+  <!-- Mi regla personal -->
+  <div class="card gold-left">
+    <div class="card-label">Mi regla personal</div>
+    <h3>¿Cuándo verifico y cuándo no?</h3>
+    <p>Formula tu propia regla de uso responsable para el análisis de documentos con IA.</p>
+    <span class="field-label">Completa: "Usaré la IA para analizar documentos cuando… pero siempre verificaré si…"</span>
+    <textarea data-key="crit_regla" placeholder="Usaré la IA para analizar documentos cuando… pero siempre verificaré si…"></textarea>
+  </div>
+</div>
+
+<!-- ===== CIERRE ===== -->
+<div id="tab-cierre" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Cierre · 18:10</div>
+    <h2>Un documento real de tu vida</h2>
+    <p>La sesión termina con una aplicación concreta a tu realidad, no con teoría.</p>
+  </div>
+
+  <div class="callout tip">
+    <strong>El objetivo del cierre</strong>
+    No salgas de aquí pensando "qué interesante". Sal con un documento real identificado que vas a analizar con ChatGPT esta semana.
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Mi próxima aplicación real</div>
+    <h3>¿Qué documento analizarías esta semana?</h3>
+
+    <span class="field-label">El documento real de tu vida que analizarías con ChatGPT</span>
+    <input type="text" data-key="cierre_documento" placeholder="Ej: mi contrato de alquiler, las condiciones de mi seguro, la última oferta de empleo que recibí, mi nómina…">
+
+    <span class="field-label">¿Qué información específica quieres extraer de él?</span>
+    <textarea data-key="cierre_info" placeholder="Ej: si hay cláusulas abusivas, qué cubre realmente mi seguro, qué requisitos no cumplo, si me están pagando correctamente…"></textarea>
+
+    <span class="field-label">¿Qué prompt usarías para empezar?</span>
+    <textarea data-key="cierre_prompt" placeholder="Escribe aquí el prompt que usarías. Intenta aplicar lo aprendido hoy: sé específico, pide lo que necesitas, indica qué formato quieres…"></textarea>
+  </div>
+
+  <div class="card green-left">
+    <div class="card-label">Reflexión final de la sesión</div>
+    <h3>¿Qué cambió hoy?</h3>
+
+    <span class="field-label">Lo más útil que has aprendido hoy</span>
+    <input type="text" data-key="cierre_util" placeholder="Ej: que puedo subir fotos de documentos y la IA los lee, que siempre hay que verificar los datos numéricos…">
+
+    <span class="field-label">Lo más sorprendente</span>
+    <input type="text" data-key="cierre_sorpresa" placeholder="Ej: lo precisa que fue con mi factura, lo fácil que fue comparar mi perfil con la oferta…">
+
+    <span class="field-label">Algo que harás diferente a partir de ahora</span>
+    <input type="text" data-key="cierre_cambio" placeholder="Ej: antes de leer un contrato entero le pediré a la IA un resumen de los puntos clave…">
+
+    <span class="field-label">Una pregunta que todavía tienes sobre el análisis de documentos con IA</span>
+    <input type="text" data-key="cierre_pregunta" placeholder="Algo que no ha quedado claro o que te genera dudas sobre fiarte de la IA con documentos…">
+  </div>
+
+  <div class="reflection">
+    <h3>💬 Comparte en voz alta</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:14px;">Esta es la frase que compartirás con el grupo:</p>
+    <span class="field-label">Completa: "El documento real de mi vida que analizaré con ChatGPT es…"</span>
+    <textarea data-key="cierre_frase" placeholder="El documento real de mi vida que analizaré con ChatGPT es… porque quiero saber…"></textarea>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+    <button class="btn btn-accent" onclick="downloadFullHTML()" style="font-size:14px;padding:13px 28px;">⬇ Descargar cuaderno completo</button>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Guardado</div>
+
+<!-- WARNING MODAL -->
+<div class="modal-overlay" id="warnModal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <h3>¿Seguro que quieres salir?</h3>
+    <p>Estás a punto de abrir un enlace externo.<br><br>
+    Tu progreso <strong>sobrevivirá si recargas esta página</strong>, pero si cierras la pestaña lo perderás. Descarga el cuaderno antes de salir para tenerlo a salvo.</p>
+    <div class="modal-actions">
+      <button class="modal-btn-stay" onclick="closeWarnModal();downloadFullHTML()">⬇ Descargar y salir</button>
+      <button class="modal-btn-stay" onclick="closeWarnModal()" style="background:var(--sky);">⬅ Quedarme</button>
+      <button class="modal-btn-leave" id="modalLeaveBtn">Salir sin guardar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="dl-bar">
+  <span class="dl-note">Sesión 4 · ChatGPT e IA · Lanbide</span>
+  <button class="btn btn-accent" onclick="downloadFullHTML()">⬇ Descargar cuaderno</button>
+</div>
+
+<script>
+const STORAGE_KEY = 'sesion4_lanbide_v1';
+let hasUnsavedChanges = false;
+let pendingUrl = null;
+let saveDebounce = null;
+
+// ====== TABS ======
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ====== COLLECT DATA ======
+function getAllData() {
+  const data = {};
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (el.classList.contains('chk')) {
+      data[key] = el.classList.contains('on');
+    } else if (el.classList.contains('doc-card')) {
+      // handled separately
+    } else if (el.tagName === 'SELECT') {
+      data[key] = el.value;
+    } else {
+      data[key] = el.value || '';
+    }
+  });
+  // doc type selected
+  const sel = document.querySelector('.doc-card.selected');
+  if (sel) data['reto_doctype_sel'] = sel.dataset.val;
+  return data;
+}
+
+function applyData(data) {
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (!(key in data)) return;
+    if (el.classList.contains('chk')) {
+      if (data[key]) el.classList.add('on');
+    } else if (el.classList.contains('doc-card')) {
+      // skip
+    } else if (el.tagName === 'SELECT') {
+      el.value = data[key];
+    } else {
+      el.value = data[key];
+    }
+  });
+  if (data['reto_doctype_sel']) {
+    document.querySelectorAll('.doc-card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.val === data['reto_doctype_sel']);
+    });
+  }
+}
+
+// ====== SAVE TO URL HASH ======
+function saveAll() {
+  document.getElementById('unsavedDot').classList.remove('hidden');
+  document.getElementById('saveDot').classList.add('saving');
+  document.getElementById('saveText').textContent = 'Guardando…';
+  hasUnsavedChanges = true;
+
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(() => {
+    try {
+      const json = JSON.stringify(getAllData());
+      const encoded = btoa(unescape(encodeURIComponent(json)));
+      history.replaceState(null, '', '#' + encoded);
+      try { sessionStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+      try { localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+      document.getElementById('saveDot').classList.remove('saving');
+      document.getElementById('saveDot').style.background = 'var(--green)';
+      document.getElementById('saveText').textContent = '✓ Guardado — si recargas la página, tus datos se restaurarán';
+    } catch(e) {
+      document.getElementById('saveText').textContent = '⚠ Error al guardar — descarga el cuaderno';
+    }
+  }, 800);
+}
+
+function loadAll() {
+  try {
+    const hash = location.hash.replace('#', '');
+    if (hash && hash.length > 10) {
+      const json = decodeURIComponent(escape(atob(hash)));
+      applyData(JSON.parse(json));
+      document.getElementById('saveText').textContent = '✓ Progreso restaurado correctamente';
+      document.getElementById('saveDot').style.background = 'var(--green)';
+      return true;
+    }
+  } catch(e) {}
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) { applyData(JSON.parse(raw)); return true; }
+  } catch(e) {}
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { applyData(JSON.parse(raw)); return true; }
+  } catch(e) {}
+  return false;
+}
+
+function confirmClear() {
+  if (confirm('¿Seguro que quieres borrar todo el progreso? Esta acción no se puede deshacer.')) {
+    history.replaceState(null, '', location.pathname + location.search);
+    try { sessionStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    document.querySelectorAll('[data-key]').forEach(el => {
+      if (el.classList.contains('chk')) el.classList.remove('on');
+      else if (el.classList.contains('doc-card')) el.classList.remove('selected');
+      else if (el.tagName === 'SELECT') el.value = '';
+      else el.value = '';
+    });
+    document.getElementById('unsavedDot').classList.add('hidden');
+    hasUnsavedChanges = false;
+    document.getElementById('saveDot').style.background = 'var(--gold)';
+    document.getElementById('saveText').textContent = 'Progreso borrado';
+    showToast('🗑️ Progreso borrado');
+  }
+}
+
+// ====== DOC SELECTOR ======
+function selectDoc(el) {
+  document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  saveAll();
+}
+
+// ====== CHECKLIST ======
+function toggleChk(el) { el.classList.toggle('on'); saveAll(); }
+
+// ====== COPY PROMPT ======
+function copyPrompt(btn) {
+  const box = btn.closest('.prompt-box');
+  const text = box.innerText.replace('COPIAR','').replace('PROMPT\n','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ COPIADO';
+    setTimeout(() => btn.textContent = 'COPIAR', 2000);
+  }).catch(() => {
+    btn.textContent = 'ERROR';
+    setTimeout(() => btn.textContent = 'COPIAR', 2000);
+  });
+}
+
+// ====== MODAL ======
+function warnLeave(e, url) {
+  e.preventDefault();
+  pendingUrl = url;
+  document.getElementById('warnModal').classList.add('show');
+  document.getElementById('modalLeaveBtn').onclick = () => {
+    document.getElementById('warnModal').classList.remove('show');
+    window.open(pendingUrl, '_blank');
+    pendingUrl = null;
+  };
+}
+function closeWarnModal() {
+  document.getElementById('warnModal').classList.remove('show');
+  pendingUrl = null;
+}
+document.getElementById('warnModal').addEventListener('click', function(e) {
+  if (e.target === this) closeWarnModal();
+});
+document.addEventListener('click', function(e) {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const href = a.getAttribute('href');
+  if (!href || href.startsWith('#')) return;
+  if (a.target === '_blank') warnLeave(e, href);
+});
+
+// ====== TOAST ======
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ====== DOWNLOAD HTML ======
+function downloadFullHTML() {
+  const data = getAllData();
+  const clone = document.documentElement.cloneNode(true);
+  clone.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (!(key in data)) return;
+    if (el.classList.contains('chk')) {
+      if (data[key]) el.classList.add('on');
+    } else if (el.tagName === 'SELECT') {
+      el.value = data[key];
+      Array.from(el.options).forEach(o => { o.selected = o.value === data[key]; });
+    } else if (!el.classList.contains('doc-card')) {
+      el.value = data[key];
+      if (el.tagName === 'TEXTAREA') el.textContent = data[key];
+    }
+  });
+  if (data['reto_doctype_sel']) {
+    clone.querySelectorAll('.doc-card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.val === data['reto_doctype_sel']);
+    });
+  }
+  clone.querySelectorAll('.section').forEach(s => s.style.display = 'block');
+  const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sesion4_archivos_imagenes_datos.html'; a.click();
+  URL.revokeObjectURL(url);
+  hasUnsavedChanges = false;
+  document.getElementById('unsavedDot').classList.add('hidden');
+  showToast('⬇ Cuaderno descargado — tu progreso está a salvo');
+}
+
+// ====== AUTO SAVE ======
+document.addEventListener('input', saveAll);
+document.addEventListener('change', saveAll);
+
+// ====== INIT ======
+window.addEventListener('load', () => {
+  const restored = loadAll();
+  if (!restored) {
+    document.getElementById('saveText').textContent = 'Empieza a escribir — tu progreso se guardará automáticamente';
+  }
+});
+</script>
+</body>
+</html>
