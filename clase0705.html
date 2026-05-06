@@ -248,7 +248,7 @@ textarea.tall { min-height: 130px; }
       <strong>¿Vas a cerrar o cambiar de página?</strong>
       Descarga el cuaderno antes de salir para no perder tu trabajo.
     </span>
-    <button class="btn btn-accent" onclick="downloadFullHTML()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora</button>
+    <button class="btn btn-accent" onclick="downloadFullHTML()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora PDF</button>
   </div>
 </div>
 
@@ -680,7 +680,7 @@ textarea.tall { min-height: 130px; }
   </div>
 
   <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-    <button class="btn btn-accent" onclick="downloadFullHTML()" style="font-size:14px;padding:13px 28px;">⬇ Descargar cuaderno PDF completo</button>
+    <button class="btn btn-accent" onclick="downloadFullHTML()" style="font-size:14px;padding:13px 28px;">⬇ Descargar cuaderno completo PDF</button>
   </div>
 </div>
 
@@ -888,151 +888,312 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ====== DOWNLOAD AS PDF (html2canvas → jsPDF) ======
-async function downloadFullHTML() {
-  showToast('⏳ Generando PDF… espera unos segundos');
-  document.getElementById('saveText').textContent = 'Generando PDF…';
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const pageW = 210, pageH = 297;
-
-  // Tab order and labels
-  const tabs = [
-    { id: 'tab-reto',     label: '🎯 Reto inicial' },
-    { id: 'tab-imagenes', label: '🖼️ Imágenes' },
-    { id: 'tab-tablas',   label: '📊 Tablas' },
-    { id: 'tab-oferta',   label: '💼 Oferta de empleo' },
-    { id: 'tab-critica',  label: '🧠 Reflexión crítica' },
-    { id: 'tab-cierre',   label: '✅ Cierre' },
-  ];
-
-  // Show all sections temporarily for capture, hide UI chrome
-  const allSections = document.querySelectorAll('.section');
-  const saveBar = document.querySelector('.save-bar');
-  const reloadBanner = document.querySelector('.reload-banner');
-  const navWrapper = document.querySelector('.nav-wrapper');
-  const dlBar = document.querySelector('.dl-bar');
-  const toast = document.getElementById('toast');
-  const modal = document.querySelector('.modal-overlay');
-
-  // Hide chrome
-  [saveBar, reloadBanner, navWrapper, dlBar, toast, modal].forEach(el => { if(el) el.style.display = 'none'; });
-
-  // Show all sections
-  allSections.forEach(s => { s.style.display = 'block'; s.style.pageBreakBefore = 'auto'; });
-
-  // Add section title dividers for PDF
-  const dividers = [];
-  tabs.forEach(tab => {
-    const section = document.getElementById(tab.id);
-    if (!section) return;
-    const div = document.createElement('div');
-    div.className = 'pdf-section-title';
-    div.style.cssText = 'background:#132347;color:#38bdf8;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px 48px;margin:0;';
-    div.textContent = tab.label;
-    section.parentNode.insertBefore(div, section);
-    dividers.push(div);
-  });
-
-  // Capture the full main content area
-  const mainEl = document.querySelector('.main');
-  const headerEl = document.querySelector('.header');
-
+// ====== DOWNLOAD PDF (jsPDF texto puro) ======
+function downloadFullHTML() {
   try {
-    // Capture header
-    const headerCanvas = await html2canvas(headerEl, {
-      scale: 1.8,
-      useCORS: true,
-      backgroundColor: '#080e1a',
-      logging: false,
-    });
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const d = getAllData();
+    const sel = document.querySelector('.doc-card.selected');
+    if (sel) d['reto_doctype_sel'] = sel.dataset.val;
 
-    // Capture main content
-    const mainCanvas = await html2canvas(mainEl, {
-      scale: 1.8,
-      useCORS: true,
-      backgroundColor: '#f8fbff',
-      logging: false,
-      windowWidth: 900,
-    });
+    const pW = 210, pH = 297;
+    const ml = 15, mr = 15, cW = pW - ml - mr;
+    let y = 0;
 
-    // Header on first page
-    const headerImgH = (headerCanvas.height * pageW) / headerCanvas.width;
-    doc.addImage(headerCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, pageW, Math.min(headerImgH, 60));
-
-    // Slice main canvas into A4 pages
-    const imgW = pageW;
-    const imgH = (mainCanvas.height * imgW) / mainCanvas.width;
-    const firstPageOffset = Math.min(headerImgH, 60);
-    const usableFirst = pageH - firstPageOffset - 6;
-    const usableRest = pageH - 6;
-
-    // How many px correspond to each mm on the canvas
-    const pxPerMm = mainCanvas.width / imgW;
-
-    let yMm = firstPageOffset;    // current Y position on current PDF page (mm)
-    let srcYPx = 0;               // source Y in canvas (px)
-    let pageIndex = 0;
-
-    while (srcYPx < mainCanvas.height) {
-      const usableMm = pageIndex === 0 ? usableFirst : usableRest;
-      const sliceHeightPx = Math.min(usableMm * pxPerMm, mainCanvas.height - srcYPx);
-      const sliceHeightMm = sliceHeightPx / pxPerMm;
-
-      // Create a slice canvas
-      const sliceCanvas = document.createElement('canvas');
-      sliceCanvas.width = mainCanvas.width;
-      sliceCanvas.height = sliceHeightPx;
-      const ctx = sliceCanvas.getContext('2d');
-      ctx.drawImage(mainCanvas, 0, -srcYPx);
-
-      doc.addImage(sliceCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, yMm, imgW, sliceHeightMm);
-
-      srcYPx += sliceHeightPx;
-      if (srcYPx < mainCanvas.height) {
-        doc.addPage();
-        yMm = 3;
-        pageIndex++;
-      }
+    // ── helpers ──────────────────────────────────────────────
+    function newPage() {
+      // footer on current page
+      doc.setFillColor(8, 14, 26);
+      doc.rect(0, pH - 9, pW, 9, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(120, 160, 200);
+      const p = doc.internal.getNumberOfPages();
+      doc.text('ChatGPT e IA · Lanbide · Sesión 4', ml, pH - 3);
+      doc.text(String(p), pW - mr, pH - 3, { align: 'right' });
+      doc.addPage();
+      y = 14;
     }
 
-    // Footer on each page
+    function need(h) { if (y + h > pH - 14) newPage(); }
+
+    function sectionHeader(title, sub) {
+      need(22);
+      doc.setFillColor(13, 27, 53);
+      doc.rect(0, y - 2, pW, 18, 'F');
+      doc.setFillColor(37, 99, 168);
+      doc.rect(0, y + 16, pW, 1.5, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(240, 247, 255);
+      doc.text(title, ml, y + 9);
+      if (sub) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(120, 160, 200);
+        doc.text(sub, ml, y + 14.5);
+      }
+      y += 24;
+    }
+
+    function fieldLabel(label) {
+      need(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(74, 107, 138);
+      doc.text(label.toUpperCase(), ml, y);
+      y += 5;
+    }
+
+    function fieldValue(val, empty) {
+      const text = (val && val.trim()) ? val.trim() : (empty || '(sin respuesta)');
+      const isEmpty = !(val && val.trim());
+      const lines = doc.splitTextToSize(text, cW - 4);
+      const bh = lines.length * 5 + 6;
+      need(bh + 2);
+      doc.setFillColor(isEmpty ? 250 : 248, isEmpty ? 250 : 251, 255);
+      doc.setDrawColor(197, 221, 240);
+      doc.rect(ml, y, cW, bh, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(isEmpty ? 180 : 15, isEmpty ? 180 : 32, isEmpty ? 180 : 64);
+      doc.text(lines, ml + 3, y + 5);
+      y += bh + 5;
+    }
+
+    function field(label, key, empty) {
+      fieldLabel(label);
+      fieldValue(d[key] || '', empty);
+    }
+
+    function checkRow(label, key) {
+      need(9);
+      const on = d[key] === true || d[key] === 'true';
+      doc.setFillColor(on ? 16 : 240, on ? 185 : 240, on ? 129 : 240);
+      doc.rect(ml, y - 3.5, 5, 5, 'F');
+      doc.setFont('helvetica', on ? 'bold' : 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(on ? 16 : 100, on ? 185 : 100, on ? 129 : 100);
+      doc.text(on ? '✓' : '—', ml + 1, y + 0.5);
+      doc.setTextColor(15, 32, 64);
+      doc.setFont('helvetica', 'normal');
+      const lines = doc.splitTextToSize(label, cW - 10);
+      doc.text(lines, ml + 8, y + 0.5);
+      y += lines.length * 5 + 3;
+    }
+
+    function divider() {
+      need(8);
+      doc.setDrawColor(197, 221, 240);
+      doc.line(ml, y, pW - mr, y);
+      y += 6;
+    }
+
+    function twoCol(l1, k1, l2, k2) {
+      const half = (cW - 5) / 2;
+      fieldLabel(l1);
+      const v1 = d[k1] || '';
+      const v2 = d[k2] || '';
+      const lines1 = doc.splitTextToSize(v1.trim() || '—', half - 4);
+      const lines2 = doc.splitTextToSize(v2.trim() || '—', half - 4);
+      const bh = Math.max(lines1.length, lines2.length) * 5 + 6;
+      need(bh + 10);
+      // col 2 label
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(74, 107, 138);
+      doc.text(l2.toUpperCase(), ml + half + 5, y - 5);
+      // boxes
+      doc.setFillColor(248, 251, 255);
+      doc.setDrawColor(197, 221, 240);
+      doc.rect(ml, y, half, bh, 'FD');
+      doc.rect(ml + half + 5, y, half, bh, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(15, 32, 64);
+      doc.text(lines1, ml + 3, y + 5);
+      doc.text(lines2, ml + half + 8, y + 5);
+      y += bh + 5;
+    }
+
+    // ── PAGE 1: HEADER COVER ──────────────────────────────────
+    doc.setFillColor(8, 14, 26);
+    doc.rect(0, 0, pW, 52, 'F');
+    doc.setFillColor(37, 99, 168);
+    doc.rect(0, 52, pW, 2.5, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(56, 189, 248);
+    doc.text('MÓDULO 2 · SESIÓN 4 · LANBIDE', ml, 14);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(240, 247, 255);
+    doc.text('ChatGPT con archivos,', ml, 27);
+    doc.text('imágenes y datos', ml, 37);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(120, 160, 200);
+    doc.text('Cuaderno de trabajo · Jueves 15:30–18:30', ml, 47);
+    y = 62;
+
+    // ── SECCIÓN 1: RETO INICIAL ──────────────────────────────
+    sectionHeader('1. RETO INICIAL', '15:30 — Extrae 5 datos clave sin leer el documento');
+
+    field('Tipo de documento usado', 'reto_doctype_sel');
+    field('¿De qué trata el documento?', 'reto_doc_desc');
+
+    divider();
+    fieldLabel('Los 5 datos extraídos por ChatGPT y verificación');
+    need(10);
+
+    const datos = [
+      ['reto_d1','reto_v1','reto_c1'],
+      ['reto_d2','reto_v2','reto_c2'],
+      ['reto_d3','reto_v3','reto_c3'],
+      ['reto_d4','reto_v4','reto_c4'],
+      ['reto_d5','reto_v5','reto_c5'],
+    ];
+    const estadoLabel = { correcto: '✓ Correcto', error: '✗ Error', parcial: '~ Parcial', '': '—' };
+
+    datos.forEach((row, i) => {
+      const dato = d[row[0]] || '';
+      const verif = d[row[1]] || '';
+      const estado = d[row[2]] || '';
+      if (!dato && !verif) return;
+      need(14);
+      const col = cW / 3 - 2;
+      const bh = 12;
+      doc.setFillColor(i % 2 === 0 ? 240 : 248, i % 2 === 0 ? 247 : 251, 255);
+      doc.setDrawColor(197, 221, 240);
+      doc.rect(ml, y, col, bh, 'FD');
+      doc.rect(ml + col + 2, y, col, bh, 'FD');
+      doc.rect(ml + (col + 2) * 2, y, col, bh, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 32, 64);
+      const d1lines = doc.splitTextToSize(dato || '—', col - 4);
+      const d2lines = doc.splitTextToSize(verif || '—', col - 4);
+      doc.text(d1lines, ml + 2, y + 4.5);
+      doc.text(d2lines, ml + col + 4, y + 4.5);
+      const ec = estado === 'correcto' ? [16,185,129] : estado === 'error' ? [239,68,68] : [245,158,11];
+      doc.setTextColor(...ec);
+      doc.setFont('helvetica', 'bold');
+      doc.text(estadoLabel[estado] || '—', ml + (col + 2) * 2 + 3, y + 4.5);
+      y += bh + 2;
+    });
+    y += 3;
+
+    divider();
+    field('¿Hubo alucinaciones o errores?', 'reto_aluc');
+    field('¿Cómo lo detectaste?', 'reto_deteccion');
+    field('¿Qué habría pasado si hubieras usado ese dato sin verificar?', 'reto_consecuencia');
+
+    // ── SECCIÓN 2: IMÁGENES ──────────────────────────────────
+    newPage();
+    sectionHeader('2. ANÁLISIS DE IMÁGENES', '16:05 — Sube una foto y extrae información');
+
+    field('¿Qué imagen subiste? (descríbela)', 'img1_desc');
+    field('¿Qué le pediste que hiciera?', 'img1_peticion');
+    field('Resultado de ChatGPT', 'img1_resultado');
+    field('¿Fue preciso? ¿Qué falló?', 'img1_precision');
+
+    divider();
+    field('Imagen para transcripción de texto', 'img2_desc');
+    field('¿La transcripción fue fiel al original?', 'img2_fidelidad');
+
+    divider();
+    field('Caso real donde esto te ahorraría tiempo', 'img_caso_real');
+    field('¿Cuándo NO confiarías sin verificar?', 'img_no_confiar');
+
+    // ── SECCIÓN 3: TABLAS ────────────────────────────────────
+    newPage();
+    sectionHeader('3. ANÁLISIS DE TABLAS Y DATOS', '16:30 — Sube una tabla y extrae conclusiones');
+
+    field('¿Qué tabla has analizado?', 'tab_desc');
+    field('¿Qué preguntaste sobre los datos?', 'tab_pregunta');
+    field('Respuesta de ChatGPT', 'tab_resultado');
+    field('¿Habrías tardado más manualmente?', 'tab_tiempo');
+    divider();
+    field('Reto extra: ¿probaste a pedir un gráfico? ¿Qué obtuviste?', 'tab_grafico');
+
+    // ── SECCIÓN 4: OFERTA DE EMPLEO ──────────────────────────
+    newPage();
+    sectionHeader('4. OFERTA DE EMPLEO VS. TU PERFIL', '17:15 — Análisis punto por punto');
+
+    field('Puesto y empresa de la oferta', 'oferta_puesto');
+    field('Requisitos principales de la oferta', 'oferta_requisitos');
+
+    divider();
+    fieldLabel('Tabla de requisitos — ¿los cumples?');
+
+    const reqKeys = [['req1_nombre','req1_resp'],['req2_nombre','req2_resp'],['req3_nombre','req3_resp'],['req4_nombre','req4_resp'],['req5_nombre','req5_resp']];
+    reqKeys.forEach(([nk, rk]) => {
+      if (!d[nk] && !d[rk]) return;
+      twoCol(d[nk] || 'Requisito', nk, '¿Lo cumples?', rk);
+    });
+
+    divider();
+    field('¿Qué dice ChatGPT que deberías destacar?', 'oferta_destacar');
+    field('¿Estás de acuerdo? ¿Qué cambiarías?', 'oferta_desacuerdo');
+    field('¿Presentarías tu candidatura? ¿Por qué?', 'oferta_decision');
+
+    // ── SECCIÓN 5: REFLEXIÓN CRÍTICA ─────────────────────────
+    newPage();
+    sectionHeader('5. REFLEXIÓN CRÍTICA', '17:55 — ¿Cuándo hay que verificar?');
+
+    fieldLabel('Checklist de verificación crítica');
+    y += 2;
+    checkRow('¿He verificado los datos numéricos?', 'crit_check1');
+    checkRow('¿Ha inventado algún dato que no estaba en el documento?', 'crit_check2');
+    checkRow('¿La IA ha interpretado o solo ha leído?', 'crit_check3');
+    checkRow('¿El documento era legible / la imagen de buena calidad?', 'crit_check4');
+    checkRow('¿Las consecuencias de un error serían graves?', 'crit_check5');
+
+    divider();
+    field('El tipo de error más peligroso que has identificado', 'crit_error_tipo');
+    field('¿En qué situación de tu vida real sería más arriesgado?', 'crit_situacion');
+    field('¿Cuándo SÍ confiarías sin verificar?', 'crit_si_confiar');
+    divider();
+    field('Mi regla personal de uso responsable', 'crit_regla');
+
+    // ── SECCIÓN 6: CIERRE ────────────────────────────────────
+    newPage();
+    sectionHeader('6. CIERRE', '18:10 — Un documento real de tu vida');
+
+    field('El documento real que analizarías esta semana', 'cierre_documento');
+    field('¿Qué información quieres extraer de él?', 'cierre_info');
+    field('El prompt que usarías para empezar', 'cierre_prompt');
+    divider();
+    field('Lo más útil que has aprendido hoy', 'cierre_util');
+    field('Lo más sorprendente', 'cierre_sorpresa');
+    field('Algo que harás diferente a partir de ahora', 'cierre_cambio');
+    field('Una pregunta que todavía tienes', 'cierre_pregunta');
+    divider();
+    fieldLabel('Frase final para compartir en voz alta');
+    fieldValue(d['cierre_frase'] || '', 'El documento real de mi vida que analizaré con ChatGPT es…');
+
+    // ── FOOTER ÚLTIMA PÁGINA ─────────────────────────────────
     const total = doc.internal.getNumberOfPages();
     for (let p = 1; p <= total; p++) {
       doc.setPage(p);
       doc.setFillColor(8, 14, 26);
-      doc.rect(0, pageH - 8, pageW, 8, 'F');
+      doc.rect(0, pH - 9, pW, 9, 'F');
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7);
       doc.setTextColor(120, 160, 200);
-      doc.text('ChatGPT e IA · Lanbide · Sesión 4', 10, pageH - 2.5);
-      doc.text(`${p} / ${total}`, pageW - 10, pageH - 2.5, { align: 'right' });
+      doc.text('ChatGPT e IA · Lanbide · Sesión 4 · ChatGPT con archivos, imágenes y datos', ml, pH - 3);
+      doc.text(`${p} / ${total}`, pW - mr, pH - 3, { align: 'right' });
     }
 
     doc.save('sesion4_archivos_imagenes_datos.pdf');
-    showToast('📄 PDF descargado correctamente');
     hasUnsavedChanges = false;
     document.getElementById('unsavedDot').classList.add('hidden');
+    showToast('📄 PDF descargado correctamente');
 
   } catch(err) {
-    showToast('⚠ Error al generar el PDF — prueba a descargar el cuaderno HTML');
     console.error(err);
-  } finally {
-    // Restore UI
-    [saveBar, reloadBanner, navWrapper, dlBar, toast, modal].forEach(el => { if(el) el.style.display = ''; });
-    dividers.forEach(d => d.remove());
-    // Restore only the active section visible
-    allSections.forEach(s => { s.style.display = ''; });
-    // Re-activate the current tab
-    const activeTab = document.querySelector('.tab-btn.active');
-    if (activeTab) {
-      const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
-      document.getElementById('tab-' + tabId).classList.add('active');
-    } else {
-      document.getElementById('tab-reto').style.display = 'block';
-    }
-    document.getElementById('saveText').textContent = '✓ Guardado — si recargas la página, tus datos se restaurarán';
+    showToast('⚠ Error: ' + err.message);
   }
 }
 
