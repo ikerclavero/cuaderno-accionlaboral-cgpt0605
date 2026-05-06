@@ -6,6 +6,7 @@
 <title>Sesión 4 · ChatGPT con archivos, imágenes y datos</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
   --night: #080e1a;
@@ -888,37 +889,152 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ====== DOWNLOAD HTML ======
-function downloadFullHTML() {
-  const data = getAllData();
-  const clone = document.documentElement.cloneNode(true);
-  clone.querySelectorAll('[data-key]').forEach(el => {
-    const key = el.dataset.key;
-    if (!(key in data)) return;
-    if (el.classList.contains('chk')) {
-      if (data[key]) el.classList.add('on');
-    } else if (el.tagName === 'SELECT') {
-      el.value = data[key];
-      Array.from(el.options).forEach(o => { o.selected = o.value === data[key]; });
-    } else if (!el.classList.contains('doc-card')) {
-      el.value = data[key];
-      if (el.tagName === 'TEXTAREA') el.textContent = data[key];
-    }
+// ====== DOWNLOAD AS PDF (html2canvas → jsPDF) ======
+async function downloadFullHTML() {
+  showToast('⏳ Generando PDF… espera unos segundos');
+  document.getElementById('saveText').textContent = 'Generando PDF…';
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageW = 210, pageH = 297;
+
+  // Tab order and labels
+  const tabs = [
+    { id: 'tab-reto',     label: '🎯 Reto inicial' },
+    { id: 'tab-imagenes', label: '🖼️ Imágenes' },
+    { id: 'tab-tablas',   label: '📊 Tablas' },
+    { id: 'tab-oferta',   label: '💼 Oferta de empleo' },
+    { id: 'tab-critica',  label: '🧠 Reflexión crítica' },
+    { id: 'tab-cierre',   label: '✅ Cierre' },
+  ];
+
+  // Show all sections temporarily for capture, hide UI chrome
+  const allSections = document.querySelectorAll('.section');
+  const saveBar = document.querySelector('.save-bar');
+  const reloadBanner = document.querySelector('.reload-banner');
+  const navWrapper = document.querySelector('.nav-wrapper');
+  const dlBar = document.querySelector('.dl-bar');
+  const toast = document.getElementById('toast');
+  const modal = document.querySelector('.modal-overlay');
+
+  // Hide chrome
+  [saveBar, reloadBanner, navWrapper, dlBar, toast, modal].forEach(el => { if(el) el.style.display = 'none'; });
+
+  // Show all sections
+  allSections.forEach(s => { s.style.display = 'block'; s.style.pageBreakBefore = 'auto'; });
+
+  // Add section title dividers for PDF
+  const dividers = [];
+  tabs.forEach(tab => {
+    const section = document.getElementById(tab.id);
+    if (!section) return;
+    const div = document.createElement('div');
+    div.className = 'pdf-section-title';
+    div.style.cssText = 'background:#132347;color:#38bdf8;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px 48px;margin:0;';
+    div.textContent = tab.label;
+    section.parentNode.insertBefore(div, section);
+    dividers.push(div);
   });
-  if (data['reto_doctype_sel']) {
-    clone.querySelectorAll('.doc-card').forEach(c => {
-      c.classList.toggle('selected', c.dataset.val === data['reto_doctype_sel']);
+
+  // Capture the full main content area
+  const mainEl = document.querySelector('.main');
+  const headerEl = document.querySelector('.header');
+
+  try {
+    // Capture header
+    const headerCanvas = await html2canvas(headerEl, {
+      scale: 1.8,
+      useCORS: true,
+      backgroundColor: '#080e1a',
+      logging: false,
     });
+
+    // Capture main content
+    const mainCanvas = await html2canvas(mainEl, {
+      scale: 1.8,
+      useCORS: true,
+      backgroundColor: '#f8fbff',
+      logging: false,
+      windowWidth: 900,
+    });
+
+    // Header on first page
+    const headerImgH = (headerCanvas.height * pageW) / headerCanvas.width;
+    doc.addImage(headerCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, pageW, Math.min(headerImgH, 60));
+
+    // Slice main canvas into A4 pages
+    const imgW = pageW;
+    const imgH = (mainCanvas.height * imgW) / mainCanvas.width;
+    const firstPageOffset = Math.min(headerImgH, 60);
+    const usableFirst = pageH - firstPageOffset - 6;
+    const usableRest = pageH - 6;
+
+    // How many px correspond to each mm on the canvas
+    const pxPerMm = mainCanvas.width / imgW;
+
+    let yMm = firstPageOffset;    // current Y position on current PDF page (mm)
+    let srcYPx = 0;               // source Y in canvas (px)
+    let pageIndex = 0;
+
+    while (srcYPx < mainCanvas.height) {
+      const usableMm = pageIndex === 0 ? usableFirst : usableRest;
+      const sliceHeightPx = Math.min(usableMm * pxPerMm, mainCanvas.height - srcYPx);
+      const sliceHeightMm = sliceHeightPx / pxPerMm;
+
+      // Create a slice canvas
+      const sliceCanvas = document.createElement('canvas');
+      sliceCanvas.width = mainCanvas.width;
+      sliceCanvas.height = sliceHeightPx;
+      const ctx = sliceCanvas.getContext('2d');
+      ctx.drawImage(mainCanvas, 0, -srcYPx);
+
+      doc.addImage(sliceCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, yMm, imgW, sliceHeightMm);
+
+      srcYPx += sliceHeightPx;
+      if (srcYPx < mainCanvas.height) {
+        doc.addPage();
+        yMm = 3;
+        pageIndex++;
+      }
+    }
+
+    // Footer on each page
+    const total = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= total; p++) {
+      doc.setPage(p);
+      doc.setFillColor(8, 14, 26);
+      doc.rect(0, pageH - 8, pageW, 8, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(120, 160, 200);
+      doc.text('ChatGPT e IA · Lanbide · Sesión 4', 10, pageH - 2.5);
+      doc.text(`${p} / ${total}`, pageW - 10, pageH - 2.5, { align: 'right' });
+    }
+
+    doc.save('sesion4_archivos_imagenes_datos.pdf');
+    showToast('📄 PDF descargado correctamente');
+    hasUnsavedChanges = false;
+    document.getElementById('unsavedDot').classList.add('hidden');
+
+  } catch(err) {
+    showToast('⚠ Error al generar el PDF — prueba a descargar el cuaderno HTML');
+    console.error(err);
+  } finally {
+    // Restore UI
+    [saveBar, reloadBanner, navWrapper, dlBar, toast, modal].forEach(el => { if(el) el.style.display = ''; });
+    dividers.forEach(d => d.remove());
+    // Restore only the active section visible
+    allSections.forEach(s => { s.style.display = ''; });
+    // Re-activate the current tab
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab) {
+      const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+      document.getElementById('tab-' + tabId).classList.add('active');
+    } else {
+      document.getElementById('tab-reto').style.display = 'block';
+    }
+    document.getElementById('saveText').textContent = '✓ Guardado — si recargas la página, tus datos se restaurarán';
   }
-  clone.querySelectorAll('.section').forEach(s => s.style.display = 'block');
-  const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'sesion4_archivos_imagenes_datos.html'; a.click();
-  URL.revokeObjectURL(url);
-  hasUnsavedChanges = false;
-  document.getElementById('unsavedDot').classList.add('hidden');
-  showToast('⬇ Cuaderno descargado — tu progreso está a salvo');
 }
 
 // ====== AUTO SAVE ======
