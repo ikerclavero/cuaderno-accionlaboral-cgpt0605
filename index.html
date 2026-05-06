@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 3 · Memoria, Instrucciones Personalizadas y GPTs</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --night: #080e1a;
+  --deep: #0d1b35;
+  --navy: #132347;
+  --steel: #2563a8;
+  --sky: #3b82c4;
+  --ice: #7bb3e0;
+  --frost: #bdd8f0;
+  --mist: #deeef9;
+  --white: #f0f7ff;
+  --paper: #f8fbff;
+  --accent: #38bdf8;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --text: #0f2040;
+  --muted: #4a6b8a;
+  --border: #c5ddf0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--paper); color: var(--text); font-size: 15px; line-height: 1.7; }
+
+/* HEADER */
+.header { background: var(--night); padding: 0; position: relative; overflow: hidden; }
+.header-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 50%, rgba(37,99,168,0.35) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 20%, rgba(56,189,248,0.15) 0%, transparent 55%); }
+.header-bg::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(59,130,196,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,196,0.07) 1px, transparent 1px); background-size: 32px 32px; }
+.header-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 48px 48px 40px; }
+.session-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+.session-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+.header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px,5vw,46px); font-weight: 400; color: var(--white); line-height: 1.15; margin-bottom: 10px; }
+.header h1 em { font-style: italic; color: var(--accent); }
+.header-sub { color: rgba(176,210,240,0.7); font-size: 14px; margin-bottom: 28px; }
+.header-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 5px 14px; border-radius: 4px; font-size: 12px; color: rgba(176,210,240,0.85); font-weight: 500; }
+
+/* SAVE STATUS */
+.save-bar { background: var(--deep); border-bottom: 1px solid rgba(56,189,248,0.15); padding: 8px 48px; display: flex; align-items: center; gap: 10px; }
+.save-bar-inner { max-width: 860px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 10px; }
+.save-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; transition: background 0.3s; }
+.save-dot.saving { background: var(--gold); animation: pulse 1s infinite; }
+.save-text { font-size: 12px; color: rgba(176,210,240,0.5); flex: 1; }
+.btn-clear { background: none; border: 1px solid rgba(255,100,100,0.3); color: rgba(255,130,130,0.6); padding: 4px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.btn-clear:hover { border-color: rgba(255,100,100,0.6); color: rgba(255,130,130,0.9); }
+
+/* NAV */
+.nav-wrapper { background: var(--deep); border-bottom: 1px solid rgba(59,130,196,0.25); padding: 0 48px; overflow-x: auto; }
+.nav-tabs { display: flex; max-width: 860px; margin: 0 auto; }
+.tab-btn { padding: 15px 18px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: rgba(176,210,240,0.5); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: all 0.2s; }
+.tab-btn:hover { color: var(--ice); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* MAIN */
+.main { max-width: 860px; margin: 0 auto; padding: 40px 48px 120px; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* SECTION HEADER */
+.sec-head { margin-bottom: 32px; }
+.sec-kicker { font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--sky); margin-bottom: 8px; }
+.sec-head h2 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; color: var(--text); margin-bottom: 6px; }
+.sec-head p { color: var(--muted); font-size: 14px; }
+
+/* CALLOUT */
+.callout { background: linear-gradient(135deg, var(--deep) 0%, var(--navy) 100%); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 20px 24px; margin-bottom: 28px; color: var(--mist); font-size: 13.5px; line-height: 1.65; }
+.callout strong { display: block; color: var(--accent); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+
+/* PROMPT BOX */
+.prompt-box { background: var(--night); border: 1px solid rgba(59,130,196,0.3); border-radius: 8px; padding: 18px 22px; margin: 14px 0 20px; font-size: 13.5px; color: var(--frost); line-height: 1.7; font-style: italic; }
+.prompt-box::before { content: 'PROMPT'; display: block; font-style: normal; font-size: 9px; font-weight: 600; letter-spacing: 2.5px; color: var(--accent); margin-bottom: 8px; }
+.prompt-box .bracket { color: var(--gold); font-style: normal; }
+
+/* CARD */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 28px 32px; margin-bottom: 24px; }
+.card.accent-top { border-top: 3px solid var(--steel); }
+.card.accent-left { border-left: 3px solid var(--sky); }
+.card.green-left { border-left: 3px solid var(--green); }
+.card-label { font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--sky); margin-bottom: 10px; }
+.card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; font-weight: 400; margin-bottom: 8px; color: var(--text); }
+.card > p { color: var(--muted); font-size: 13.5px; margin-bottom: 16px; line-height: 1.6; }
+
+/* FORM FIELDS */
+.field-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; margin-top: 20px; }
+.field-label:first-of-type { margin-top: 0; }
+.field-hint { font-size: 12px; color: var(--ice); font-style: italic; margin-bottom: 7px; margin-top: -4px; display: block; font-weight: 400; text-transform: none; letter-spacing: 0; }
+textarea, input[type="text"] { width: 100%; border: 1.5px solid var(--border); border-radius: 6px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--paper); resize: vertical; transition: border-color 0.2s, box-shadow 0.2s; line-height: 1.6; }
+textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--steel); box-shadow: 0 0 0 3px rgba(37,99,168,0.1); }
+textarea { min-height: 90px; }
+textarea.tall { min-height: 130px; }
+textarea.xl { min-height: 180px; }
+
+/* CHECKLIST */
+.check-row { display: flex; align-items: flex-start; gap: 14px; padding: 15px 0; border-bottom: 1px solid var(--mist); }
+.check-row:last-child { border-bottom: none; }
+.chk { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; margin-top: 2px; background: var(--white); }
+.chk:hover { border-color: var(--steel); }
+.chk.on { background: var(--green); border-color: var(--green); }
+.chk.on::after { content: '✓'; color: white; font-size: 13px; font-weight: 700; }
+.chk-content strong { font-size: 14px; font-weight: 600; display: block; margin-bottom: 3px; }
+.chk-content span { font-size: 13px; color: var(--muted); }
+
+/* GPT LINKS */
+.gpt-link-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 14px; }
+.gpt-link-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.gpt-link-emoji { font-size: 24px; }
+.gpt-link-title { font-size: 15px; font-weight: 600; color: var(--text); display: block; }
+.gpt-link-desc { font-size: 12.5px; color: var(--muted); display: block; margin-top: 2px; }
+.gpt-link-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.btn-gpt { display: inline-flex; align-items: center; gap: 6px; background: var(--steel); color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 12.5px; font-weight: 600; transition: background 0.2s; font-family: 'DM Sans', sans-serif; border: none; cursor: pointer; }
+.btn-gpt:hover { background: var(--sky); }
+.btn-gpt.secondary { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.btn-gpt.secondary:hover { border-color: var(--sky); color: var(--sky); }
+.note-plus { font-size: 11.5px; color: var(--gold); background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+.search-tip { background: var(--mist); border-radius: 6px; padding: 10px 14px; font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.search-tip code { background: var(--frost); padding: 1px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; color: var(--steel); }
+
+/* GPT BUILDER */
+.gpt-builder { background: linear-gradient(160deg, var(--night) 0%, var(--deep) 60%, #0a1e3d 100%); border: 1px solid rgba(56,189,248,0.2); border-radius: 12px; padding: 36px 40px; margin-bottom: 28px; position: relative; overflow: hidden; }
+.gpt-builder::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(59,130,196,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,196,0.04) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
+.gpt-builder-inner { position: relative; z-index: 1; }
+.gpt-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid rgba(59,130,196,0.2); }
+.gpt-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--steel) 0%, var(--accent) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 4px 16px rgba(37,99,168,0.4); }
+.gpt-title-wrap small { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 3px; font-weight: 600; }
+.gpt-title-wrap h3 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white); font-weight: 400; }
+.gpt-field-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ice); margin-bottom: 7px; margin-top: 22px; }
+.gpt-field-label:first-of-type { margin-top: 0; }
+.gpt-field-desc { font-size: 12px; color: rgba(176,210,240,0.55); margin-bottom: 8px; display: block; margin-top: -4px; }
+.gpt-input, .gpt-textarea { width: 100%; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(59,130,196,0.25); border-radius: 6px; padding: 12px 15px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.65; transition: border-color 0.2s, box-shadow 0.2s; }
+.gpt-input::placeholder, .gpt-textarea::placeholder { color: rgba(176,210,240,0.3); }
+.gpt-input:focus, .gpt-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.1); background: rgba(255,255,255,0.08); }
+.gpt-textarea { resize: vertical; min-height: 100px; }
+.gpt-textarea.xl { min-height: 170px; }
+.gpt-textarea.xxl { min-height: 230px; }
+.starters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.starter-input { width: 100%; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(59,130,196,0.2); border-radius: 6px; padding: 10px 13px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13.5px; transition: border-color 0.2s; }
+.starter-input::placeholder { color: rgba(176,210,240,0.3); }
+.starter-input:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.08); }
+.func-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 10px; margin-top: 4px; }
+.func-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(59,130,196,0.2); border-radius: 6px; padding: 11px 14px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.func-item:hover { border-color: rgba(56,189,248,0.4); background: rgba(56,189,248,0.06); }
+.func-item.on { background: rgba(56,189,248,0.1); border-color: var(--accent); }
+.func-chk { width: 18px; height: 18px; border: 2px solid rgba(59,130,196,0.4); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.func-item.on .func-chk { background: var(--accent); border-color: var(--accent); }
+.func-item.on .func-chk::after { content: '✓'; color: var(--night); font-size: 11px; font-weight: 700; }
+.func-label { font-size: 13px; color: var(--frost); font-weight: 500; }
+.knowledge-box { background: rgba(255,255,255,0.04); border: 1.5px dashed rgba(59,130,196,0.3); border-radius: 6px; padding: 16px 18px; }
+.knowledge-note { font-size: 12px; color: rgba(176,210,240,0.45); margin-top: 10px; font-style: italic; }
+
+/* EXAMPLE GPT (legible sobre fondo oscuro) */
+.example-gpt { background: #f0f7ff; border: 1.5px solid #7bb3e0; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px; }
+.example-gpt > strong { display: block; color: #1a3a6b; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1.5px solid #c5ddf0; }
+.example-gpt .field-row { display: flex; gap: 8px; margin-bottom: 10px; font-size: 13px; color: #0f2040; padding: 9px 12px; background: white; border: 1px solid #c5ddf0; border-radius: 5px; line-height: 1.5; }
+.example-gpt .field-row b { color: #2563a8; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+
+/* IDEAS GRID */
+.ideas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin: 16px 0; }
+.idea-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.15s; text-align: center; }
+.idea-card:hover { border-color: var(--sky); background: var(--mist); transform: translateY(-2px); }
+.idea-emoji { font-size: 24px; margin-bottom: 8px; display: block; }
+.idea-name { font-size: 13px; font-weight: 600; color: var(--text); display: block; }
+.idea-desc { font-size: 12px; color: var(--muted); margin-top: 4px; display: block; line-height: 1.4; }
+
+/* REFLECTION */
+.reflection { background: var(--mist); border: 1px solid var(--frost); border-radius: 8px; padding: 24px 28px; margin-bottom: 24px; }
+.reflection h3 { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 14px; color: var(--deep); }
+
+/* DIVIDER */
+.divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 36px 0; }
+
+/* BOTTOM BAR */
+.dl-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--night); border-top: 1px solid rgba(56,189,248,0.2); padding: 12px 48px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; z-index: 200; }
+.dl-note { color: rgba(176,210,240,0.35); font-size: 12px; margin-right: auto; }
+.btn { padding: 10px 20px; border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: var(--steel); color: white; }
+.btn-primary:hover { background: var(--sky); }
+.btn-accent { background: var(--accent); color: var(--night); }
+.btn-accent:hover { background: #5dcffc; }
+.btn-store { background: rgba(56,189,248,0.12); border: 1.5px solid rgba(56,189,248,0.35); color: var(--accent); text-decoration: none; padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+.btn-store:hover { background: rgba(56,189,248,0.2); }
+
+/* RELOAD WARNING BANNER */
+.reload-banner { background: linear-gradient(90deg, #7c3700 0%, #92400e 100%); border-bottom: 2px solid var(--gold); padding: 10px 48px; }
+.reload-banner-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.reload-icon { font-size: 18px; flex-shrink: 0; }
+.reload-text { font-size: 12.5px; color: rgba(255,237,180,0.95); line-height: 1.4; flex: 1; min-width: 200px; }
+.reload-text strong { color: #fef3c7; display: block; margin-bottom: 2px; }
+
+/* CLASSROOM BUTTON */
+.btn-classroom { display: inline-flex; align-items: center; gap: 7px; background: #1a73e8; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 600; font-family: 'DM Sans', sans-serif; transition: background 0.2s; border: none; cursor: pointer; white-space: nowrap; }
+.btn-classroom:hover { background: #1557b0; }
+.btn-classroom svg { flex-shrink: 0; }
+
+/* TOAST */
+.toast { position: fixed; top: 20px; right: 20px; background: var(--deep); border: 1px solid var(--green); color: var(--frost); padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 999; transform: translateY(-60px); opacity: 0; transition: all 0.3s; pointer-events: none; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* WARNING MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(8,14,26,0.75); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal-box { background: var(--white); border-radius: 12px; padding: 32px 36px; max-width: 440px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.4); border-top: 4px solid var(--gold); }
+.modal-icon { font-size: 32px; margin-bottom: 12px; }
+.modal-box h3 { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); margin-bottom: 8px; }
+.modal-box p { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+.modal-box p strong { color: var(--text); }
+.modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.modal-btn-stay { background: var(--steel); color: white; border: none; padding: 11px 22px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.modal-btn-stay:hover { background: var(--sky); }
+.modal-btn-leave { background: none; border: 1.5px solid var(--border); color: var(--muted); padding: 11px 22px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.modal-btn-leave:hover { border-color: var(--muted); }
+
+/* UNSAVED INDICATOR */
+.unsaved-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); margin-left: 6px; vertical-align: middle; animation: pulse 1.5s infinite; }
+.unsaved-dot.hidden { display: none; }
+
+@media (max-width: 640px) {
+  .header-inner, .main { padding-left: 20px; padding-right: 20px; }
+  .nav-wrapper, .save-bar { padding: 0 16px; }
+  .dl-bar { padding: 12px 20px; flex-wrap: wrap; gap: 8px; }
+  .starters-grid { grid-template-columns: 1fr; }
+  .func-grid { grid-template-columns: 1fr; }
+  .gpt-builder { padding: 24px 20px; }
+  .dl-note { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-bg"></div>
+  <div class="header-inner">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+      <div class="session-badge" style="margin-bottom:0;">Módulo 2 · Sesión 3 · Miércoles</div>
+      <a href="https://classroom.google.com/u/1/c/ODE5MzExOTc3MzAw" target="_blank" class="btn-classroom" onclick="warnLeave(event, this.href)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#fff" fill-opacity=".15"/><path d="M12 4L4 8l8 4 8-4-8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ir a Classroom
+      </a>
+    </div>
+    <h1>Memoria, instrucciones<br>personalizadas y <em>GPTs</em></h1>
+    <div class="header-sub">Cuaderno de trabajo del alumno · 15:30–18:30</div>
+    <div class="header-chips">
+      <span class="chip">🧠 Instrucciones personalizadas</span>
+      <span class="chip">💾 Memoria de ChatGPT</span>
+      <span class="chip">🤖 Crea tu propio GPT</span>
+      <span class="chip">📄 Exporta la ficha</span>
+    </div>
+  </div>
+</div>
+
+<div class="save-bar">
+  <div class="save-bar-inner">
+    <div class="save-dot" id="saveDot"></div>
+    <span class="save-text" id="saveText">Tu progreso se guarda en la URL — sobrevive a recargas de página</span>
+    <span class="unsaved-dot hidden" id="unsavedDot" title="Hay cambios sin exportar"></span>
+    <button class="btn-clear" onclick="confirmClear()">Borrar todo</button>
+  </div>
+</div>
+
+<!-- RELOAD WARNING BANNER -->
+<div class="reload-banner">
+  <div class="reload-banner-inner">
+    <span class="reload-icon">💾</span>
+    <span class="reload-text">
+      <strong>¿Vas a cerrar o cambiar de página?</strong>
+      Descarga el cuaderno o exporta el PDF de tu GPT antes de salir para no perder tu trabajo.
+    </span>
+    <button class="btn btn-accent" onclick="downloadFullHTML()" style="padding:8px 16px; font-size:12.5px; white-space:nowrap;">⬇ Descargar ahora</button>
+  </div>
+</div>
+
+<div class="nav-wrapper">
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('reto',this)">🔍 Reto inicial</button>
+    <button class="tab-btn" onclick="showTab('instrucciones',this)">⚙️ Instrucciones</button>
+    <button class="tab-btn" onclick="showTab('memoria',this)">💾 Memoria</button>
+    <button class="tab-btn" id="gpts-tab-btn" onclick="showTab('gpts-explore',this)">🗂️ Explorar GPTs</button>
+    <button class="tab-btn gpt-tab-btn" onclick="showTab('gpt-builder',this)">🤖 Crear mi GPT</button>
+    <button class="tab-btn" onclick="showTab('cierre',this)">✅ Cierre</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== RETO INICIAL ===== -->
+<div id="tab-reto" class="section active">
+  <div class="sec-head">
+    <div class="sec-kicker">Reto inicial · 15:30</div>
+    <h2>¿Cómo me llamo?</h2>
+    <p>ChatGPT no sabe quién eres. Esta es la pregunta de arranque de toda la sesión.</p>
+  </div>
+  <div class="callout">
+    <strong>El experimento</strong>
+    Abre una conversación nueva con ChatGPT y escribe exactamente esto: <em>"¿Cómo me llamo? ¿A qué me dedico? ¿Cuál es mi objetivo profesional?"</em> Observa la respuesta. Luego responde las preguntas de abajo.
+  </div>
+  <div class="card accent-left">
+    <div class="card-label">Tu observación</div>
+    <h3>¿Qué ha respondido ChatGPT?</h3>
+    <span class="field-label">Copia aquí la respuesta de ChatGPT</span>
+    <textarea data-key="reto_respuesta" placeholder="Pega aquí exactamente lo que ha dicho ChatGPT cuando le has preguntado quién eres…" class="tall"></textarea>
+    <span class="field-label">¿Por qué no sabe quién eres?</span>
+    <span class="field-hint">Intenta explicarlo con tus propias palabras, sin tecnicismos</span>
+    <textarea data-key="reto_porqué" placeholder="Ej: porque cada conversación empieza desde cero, porque no guarda datos personales entre sesiones…"></textarea>
+    <span class="field-label">¿Qué implica esto para cómo deberías usar ChatGPT?</span>
+    <textarea data-key="reto_implica" placeholder="Ej: que siempre tengo que presentarme, que no puedo asumir que recuerda lo que hicimos ayer…"></textarea>
+  </div>
+  <div class="card">
+    <div class="card-label">Reflexión del grupo</div>
+    <h3>Debate: ¿qué queremos que la IA sepa de nosotros?</h3>
+    <span class="field-label">Una idea del debate que no habías pensado</span>
+    <input type="text" data-key="reto_idea" placeholder="Ej: que hay cosas que preferimos que NO recuerde…">
+    <span class="field-label">¿Qué tres cosas le dirías a ChatGPT sobre ti si tuvieras que presentarte?</span>
+    <textarea data-key="reto_presentacion" placeholder="1. Soy…&#10;2. Me dedico a…&#10;3. Mi objetivo es…"></textarea>
+  </div>
+</div>
+
+<!-- ===== INSTRUCCIONES ===== -->
+<div id="tab-instrucciones" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Configuración · 15:45</div>
+    <h2>Instrucciones personalizadas</h2>
+    <p>Cuéntale a ChatGPT quién eres y cómo quieres que te responda — para siempre.</p>
+  </div>
+  <div class="callout">
+    <strong>¿Dónde se configura?</strong>
+    En ChatGPT: haz clic en tu nombre (esquina inferior izquierda) → <strong>Personalizar ChatGPT</strong> → verás dos campos: "¿Qué deberías saber de mí?" y "¿Cómo quieres que responda?". Esto se aplica a todas tus conversaciones futuras.
+  </div>
+  <div class="card accent-top">
+    <div class="card-label">Campo 1 · ¿Qué debería saber ChatGPT de ti?</div>
+    <h3>Redacta tu presentación personal</h3>
+    <p>Este texto se enviará automáticamente al inicio de cada conversación. Sé concreto: tu nombre, tu situación, tu sector y tu experiencia.</p>
+    <div class="prompt-box">"Me llamo <span class="bracket">[nombre]</span>. Soy <span class="bracket">[profesión / situación actual]</span>. Estoy buscando trabajo en <span class="bracket">[sector]</span>. Tengo experiencia en <span class="bracket">[áreas]</span>. Mi nivel de conocimiento tecnológico es intermedio."</div>
+    <span class="field-label">Tu versión — ¿Qué debería saber ChatGPT de ti?</span>
+    <span class="field-hint">Rellena esto para copiar y pegar directamente en ChatGPT</span>
+    <textarea data-key="inst_sobremi" class="tall" placeholder="Me llamo… Soy… Actualmente busco trabajo en… Tengo experiencia en… Mi nivel tecnológico es…"></textarea>
+    <span class="field-label">¿Qué has incluido y por qué?</span>
+    <input type="text" data-key="inst_sobremi_ref" placeholder="Ej: he incluido mi sector porque afecta al vocabulario que usa la IA conmigo…">
+  </div>
+  <div class="card accent-top">
+    <div class="card-label">Campo 2 · ¿Cómo quieres que te responda?</div>
+    <h3>Define el estilo de respuesta</h3>
+    <p>Indica tono, formato y comportamiento. Esto evita tener que repetirlo en cada conversación.</p>
+    <div class="prompt-box">"Sé siempre directo y práctico. Dame ejemplos concretos. Si no sabes algo, dímelo claramente. Responde siempre en español. Usa un tono cercano pero profesional."</div>
+    <span class="field-label">Tu versión — ¿Cómo quieres que te responda?</span>
+    <textarea data-key="inst_como" class="tall" placeholder="Ej: respóndeme siempre en español. Sé directo. Dame ejemplos reales. Cuando no sepas algo, dímelo. Usa listas cuando sea útil pero no siempre…"></textarea>
+    <span class="field-label">Una preferencia de formato que has añadido</span>
+    <input type="text" data-key="inst_como_ref" placeholder="Ej: prefiero respuestas cortas, quiero que use viñetas, que evite el lenguaje técnico…">
+  </div>
+  <div class="card green-left">
+    <div class="card-label">Práctica · Antes vs. Después</div>
+    <h3>Compara los resultados</h3>
+    <p>Haz la misma pregunta a ChatGPT antes y después de configurar las instrucciones. Anota la diferencia.</p>
+    <span class="field-label">Pregunta que has usado para la prueba</span>
+    <input type="text" data-key="inst_pregunta" placeholder="Ej: ¿Cómo mejoro mi perfil de LinkedIn?">
+    <span class="field-label">Respuesta SIN instrucciones personalizadas</span>
+    <textarea data-key="inst_sin" placeholder="Pega aquí la respuesta que dio ChatGPT antes de configurar nada…"></textarea>
+    <span class="field-label">Respuesta CON instrucciones personalizadas</span>
+    <textarea data-key="inst_con" placeholder="Pega aquí la respuesta después de configurar las instrucciones…"></textarea>
+    <span class="field-label">¿Cuál es la diferencia? ¿Ha merecido la pena?</span>
+    <textarea data-key="inst_diff" placeholder="Reflexión: ¿es más útil? ¿más cercana? ¿más concreta?…"></textarea>
+  </div>
+</div>
+
+<!-- ===== MEMORIA ===== -->
+<div id="tab-memoria" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Exploración guiada · 16:10</div>
+    <h2>La memoria de ChatGPT</h2>
+    <p>¿Qué recuerda entre conversaciones? ¿Qué no recuerda? ¿Qué quieres que recuerde?</p>
+  </div>
+  <div class="callout">
+    <strong>¿Dónde está la memoria?</strong>
+    ChatGPT → tu nombre → <strong>Personalizar ChatGPT</strong> → pestaña <strong>"Memoria"</strong>. Desde ahí puedes ver qué ha guardado, editarlo o borrarlo. También puedes desactivar la memoria completamente si prefieres empezar siempre desde cero.
+  </div>
+  <div class="card accent-left">
+    <div class="card-label">Exploración práctica</div>
+    <h3>Investiga tu propia memoria</h3>
+    <div class="check-row">
+      <div class="chk" data-key="mem_check1" onclick="toggleChk(this)"></div>
+      <div class="chk-content"><strong>He encontrado dónde está la memoria en ChatGPT</strong><span>Configuración → Personalizar ChatGPT → Memoria</span></div>
+    </div>
+    <div class="check-row">
+      <div class="chk" data-key="mem_check2" onclick="toggleChk(this)"></div>
+      <div class="chk-content"><strong>He visto qué ha guardado ChatGPT sobre mí</strong><span>O he comprobado que está vacía si nunca la he usado</span></div>
+    </div>
+    <div class="check-row">
+      <div class="chk" data-key="mem_check3" onclick="toggleChk(this)"></div>
+      <div class="chk-content"><strong>He probado a activar / desactivar la memoria</strong><span>Y observado qué cambia en el comportamiento de la IA</span></div>
+    </div>
+    <div class="check-row">
+      <div class="chk" data-key="mem_check4" onclick="toggleChk(this)"></div>
+      <div class="chk-content"><strong>He editado o borrado al menos un recuerdo</strong><span>O he pedido a ChatGPT que "recuerde" algo concreto sobre mí</span></div>
+    </div>
+    <span class="field-label" style="margin-top:20px">¿Qué había guardado ChatGPT sobre ti? (o qué has descubierto)</span>
+    <textarea data-key="mem_descubrimiento" placeholder="Ej: no había nada guardado. O: había recordado que trabajo en sanidad porque lo mencioné en una conversación anterior…"></textarea>
+  </div>
+  <div class="card">
+    <div class="card-label">Reflexión personal</div>
+    <h3>Privacidad y memoria: ¿qué quieres controlar?</h3>
+    <span class="field-label">3 cosas que SÍ quiero que ChatGPT recuerde de mí</span>
+    <textarea data-key="mem_si" placeholder="1. Mi sector profesional para que adapte el vocabulario&#10;2. Que prefiero respuestas cortas&#10;3. Que busco trabajo actualmente…"></textarea>
+    <span class="field-label">3 cosas que NO quiero que ChatGPT guarde</span>
+    <textarea data-key="mem_no" placeholder="1. Datos personales sensibles (DNI, dirección)&#10;2. Conversaciones sobre temas privados&#10;3. Información sobre otras personas…"></textarea>
+    <span class="field-label">¿Cambiarías algo en cómo usas ChatGPT tras explorar la memoria?</span>
+    <input type="text" data-key="mem_cambio" placeholder="Ej: ahora seré más cuidadoso con lo que comparto, voy a activar la memoria para mi búsqueda de empleo…">
+  </div>
+</div>
+
+<!-- ===== EXPLORAR GPTs ===== -->
+<div id="tab-gpts-explore" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Introducción · 16:30</div>
+    <h2>¿Qué son los GPTs?</h2>
+    <p>Versiones especializadas de ChatGPT con instrucciones, contexto y nombre propio.</p>
+  </div>
+  <div class="callout">
+    <strong>GPT ≠ ChatGPT genérico</strong>
+    Un GPT es ChatGPT con un "rol" fijo: siempre actúa como experto en algo concreto, tiene instrucciones predefinidas, puede tener documentos de referencia y un nombre propio. Puedes explorar la tienda de GPTs públicos o crear el tuyo.
+  </div>
+
+  <!-- BOTÓN TIENDA -->
+  <div class="card accent-top" style="margin-bottom:24px;">
+    <div class="card-label">Acceso directo</div>
+    <h3>Tienda de GPTs de ChatGPT</h3>
+    <p>Aquí encontrarás miles de GPTs públicos creados por la comunidad. Busca por categoría o por nombre.</p>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:4px;">
+      <a href="https://chatgpt.com/gpts" target="_blank" class="btn-gpt" style="font-size:14px; padding:11px 22px;">
+        🏪 Abrir tienda de GPTs →
+      </a>
+      <span style="font-size:12.5px; color:var(--muted); font-style:italic;">Necesitas iniciar sesión en ChatGPT</span>
+    </div>
+  </div>
+
+  <!-- GPTs RECOMENDADOS -->
+  <div class="card-label" style="margin-bottom:12px;">GPTs recomendados para esta sesión</div>
+
+  <!-- CV Reviewer -->
+  <div class="gpt-link-card">
+    <div class="gpt-link-header">
+      <span class="gpt-link-emoji">📄</span>
+      <div>
+        <span class="gpt-link-title">Resume Review</span>
+        <span class="gpt-link-desc">Analiza tu CV y propone mejoras concretas orientadas a resultados · Por OpenAI</span>
+      </div>
+    </div>
+    <div class="gpt-link-actions">
+      <a href="https://chatgpt.com/g/g-t1SGvDtnq-resume-review" target="_blank" class="btn-gpt">🔗 Abrir este GPT →</a>
+      <span class="note-plus">⚠️ Puede requerir ChatGPT Plus</span>
+    </div>
+    <div class="search-tip">Si no funciona el enlace directo, búscalo en la tienda: <code>Resume Review</code> (por OpenAI)</div>
+    <span class="field-label" style="margin-top:4px;">¿Lo has probado? ¿Qué ha hecho?</span>
+    <textarea data-key="gpt1_prueba" placeholder="Describe qué pasó cuando lo usaste: qué le diste, qué te respondió, si fue útil…"></textarea>
+    <span class="field-label">Puntuación (1–5) y por qué</span>
+    <input type="text" data-key="gpt1_punt" placeholder="Ej: 4/5 — muy concreto, pero a veces demasiado formal">
+  </div>
+
+  <!-- Interview Coach -->
+  <div class="gpt-link-card">
+    <div class="gpt-link-header">
+      <span class="gpt-link-emoji">🎤</span>
+      <div>
+        <span class="gpt-link-title">Interview Coach</span>
+        <span class="gpt-link-desc">Simula entrevistas y da feedback detallado respuesta a respuesta</span>
+      </div>
+    </div>
+    <div class="gpt-link-actions">
+      <a href="https://chatgpt.com/g/g-Br0UFtDCR-interview-coach" target="_blank" class="btn-gpt">🔗 Abrir este GPT →</a>
+      <a href="https://chatgpt.com/g/g-bFqfrtFKe-interview-coach-mock-job-interview-prep" target="_blank" class="btn-gpt secondary">🔗 Versión alternativa</a>
+      <span class="note-plus">⚠️ Puede requerir ChatGPT Plus</span>
+    </div>
+    <div class="search-tip">Si no funciona el enlace directo, búscalo en la tienda: <code>Interview Coach</code></div>
+    <span class="field-label" style="margin-top:4px;">¿Lo has probado? ¿Qué ha hecho?</span>
+    <textarea data-key="gpt2_prueba" placeholder="Describe la experiencia: ¿las preguntas eran realistas? ¿el feedback fue útil?…"></textarea>
+    <span class="field-label">Puntuación (1–5) y por qué</span>
+    <input type="text" data-key="gpt2_punt" placeholder="Ej: 5/5 — las preguntas eran muy específicas para mi sector">
+  </div>
+
+  <!-- Plain English / Explainer -->
+  <div class="gpt-link-card">
+    <div class="gpt-link-header">
+      <span class="gpt-link-emoji">💬</span>
+      <div>
+        <span class="gpt-link-title">Explain Anything GPT</span>
+        <span class="gpt-link-desc">Explica cualquier concepto complejo con analogías simples y ejemplos del mundo real</span>
+      </div>
+    </div>
+    <div class="gpt-link-actions">
+      <a href="https://chatgpt.com/g/g-LGZMS6iH2-explain-anything-gpt" target="_blank" class="btn-gpt">🔗 Abrir este GPT →</a>
+      <a href="https://chatgpt.com/g/g-abcvK2crW-plainspeak" target="_blank" class="btn-gpt secondary">🔗 Alternativa: PlainSpeak</a>
+    </div>
+    <div class="search-tip">Si no funciona el enlace directo, búscalo en la tienda: <code>Explain Anything</code> o <code>PlainSpeak</code></div>
+    <span class="field-label" style="margin-top:4px;">¿Lo has probado? ¿Qué ha hecho?</span>
+    <textarea data-key="gpt3_prueba" placeholder="Describe qué concepto le pediste que explicara y cómo lo hizo…"></textarea>
+    <span class="field-label">Puntuación (1–5) y por qué</span>
+    <input type="text" data-key="gpt3_punt" placeholder="Ej: 3/5 — útil, pero a veces simplifica demasiado">
+  </div>
+
+  <div class="card green-left">
+    <div class="card-label">Reflexión comparativa</div>
+    <h3>GPT especializado vs. ChatGPT genérico</h3>
+    <span class="field-label">Haz la misma pregunta a un GPT especializado y a ChatGPT normal. ¿Qué diferencia notas?</span>
+    <textarea data-key="gpt_comparativa" placeholder="Ej: el GPT de CV fue mucho más directo y pedía contexto antes de responder. ChatGPT genérico dio una respuesta más larga pero más vaga…"></textarea>
+    <span class="field-label">¿Para qué tarea de tu vida real usarías un GPT especializado?</span>
+    <input type="text" data-key="gpt_tarea_real" placeholder="Ej: para repasar mis correos profesionales antes de enviarlos, para preparar una oposición…">
+  </div>
+</div>
+
+<!-- ===== CREAR GPT ===== -->
+<div id="tab-gpt-builder" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Taller · 17:15 — La estrella de la sesión</div>
+    <h2>Diseña tu propio GPT</h2>
+    <p>Rellena todos los campos. Tu docente usará esta ficha para crear el GPT en su cuenta y compartírtelo.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label">¿No sabes qué GPT crear? Elige una idea</div>
+    <h3>Ideas de GPT para el taller</h3>
+    <p>Haz clic en una idea para pre-rellenar todos los campos automáticamente.</p>
+    <div class="ideas-grid">
+      <div class="idea-card" onclick="fillIdea('correos')"><span class="idea-emoji">✉️</span><span class="idea-name">Asistente de correos</span><span class="idea-desc">Redacta y mejora correos profesionales</span></div>
+      <div class="idea-card" onclick="fillIdea('cv')"><span class="idea-emoji">📄</span><span class="idea-name">Revisor de CV</span><span class="idea-desc">Analiza y mejora tu currículum</span></div>
+      <div class="idea-card" onclick="fillIdea('entrevista')"><span class="idea-emoji">🎤</span><span class="idea-name">Coach de entrevistas</span><span class="idea-desc">Practica y recibe feedback real</span></div>
+      <div class="idea-card" onclick="fillIdea('tutor')"><span class="idea-emoji">🧑‍🏫</span><span class="idea-name">Tutor con analogías</span><span class="idea-desc">Explica cualquier concepto con ejemplos</span></div>
+      <div class="idea-card" onclick="fillIdea('emprendimiento')"><span class="idea-emoji">💡</span><span class="idea-name">Generador de ideas</span><span class="idea-desc">Brainstorming para emprender</span></div>
+      <div class="idea-card" onclick="fillIdea('propio')"><span class="idea-emoji">✨</span><span class="idea-name">Idea propia</span><span class="idea-desc">Crea algo totalmente personalizado</span></div>
+    </div>
+  </div>
+
+  <!-- EJEMPLO -->
+  <div class="gpt-builder" style="margin-bottom:20px;">
+    <div class="gpt-builder-inner">
+      <div class="gpt-header">
+        <div class="gpt-icon">💡</div>
+        <div class="gpt-title-wrap"><small>Ejemplo del docente</small><h3>Así se ve un GPT bien configurado</h3></div>
+      </div>
+      <div class="example-gpt">
+        <strong>GPT de ejemplo: Asistente de revisión de CV</strong>
+        <div class="field-row"><b>Nombre:</b>&nbsp;Mi Revisor de CV Pro</div>
+        <div class="field-row"><b>Descripción:</b>&nbsp;Analiza tu CV y propone mejoras concretas orientadas a resultados para cada puesto al que aplicas.</div>
+        <div class="field-row"><b>Instrucciones:</b>&nbsp;Eres un reclutador experto con 15 años de experiencia. Cuando alguien comparte texto de su CV, lo analizas y propones mejoras concretas orientadas a impacto y resultados. Siempre preguntas "¿para qué puesto es?" antes de dar feedback. Nunca corriges sin contexto. Responde siempre en español. Sé directo y concreto.</div>
+        <div class="field-row"><b>Iniciadores:</b>&nbsp;"Revisa este punto de mi CV" / "¿Cómo mejoro mi sección de experiencia?" / "¿Este CV se adapta a esta oferta?"</div>
+        <div class="field-row"><b>Funciones:</b>&nbsp;Búsqueda en Internet ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div class="gpt-builder" id="gpt-form">
+    <div class="gpt-builder-inner">
+      <div class="gpt-header">
+        <div class="gpt-icon">🤖</div>
+        <div class="gpt-title-wrap"><small>Tu diseño · para entregar al docente</small><h3>Ficha de creación de GPT</h3></div>
+      </div>
+
+      <label class="gpt-field-label" for="gpt-name">Nombre del GPT</label>
+      <span class="gpt-field-desc">Ponle un nombre descriptivo y memorable.</span>
+      <input class="gpt-input" id="gpt-name" data-key="gpt_nombre" type="text" placeholder="Escribe aquí el nombre de tu GPT…">
+
+      <label class="gpt-field-label" for="gpt-desc">Descripción</label>
+      <span class="gpt-field-desc">1–2 frases que expliquen para qué sirve. Esta descripción aparece en la tienda de GPTs.</span>
+      <textarea class="gpt-textarea" id="gpt-desc" data-key="gpt_descripcion" placeholder="Ej: Un asistente experto que te ayuda a redactar y mejorar correos profesionales difíciles con el tono adecuado para cada situación."></textarea>
+
+      <label class="gpt-field-label" for="gpt-instructions">Instrucciones del sistema</label>
+      <span class="gpt-field-desc">El corazón de tu GPT. Define: ¿qué es? ¿cómo se comporta? ¿qué hace siempre? ¿qué nunca haría? Cuanto más concreto, mejor.</span>
+      <textarea class="gpt-textarea xxl" id="gpt-instructions" data-key="gpt_instrucciones" placeholder="Ej: Eres un experto en comunicación profesional con 10 años de experiencia. Cuando alguien te pida ayuda con un correo, primero preguntas: 1) ¿cuál es el objetivo? 2) ¿qué relación tienes con el destinatario? Solo después redactas. Siempre ofreces dos versiones: formal y cercana. Responde siempre en español."></textarea>
+
+      <label class="gpt-field-label">Iniciadores de conversación</label>
+      <span class="gpt-field-desc">4 frases de ejemplo que aparecen al abrir el GPT.</span>
+      <div class="starters-grid">
+        <input class="starter-input" id="starter1" data-key="gpt_s1" type="text" placeholder="Iniciador 1…">
+        <input class="starter-input" id="starter2" data-key="gpt_s2" type="text" placeholder="Iniciador 2…">
+        <input class="starter-input" id="starter3" data-key="gpt_s3" type="text" placeholder="Iniciador 3…">
+        <input class="starter-input" id="starter4" data-key="gpt_s4" type="text" placeholder="Iniciador 4…">
+      </div>
+
+      <label class="gpt-field-label">Conocimiento (archivos de referencia)</label>
+      <span class="gpt-field-desc">Describe los archivos que quieres añadir. El docente los subirá al crear el GPT.</span>
+      <div class="knowledge-box">
+        <textarea class="gpt-textarea" id="gpt-knowledge" data-key="gpt_conocimiento" style="background:transparent; border-color:transparent; padding-left:0;" placeholder="Describe los archivos:&#10;· Mi CV actual (PDF)&#10;· Guía de correos formales en español&#10;&#10;(Si no tienes archivos, déjalo en blanco)"></textarea>
+        <p class="knowledge-note">💡 Los archivos se suben directamente en la interfaz de creación de GPTs.</p>
+      </div>
+
+      <label class="gpt-field-label">Funciones activas</label>
+      <span class="gpt-field-desc">Selecciona las capacidades que necesita tu GPT.</span>
+      <div class="func-grid">
+        <div class="func-item" data-key="gpt_f1" onclick="toggleFunc(this)"><div class="func-chk"></div><span>🌐</span><span class="func-label">Búsqueda en Internet</span></div>
+        <div class="func-item" data-key="gpt_f2" onclick="toggleFunc(this)"><div class="func-chk"></div><span>🖼️</span><span class="func-label">Lienzo (Canvas)</span></div>
+        <div class="func-item" data-key="gpt_f3" onclick="toggleFunc(this)"><div class="func-chk"></div><span>🎨</span><span class="func-label">Generación de imágenes</span></div>
+        <div class="func-item" data-key="gpt_f4" onclick="toggleFunc(this)"><div class="func-chk"></div><span>📊</span><span class="func-label">Intérprete de código y análisis de datos</span></div>
+      </div>
+
+      <label class="gpt-field-label" for="gpt-notes" style="margin-top:28px;">Notas para el docente</label>
+      <span class="gpt-field-desc">Cualquier detalle adicional sobre cómo quieres que funcione tu GPT.</span>
+      <textarea class="gpt-textarea" id="gpt-notes" data-key="gpt_notas" placeholder="Ej: quiero que el tono sea muy informal, como si fuera un amigo experto…"></textarea>
+
+      <div style="display:flex; gap:12px; margin-top:28px; flex-wrap:wrap;">
+        <button class="btn btn-accent" onclick="exportGPTPDF()" style="font-size:14px; padding:13px 28px;">📄 Exportar ficha como PDF</button>
+        <button class="btn btn-primary" onclick="downloadFullHTML()" style="font-size:14px; padding:13px 28px;">⬇ Descargar cuaderno completo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CIERRE ===== -->
+<div id="tab-cierre" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Cierre · 18:20</div>
+    <h2>¿Cuándo usarías este GPT?</h2>
+    <p>La sesión no termina con el GPT creado — termina cuando puedes responder esta pregunta.</p>
+  </div>
+  <div class="callout">
+    <strong>Reflexión de cierre</strong>
+    Un GPT que creas pero no usas no sirve para nada. Piensa en un momento concreto de tu semana habitual donde este GPT te ahorraría tiempo o te haría la vida más fácil.
+  </div>
+  <div class="card accent-top">
+    <div class="card-label">Tu plan de uso</div>
+    <h3>¿En qué momento concreto de tu semana usarías tu GPT?</h3>
+    <span class="field-label">El momento exacto de la semana</span>
+    <input type="text" data-key="cierre_momento" placeholder="Ej: los martes por la mañana cuando reviso los correos pendientes de la semana…">
+    <span class="field-label">¿Qué tarea concreta resolverías con él?</span>
+    <textarea data-key="cierre_tarea" placeholder="Ej: redactar la respuesta a los clientes que han presentado una queja, revisar mi CV antes de enviarlo a una oferta…"></textarea>
+    <span class="field-label">¿Cuánto tiempo estimas que te ahorraría por semana?</span>
+    <input type="text" data-key="cierre_tiempo" placeholder="Ej: aproximadamente 1 hora, o 2 correos difíciles que antes me costaban 20 min cada uno…">
+  </div>
+  <div class="card green-left">
+    <div class="card-label">Reflexión de la sesión</div>
+    <h3>¿Qué cambió hoy en cómo entiendes ChatGPT?</h3>
+    <span class="field-label">Una cosa que no sabías esta mañana y ahora sí</span>
+    <input type="text" data-key="cierre_aprendido" placeholder="Ej: que puedo configurar instrucciones que se aplican a todas las conversaciones…">
+    <span class="field-label">Lo más sorprendente de la sesión</span>
+    <input type="text" data-key="cierre_sorpresa" placeholder="Ej: que ChatGPT no recuerda nada entre conversaciones a menos que lo configures…">
+    <span class="field-label">Una pregunta que todavía tienes</span>
+    <input type="text" data-key="cierre_pregunta" placeholder="Algo que no ha quedado claro o que quieres explorar más…">
+    <span class="field-label">¿Recomendarías esta herramienta a alguien de tu entorno? ¿A quién y para qué?</span>
+    <textarea data-key="cierre_recomendacion" placeholder="Ej: a mi pareja para que prepare sus clases, a un amigo que busca trabajo actualmente…"></textarea>
+  </div>
+  <div class="reflection">
+    <h3>💬 Comparte en voz alta</h3>
+    <p style="color:var(--muted); font-size:13.5px; margin-bottom:16px;">Esta es la frase que compartirás con el grupo al final de la sesión:</p>
+    <span class="field-label">Completa en una frase: "Usaré mi GPT cuando…"</span>
+    <textarea data-key="cierre_frase" placeholder="Usaré mi GPT cuando… y me ayudará a…"></textarea>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Guardado</div>
+
+<!-- WARNING MODAL -->
+<div class="modal-overlay" id="warnModal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <h3>¿Seguro que quieres salir?</h3>
+    <p>Estás a punto de abrir un enlace externo en una nueva pestaña.<br><br>
+    Tu progreso está guardado en esta página y <strong>sobrevivirá si recargas</strong>, pero si cierras esta pestaña completamente lo perderás. Descarga el cuaderno antes de salir para tenerlo a salvo.</p>
+    <div class="modal-actions">
+      <button class="modal-btn-stay" onclick="closeWarnModal(); downloadFullHTML()">⬇ Descargar y luego salir</button>
+      <button class="modal-btn-stay" onclick="closeWarnModal()" style="background:var(--sky);">⬅ Quedarme aquí</button>
+      <button class="modal-btn-leave" id="modalLeaveBtn">Salir sin descargar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="dl-bar">
+  <span class="dl-note">Sesión 3 · ChatGPT e IA · Lanbide</span>
+  <a href="https://chatgpt.com/gpts" target="_blank" class="btn-store">🏪 Tienda de GPTs →</a>
+  <button class="btn btn-accent" onclick="exportGPTPDF()">📄 Exportar ficha GPT</button>
+  <button class="btn btn-primary" onclick="downloadFullHTML()">⬇ Descargar cuaderno</button>
+</div>
+
+<script>
+const STORAGE_KEY = 'sesion3_lanbide_v1';
+let hasUnsavedChanges = false;
+let pendingUrl = null;
+
+// ====== TAB NAVIGATION ======
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ====== COLLECT DATA ======
+function getAllData() {
+  const data = {};
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (el.classList.contains('chk') || el.classList.contains('func-item')) {
+      data[key] = el.classList.contains('on');
+    } else {
+      data[key] = el.value || '';
+    }
+  });
+  return data;
+}
+
+function applyData(data) {
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (!(key in data)) return;
+    if (el.classList.contains('chk') || el.classList.contains('func-item')) {
+      if (data[key]) el.classList.add('on');
+    } else {
+      el.value = data[key];
+    }
+  });
+}
+
+// ====== SAVE TO URL HASH (survives iframe reload) ======
+// The URL hash is preserved when the iframe src is reloaded, so data persists across F5.
+let saveDebounce = null;
+
+function saveAll() {
+  document.getElementById('saveDot').classList.add('saving');
+  document.getElementById('saveText').textContent = 'Guardando…';
+  document.getElementById('unsavedDot').classList.remove('hidden');
+  hasUnsavedChanges = true;
+
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(() => {
+    try {
+      const json = JSON.stringify(getAllData());
+      const encoded = btoa(unescape(encodeURIComponent(json)));
+      // Write to hash — survives iframe reload
+      history.replaceState(null, '', '#' + encoded);
+      // Also try session/localStorage as bonus fallback
+      try { sessionStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+      try { localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+
+      document.getElementById('saveDot').classList.remove('saving');
+      document.getElementById('saveText').textContent = '✓ Guardado — si recargas la página, tus datos se restaurarán';
+    } catch(e) {
+      document.getElementById('saveText').textContent = '⚠ Error al guardar — descarga el cuaderno para no perder tu trabajo';
+    }
+  }, 800);
+}
+
+function loadAll() {
+  // 1. Try URL hash first (most reliable in iframes)
+  try {
+    const hash = location.hash.replace('#', '');
+    if (hash && hash.length > 10) {
+      const json = decodeURIComponent(escape(atob(hash)));
+      applyData(JSON.parse(json));
+      document.getElementById('saveText').textContent = '✓ Progreso restaurado correctamente';
+      document.getElementById('saveDot').style.background = 'var(--green)';
+      return true;
+    }
+  } catch(e) {}
+
+  // 2. sessionStorage fallback
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) { applyData(JSON.parse(raw)); return true; }
+  } catch(e) {}
+
+  // 3. localStorage fallback
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { applyData(JSON.parse(raw)); return true; }
+  } catch(e) {}
+
+  return false;
+}
+
+function confirmClear() {
+  if (confirm('¿Seguro que quieres borrar todo el progreso? Esta acción no se puede deshacer.')) {
+    history.replaceState(null, '', location.pathname + location.search);
+    try { sessionStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    document.querySelectorAll('[data-key]').forEach(el => {
+      if (el.classList.contains('chk') || el.classList.contains('func-item')) el.classList.remove('on');
+      else el.value = '';
+    });
+    document.getElementById('saveText').textContent = 'Progreso borrado';
+    document.getElementById('unsavedDot').classList.add('hidden');
+    hasUnsavedChanges = false;
+    showToast('🗑️ Progreso borrado');
+  }
+}
+
+// ====== EXTERNAL LINK WARNING (modal) ======
+function warnLeave(e, url) {
+  e.preventDefault();
+  pendingUrl = url;
+  document.getElementById('warnModal').classList.add('show');
+  document.getElementById('modalLeaveBtn').onclick = () => {
+    document.getElementById('warnModal').classList.remove('show');
+    window.open(pendingUrl, '_blank');
+    pendingUrl = null;
+  };
+}
+
+function closeWarnModal() {
+  document.getElementById('warnModal').classList.remove('show');
+  pendingUrl = null;
+}
+
+document.getElementById('warnModal').addEventListener('click', function(e) {
+  if (e.target === this) closeWarnModal();
+});
+
+// Intercept external link clicks to show modal
+document.addEventListener('click', function(e) {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const href = a.getAttribute('href');
+  if (!href || href.startsWith('#')) return;
+  if (a.target === '_blank') warnLeave(e, href);
+});
+
+// ====== TOAST ======
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ====== MARK SAVED (hide unsaved dot) after export ======
+function markExported() {
+  hasUnsavedChanges = false;
+  document.getElementById('unsavedDot').classList.add('hidden');
+}
+
+// ====== TOGGLE FUNCTIONS ======
+function toggleChk(el) { el.classList.toggle('on'); saveAll(); }
+function toggleFunc(el) { el.classList.toggle('on'); saveAll(); }
+
+// Auto-save on any input
+document.addEventListener('input', saveAll);
+
+// ====== FILL IDEA ======
+const ideas = {
+  correos: {
+    nombre: 'Mi Asistente de Correos Profesionales',
+    descripcion: 'Te ayuda a redactar, revisar y mejorar correos difíciles en el trabajo: peticiones, quejas, candidaturas y situaciones delicadas.',
+    instrucciones: 'Eres un experto en comunicación escrita profesional. Cuando alguien te pida ayuda con un correo, primero preguntas: 1) ¿cuál es el objetivo del correo? 2) ¿qué relación tienes con el destinatario? 3) ¿cuál es el tono deseado (formal, cercano, urgente)? Solo después de tener contexto, redactas el correo. Siempre ofreces dos versiones: una más formal y una más cercana. Nunca redactas sin contexto previo. Responde siempre en español.',
+    s1: 'Ayúdame a escribir un correo para pedir un aumento de sueldo',
+    s2: 'Necesito responder a una queja de un cliente enfadado',
+    s3: '¿Cómo escribo a una empresa sin oferta publicada?',
+    s4: 'Revisa este correo antes de enviarlo'
+  },
+  cv: {
+    nombre: 'Mi Revisor de CV Experto',
+    descripcion: 'Analiza tu CV y propone mejoras concretas orientadas a resultados, adaptadas al puesto al que aplicas.',
+    instrucciones: 'Eres un reclutador experto con 15 años de experiencia en selección de personal. Cuando alguien comparta texto de su CV, primero preguntas: ¿para qué puesto o sector es este CV? Solo con ese contexto das feedback concreto. Tus sugerencias siempre se orientan a logros medibles, no a responsabilidades genéricas. Cuando sea posible, propones alternativas más impactantes. Eres directo y constructivo. Responde siempre en español.',
+    s1: 'Revisa este punto de mi CV y hazlo más impactante',
+    s2: '¿Cómo mejoro mi sección de experiencia?',
+    s3: '¿Este CV se adapta bien a esta oferta de trabajo?',
+    s4: 'Reescribe mi objetivo profesional para que sea más concreto'
+  },
+  entrevista: {
+    nombre: 'Mi Coach de Entrevistas Personal',
+    descripcion: 'Simula entrevistas de trabajo y te da feedback detallado respuesta a respuesta para que llegues preparado/a.',
+    instrucciones: 'Eres un entrevistador de RRHH con amplia experiencia en selección de personal. Cuando alguien quiera practicar, primero preguntas: ¿para qué puesto y sector es la entrevista? Luego haces las preguntas de una en una, esperas la respuesta y das feedback breve: qué ha hecho bien, qué mejoraría y cómo lo dirías tú en su lugar. Termina con una valoración general y los 2 puntos más importantes a trabajar. Responde siempre en español. Adapta las preguntas al sector.',
+    s1: 'Quiero practicar una entrevista para el sector sanitario',
+    s2: 'Hazme preguntas difíciles de entrevista por competencias',
+    s3: 'Dame feedback sobre esta respuesta de entrevista',
+    s4: '¿Cómo respondo mejor a "¿cuál es tu mayor debilidad?"'
+  },
+  tutor: {
+    nombre: 'Mi Tutor con Analogías',
+    descripcion: 'Explica cualquier concepto complejo con ejemplos y analogías del mundo real, sin tecnicismos.',
+    instrucciones: 'Eres un tutor extraordinariamente paciente y creativo. Tu superpoder es explicar cualquier concepto difícil usando analogías del mundo cotidiano. Cuando alguien te pida que expliques algo, primero preguntas: ¿qué nivel de conocimiento tienes sobre este tema? (ninguno / básico / intermedio). Luego explicas el concepto en máximo 3 párrafos con al menos una analogía concreta. Al final preguntas: ¿hay algo que no ha quedado claro? Nunca usas jerga técnica sin explicarla. Responde siempre en español.',
+    s1: 'Explícame qué es la inteligencia artificial',
+    s2: '¿Cómo funciona una base de datos? Usa una analogía',
+    s3: 'Explícame el concepto de inflación de forma sencilla',
+    s4: 'No entiendo qué es la nube en informática'
+  },
+  emprendimiento: {
+    nombre: 'Mi Generador de Ideas de Negocio',
+    descripcion: 'Te ayuda a desarrollar ideas de negocio o emprendimiento adaptadas a tu perfil, recursos y contexto local.',
+    instrucciones: 'Eres un mentor de emprendimiento con experiencia en ayudar a personas sin recursos previos a desarrollar ideas de negocio viables. Cuando alguien pida ideas, primero preguntas: 1) ¿qué habilidades o experiencia tienes? 2) ¿cuánto tiempo tienes disponible? 3) ¿con qué presupuesto inicial cuentas? Solo con esos datos propones 5 ideas concretas en formato tabla: Idea / Inversión inicial / Dificultad / Por qué encaja contigo. Siempre eres realista pero optimista. Responde siempre en español.',
+    s1: 'Dame 5 ideas de negocio para alguien sin experiencia previa',
+    s2: 'Quiero montar algo con menos de 500€. ¿Qué opciones tengo?',
+    s3: 'Tengo experiencia en cocina. ¿Cómo puedo monetizarla?',
+    s4: 'Analiza si esta idea de negocio es viable: [descripción]'
+  },
+  propio: { nombre:'', descripcion:'', instrucciones:'', s1:'', s2:'', s3:'', s4:'' }
+};
+
+function fillIdea(key) {
+  const d = ideas[key];
+  document.getElementById('gpt-name').value = d.nombre;
+  document.getElementById('gpt-desc').value = d.descripcion;
+  document.getElementById('gpt-instructions').value = d.instrucciones;
+  document.getElementById('starter1').value = d.s1;
+  document.getElementById('starter2').value = d.s2;
+  document.getElementById('starter3').value = d.s3;
+  document.getElementById('starter4').value = d.s4;
+  saveAll();
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-gpt-builder').classList.add('active');
+  document.querySelector('.gpt-tab-btn').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('✓ Idea cargada — rellena los campos y ajústala a ti');
+}
+
+// ====== EXPORT GPT PDF (jsPDF) ======
+function exportGPTPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const name = document.getElementById('gpt-name').value || '(sin nombre)';
+  const desc = document.getElementById('gpt-desc').value || '(sin descripción)';
+  const instructions = document.getElementById('gpt-instructions').value || '(sin instrucciones)';
+  const s1 = document.getElementById('starter1').value;
+  const s2 = document.getElementById('starter2').value;
+  const s3 = document.getElementById('starter3').value;
+  const s4 = document.getElementById('starter4').value;
+  const knowledge = document.getElementById('gpt-knowledge').value || '(sin archivos)';
+  const notes = document.getElementById('gpt-notes').value || '';
+
+  const funcs = Array.from(document.querySelectorAll('.func-item')).map((el,i) => {
+    const labels = ['Búsqueda en Internet','Lienzo (Canvas)','Generación de imágenes','Intérprete de código y análisis de datos'];
+    return { label: labels[i], on: el.classList.contains('on') };
+  });
+
+  const pageW = 210, pageH = 297, margin = 18, contentW = pageW - margin * 2;
+  let y = 0;
+
+  function newPage() { doc.addPage(); y = margin; }
+  function checkY(needed) { if (y + needed > pageH - margin) newPage(); }
+
+  // HEADER
+  doc.setFillColor(8, 14, 26);
+  doc.rect(0, 0, pageW, 52, 'F');
+  doc.setFillColor(37, 99, 168);
+  doc.rect(0, 52, pageW, 3, 'F');
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(56, 189, 248);
+  doc.text('FICHA DE DISEÑO GPT · SESIÓN 3 · LANBIDE', margin, 16);
+  doc.setFontSize(20);
+  doc.setFont('helvetica','bold');
+  doc.setTextColor(240, 247, 255);
+  doc.text('Mi GPT personalizado', margin, 28);
+  doc.setFontSize(13);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(56, 189, 248);
+  doc.text(`GPT: ${name}`, margin, 40);
+  doc.setFontSize(8);
+  doc.setTextColor(120, 160, 200);
+  doc.text(`Generado el ${new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`, margin, 49);
+
+  y = 64;
+
+  function addField(title, content, bgColor) {
+    if (!content || !content.trim()) return;
+    const lines = doc.splitTextToSize(content, contentW - 10);
+    const blockH = 8 + lines.length * 5.5 + 6;
+    checkY(blockH + 14);
+    doc.setFillColor(37, 99, 168);
+    doc.rect(margin, y, contentW, 7, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(255,255,255);
+    doc.text(title.toUpperCase(), margin + 3, y + 4.8);
+    y += 7;
+    if (bgColor) doc.setFillColor(...bgColor);
+    else doc.setFillColor(248, 251, 255);
+    doc.rect(margin, y, contentW, lines.length * 5.5 + 6, 'F');
+    doc.setDrawColor(197, 221, 240);
+    doc.rect(margin, y, contentW, lines.length * 5.5 + 6);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(15, 32, 64);
+    doc.text(lines, margin + 4, y + 5);
+    y += lines.length * 5.5 + 6 + 8;
+  }
+
+  addField('Nombre del GPT', name);
+  addField('Descripción', desc);
+
+  if (instructions.trim()) {
+    const lines = doc.splitTextToSize(instructions, contentW - 10);
+    const blockH = 7 + lines.length * 5.5 + 6;
+    checkY(blockH + 14);
+    doc.setFillColor(37, 99, 168);
+    doc.rect(margin, y, contentW, 7, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(255,255,255);
+    doc.text('INSTRUCCIONES DEL SISTEMA (PROMPT PRINCIPAL)', margin + 3, y + 4.8);
+    y += 7;
+    doc.setFillColor(13, 27, 53);
+    doc.rect(margin, y, contentW, lines.length * 5.5 + 6, 'F');
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(189, 216, 240);
+    doc.text(lines, margin + 4, y + 5);
+    y += lines.length * 5.5 + 6 + 8;
+  }
+
+  const starters = [s1,s2,s3,s4].filter(Boolean);
+  if (starters.length) {
+    checkY(30);
+    doc.setFillColor(37, 99, 168);
+    doc.rect(margin, y, contentW, 7, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(255,255,255);
+    doc.text('INICIADORES DE CONVERSACIÓN', margin + 3, y + 4.8);
+    y += 7;
+    starters.forEach((s, i) => {
+      const lines = doc.splitTextToSize(`${i+1}. ${s}`, contentW - 12);
+      checkY(lines.length * 5.5 + 8);
+      doc.setFillColor(i % 2 === 0 ? 240 : 248, i % 2 === 0 ? 247 : 251, 255);
+      doc.rect(margin, y, contentW, lines.length * 5.5 + 6, 'F');
+      doc.setDrawColor(197,221,240);
+      doc.rect(margin, y, contentW, lines.length * 5.5 + 6);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(15, 32, 64);
+      doc.text(lines, margin + 4, y + 5);
+      y += lines.length * 5.5 + 6;
+    });
+    y += 8;
+  }
+
+  addField('Conocimiento (archivos de referencia)', knowledge);
+
+  checkY(30);
+  doc.setFillColor(37, 99, 168);
+  doc.rect(margin, y, contentW, 7, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(255,255,255);
+  doc.text('FUNCIONES ACTIVAS', margin + 3, y + 4.8);
+  y += 7;
+  doc.setFillColor(248, 251, 255);
+  doc.rect(margin, y, contentW, funcs.length * 7 + 4, 'F');
+  doc.setDrawColor(197,221,240);
+  doc.rect(margin, y, contentW, funcs.length * 7 + 4);
+  funcs.forEach((f, i) => {
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(f.on ? 16 : 150, f.on ? 185 : 150, f.on ? 129 : 150);
+    doc.text(f.on ? 'SI' : 'NO', margin + 4, y + 5.5 + i * 7);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(f.on ? 15 : 160, f.on ? 32 : 160, f.on ? 64 : 160);
+    doc.text(f.label, margin + 14, y + 5.5 + i * 7);
+  });
+  y += funcs.length * 7 + 4 + 8;
+
+  if (notes.trim()) addField('Notas para el docente', notes, [255, 251, 235]);
+
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setFillColor(8, 14, 26);
+    doc.rect(0, pageH - 12, pageW, 12, 'F');
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(120,160,200);
+    doc.text('ChatGPT e IA · Lanbide · Módulo 2 Sesión 3', margin, pageH - 4.5);
+    doc.text(`Entrega esta ficha al docente para que cree tu GPT · ${p}/${totalPages}`, pageW - margin, pageH - 4.5, { align: 'right' });
+  }
+
+  doc.save(`ficha_GPT_${name.replace(/[^a-z0-9]/gi,'_').substring(0,30)}.pdf`);
+  markExported();
+  showToast('📄 PDF generado — ya puedes enviárselo al docente');
+}
+
+// ====== DOWNLOAD FULL HTML ======
+function downloadFullHTML() {
+  const data = getAllData();
+  const clone = document.documentElement.cloneNode(true);
+  clone.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (!(key in data)) return;
+    if (el.classList.contains('chk') || el.classList.contains('func-item')) {
+      if (data[key]) el.classList.add('on');
+    } else {
+      el.value = data[key];
+      if (el.tagName === 'TEXTAREA') el.textContent = data[key];
+    }
+  });
+  clone.querySelectorAll('.section').forEach(s => s.style.display = 'block');
+  const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sesion3_memoria_GPTs.html'; a.click();
+  URL.revokeObjectURL(url);
+  markExported();
+  showToast('⬇ Cuaderno descargado — tu progreso está a salvo');
+}
+
+// ====== INIT ======
+window.addEventListener('load', () => {
+  const restored = loadAll();
+  if (!restored) {
+    document.getElementById('saveText').textContent = 'Empieza a escribir — tu progreso se guardará automáticamente';
+    document.getElementById('saveDot').style.background = 'var(--gold)';
+  }
+});
+</script>
+
+</body>
+</html>
