@@ -122,6 +122,17 @@ textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--st
 textarea { min-height: 88px; }
 textarea.tall { min-height: 130px; }
 
+/* DOCUMENT DOWNLOAD CARDS */
+.doc-dl-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.doc-dl-card { display: flex; align-items: center; gap: 14px; background: var(--paper); border: 1.5px solid var(--border); border-radius: 8px; padding: 14px 16px; text-decoration: none; color: inherit; transition: all 0.15s; cursor: pointer; }
+.doc-dl-card:hover { border-color: var(--sky); background: var(--mist); transform: translateX(3px); }
+.doc-dl-emoji { font-size: 24px; flex-shrink: 0; }
+.doc-dl-info { flex: 1; min-width: 0; }
+.doc-dl-name { display: block; font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+.doc-dl-desc { display: block; font-size: 12px; color: var(--muted); line-height: 1.4; }
+.doc-dl-btn { flex-shrink: 0; background: var(--steel); color: white; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; transition: background 0.15s; }
+.doc-dl-card:hover .doc-dl-btn { background: var(--sky); }
+
 /* DOCUMENT TYPE SELECTOR */
 .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px; margin: 14px 0 20px; }
 .doc-card { background: var(--white); border: 2px solid var(--border); border-radius: 8px; padding: 14px 12px; cursor: pointer; transition: all 0.15s; text-align: center; user-select: none; }
@@ -248,7 +259,7 @@ textarea.tall { min-height: 130px; }
       <strong>¿Vas a cerrar o cambiar de página?</strong>
       Descarga el cuaderno antes de salir para no perder tu trabajo.
     </span>
-    <button class="btn btn-accent" onclick="downloadFullHTML()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora PDF</button>
+    <button class="btn btn-accent" onclick="downloadFullHTML()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora</button>
   </div>
 </div>
 
@@ -277,6 +288,63 @@ textarea.tall { min-height: 130px; }
   <div class="callout">
     <strong>El reto</strong>
     Coge el documento que has traído (o uno de los que reparte el docente) y súbelo a ChatGPT. Tu misión: extraer 5 datos clave en 20 minutos usando solo prompts. Sin leerlo tú directamente.
+  </div>
+
+  <!-- DOCUMENTOS DE EJEMPLO -->
+  <div class="card accent-top">
+    <div class="card-label">Documentos de ejemplo — descarga el tuyo</div>
+    <h3>¿No has traído un documento? Usa uno de estos</h3>
+    <p>Todos son documentos ficticios pero realistas, diseñados específicamente para este reto. Son complejos: tienen cláusulas difíciles de localizar, datos dispersos y detalles que se prestan a error.</p>
+    <div class="doc-dl-grid">
+      <a class="doc-dl-card" href="https://ikerclavero.github.io/cuaderno-accionlaboral-cgpt0605/doc1_contrato_trabajo.pdf" target="_blank" onclick="warnLeave(event,this.href)">
+        <span class="doc-dl-emoji">📜</span>
+        <div class="doc-dl-info">
+          <span class="doc-dl-name">Contrato de trabajo</span>
+          <span class="doc-dl-desc">Indefinido a tiempo parcial · 10 cláusulas · Pacto de no competencia</span>
+        </div>
+        <span class="doc-dl-btn">⬇ Descargar</span>
+      </a>
+      <a class="doc-dl-card" href="https://ikerclavero.github.io/cuaderno-accionlaboral-cgpt0605/doc2_factura_rectificativa.pdf" target="_blank" onclick="warnLeave(event,this.href)">
+        <span class="doc-dl-emoji">🧾</span>
+        <div class="doc-dl-info">
+          <span class="doc-dl-name">Factura rectificativa</span>
+          <span class="doc-dl-desc">Servicios cloud · IVA + retención IRPF · Crédito por penalización SLA</span>
+        </div>
+        <span class="doc-dl-btn">⬇ Descargar</span>
+      </a>
+      <a class="doc-dl-card" href="https://ikerclavero.github.io/cuaderno-accionlaboral-cgpt0605/doc3_oferta_empleo.pdf" target="_blank" onclick="warnLeave(event,this.href)">
+        <span class="doc-dl-emoji">💼</span>
+        <div class="doc-dl-info">
+          <span class="doc-dl-name">Oferta de empleo</span>
+          <span class="doc-dl-desc">Data & AI Architect · Requisitos técnicos complejos · Proceso 5 fases</span>
+        </div>
+        <span class="doc-dl-btn">⬇ Descargar</span>
+      </a>
+      <a class="doc-dl-card" href="https://ikerclavero.github.io/cuaderno-accionlaboral-cgpt0605/doc4_nomina.pdf" target="_blank" onclick="warnLeave(event,this.href)">
+        <span class="doc-dl-emoji">💰</span>
+        <div class="doc-dl-info">
+          <span class="doc-dl-name">Nómina</span>
+          <span class="doc-dl-desc">Primer mes · Múltiples devengos y deducciones · Anticipo incluido</span>
+        </div>
+        <span class="doc-dl-btn">⬇ Descargar</span>
+      </a>
+      <a class="doc-dl-card" href="https://ikerclavero.github.io/cuaderno-accionlaboral-cgpt0605/doc5_articulo_tecnico.pdf" target="_blank" onclick="warnLeave(event,this.href)">
+        <span class="doc-dl-emoji">📰</span>
+        <div class="doc-dl-info">
+          <span class="doc-dl-name">Informe técnico</span>
+          <span class="doc-dl-desc">Riesgos de IA en empresas · 6 secciones · Referencias normativas reales</span>
+        </div>
+        <span class="doc-dl-btn">⬇ Descargar</span>
+      </a>
+      <a class="doc-dl-card" href="https://ikerclavero.github.io/cuaderno-accionlaboral-cgpt0605/doc6_contrato_alquiler.pdf" target="_blank" onclick="warnLeave(event,this.href)">
+        <span class="doc-dl-emoji">🏠</span>
+        <div class="doc-dl-info">
+          <span class="doc-dl-name">Contrato de alquiler</span>
+          <span class="doc-dl-desc">LAU · Depósito + garantía adicional · Cláusulas de prórroga y tanteo</span>
+        </div>
+        <span class="doc-dl-btn">⬇ Descargar</span>
+      </a>
+    </div>
   </div>
 
   <div class="prompt-box">
@@ -680,7 +748,7 @@ textarea.tall { min-height: 130px; }
   </div>
 
   <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-    <button class="btn btn-accent" onclick="downloadFullHTML()" style="font-size:14px;padding:13px 28px;">⬇ Descargar cuaderno completo PDF</button>
+    <button class="btn btn-accent" onclick="downloadFullHTML()" style="font-size:14px;padding:13px 28px;">⬇ Descargar cuaderno PDF completo</button>
   </div>
 </div>
 
