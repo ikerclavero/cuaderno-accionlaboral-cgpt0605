@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 5 · Comparativa de modelos de IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --night: #080e1a;
+  --deep: #0d1b35;
+  --navy: #132347;
+  --steel: #2563a8;
+  --sky: #3b82c4;
+  --ice: #7bb3e0;
+  --frost: #bdd8f0;
+  --mist: #deeef9;
+  --white: #f0f7ff;
+  --paper: #f8fbff;
+  --accent: #38bdf8;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --text: #0f2040;
+  --muted: #4a6b8a;
+  --border: #c5ddf0;
+  --purple: #7c3aed;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--paper); color: var(--text); font-size: 15px; line-height: 1.7; }
+
+/* HEADER */
+.header { background: var(--night); position: relative; overflow: hidden; }
+.header-bg { position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 70% at 10% 50%, rgba(37,99,168,0.4) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 60% at 90% 20%, rgba(56,189,248,0.12) 0%, transparent 55%),
+              radial-gradient(ellipse 40% 40% at 50% 90%, rgba(124,58,237,0.08) 0%, transparent 55%); }
+.header-bg::after { content:''; position:absolute; inset:0;
+  background-image: linear-gradient(rgba(59,130,196,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,196,0.06) 1px,transparent 1px);
+  background-size: 32px 32px; }
+.header-inner { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:44px 48px 38px; }
+.header-top { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:20px; }
+.session-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); padding:5px 14px; border-radius:20px; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); }
+.session-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+.btn-classroom { display:inline-flex; align-items:center; gap:7px; background:#1a73e8; color:white; text-decoration:none; padding:8px 18px; border-radius:6px; font-size:12.5px; font-weight:600; font-family:'DM Sans',sans-serif; transition:background 0.2s; border:none; cursor:pointer; white-space:nowrap; }
+.btn-classroom:hover { background:#1557b0; }
+.header h1 { font-family:'DM Serif Display',serif; font-size:clamp(26px,5vw,44px); font-weight:400; color:var(--white); line-height:1.15; margin-bottom:10px; }
+.header h1 em { font-style:italic; color:var(--accent); }
+.header-sub { color:rgba(176,210,240,0.7); font-size:14px; margin-bottom:24px; }
+.header-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:5px 14px; border-radius:4px; font-size:12px; color:rgba(176,210,240,0.85); font-weight:500; }
+
+/* SAVE BAR */
+.save-bar { background:var(--deep); border-bottom:1px solid rgba(56,189,248,0.15); padding:8px 48px; }
+.save-bar-inner { max-width:900px; margin:0 auto; display:flex; align-items:center; gap:10px; }
+.save-dot { width:8px; height:8px; border-radius:50%; background:var(--gold); flex-shrink:0; transition:background 0.3s; }
+.save-dot.saving { animation:pulse 1s infinite; }
+.save-text { font-size:12px; color:rgba(176,210,240,0.5); flex:1; }
+.unsaved-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--gold); margin-left:4px; animation:pulse 1.5s infinite; }
+.unsaved-dot.hidden { display:none; }
+.btn-clear { background:none; border:1px solid rgba(255,100,100,0.3); color:rgba(255,130,130,0.6); padding:4px 12px; border-radius:4px; font-size:11px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.btn-clear:hover { border-color:rgba(255,100,100,0.6); color:rgba(255,130,130,0.9); }
+
+/* RELOAD BANNER */
+.reload-banner { background:linear-gradient(90deg,#7c3700 0%,#92400e 100%); border-bottom:2px solid var(--gold); padding:10px 48px; }
+.reload-banner-inner { max-width:900px; margin:0 auto; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.reload-icon { font-size:18px; flex-shrink:0; }
+.reload-text { font-size:12.5px; color:rgba(255,237,180,0.95); line-height:1.4; flex:1; min-width:200px; }
+.reload-text strong { color:#fef3c7; display:block; margin-bottom:2px; }
+
+/* NAV */
+.nav-wrapper { background:var(--deep); border-bottom:1px solid rgba(59,130,196,0.25); padding:0 48px; overflow-x:auto; }
+.nav-tabs { display:flex; max-width:900px; margin:0 auto; }
+.tab-btn { padding:15px 22px; border:none; background:none; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:rgba(176,210,240,0.5); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; transition:all 0.2s; }
+.tab-btn:hover { color:var(--ice); }
+.tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* MAIN */
+.main { max-width:900px; margin:0 auto; padding:40px 48px 120px; }
+.section { display:none; }
+.section.active { display:block; }
+
+/* SEC HEAD */
+.sec-head { margin-bottom:32px; }
+.sec-kicker { font-size:10px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--sky); margin-bottom:8px; }
+.sec-head h2 { font-family:'DM Serif Display',serif; font-size:28px; font-weight:400; color:var(--text); margin-bottom:6px; }
+.sec-head p { color:var(--muted); font-size:14px; }
+
+/* CALLOUT */
+.callout { background:linear-gradient(135deg,var(--deep) 0%,var(--navy) 100%); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:20px 24px; margin-bottom:28px; color:var(--mist); font-size:13.5px; line-height:1.65; }
+.callout strong { display:block; color:var(--accent); font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; font-weight:600; }
+.callout.tip strong { color:#6ee7b7; }
+
+/* CARD */
+.card { background:var(--white); border:1px solid var(--border); border-radius:8px; padding:28px 32px; margin-bottom:24px; }
+.card.accent-top { border-top:3px solid var(--steel); }
+.card.accent-left { border-left:3px solid var(--sky); }
+.card.green-left { border-left:3px solid var(--green); }
+.card.gold-left { border-left:3px solid var(--gold); }
+.card.purple-left { border-left:3px solid var(--purple); }
+.card-label { font-size:10px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--sky); margin-bottom:10px; }
+.card h3 { font-family:'DM Serif Display',serif; font-size:18px; font-weight:400; margin-bottom:8px; color:var(--text); }
+.card > p { color:var(--muted); font-size:13.5px; margin-bottom:16px; line-height:1.6; }
+
+/* FIELDS */
+.field-label { display:block; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:7px; margin-top:20px; }
+.field-label:first-of-type { margin-top:0; }
+.field-hint { font-size:12px; color:var(--sky); font-style:italic; margin-bottom:7px; margin-top:-4px; display:block; font-weight:400; text-transform:none; letter-spacing:0; }
+textarea, input[type="text"] { width:100%; border:1.5px solid var(--border); border-radius:6px; padding:12px 14px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); background:var(--paper); resize:vertical; transition:border-color 0.2s,box-shadow 0.2s; line-height:1.6; }
+textarea:focus, input[type="text"]:focus { outline:none; border-color:var(--steel); box-shadow:0 0 0 3px rgba(37,99,168,0.1); }
+textarea { min-height:88px; }
+textarea.tall { min-height:130px; }
+
+/* IA SELECTOR */
+.ia-selector-bar { background:var(--deep); border:1px solid rgba(59,130,196,0.3); border-radius:10px; padding:16px 20px; margin-bottom:28px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.ia-selector-bar label { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ice); white-space:nowrap; }
+.ia-select { background:rgba(255,255,255,0.08); border:1.5px solid rgba(59,130,196,0.35); border-radius:6px; padding:10px 36px 10px 14px; color:var(--white); font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; flex:1; min-width:200px; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2338bdf8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+.ia-select:focus { outline:none; border-color:var(--accent); }
+.ia-nav-btns { display:flex; gap:8px; }
+.ia-nav-btn { background:rgba(56,189,248,0.12); border:1.5px solid rgba(56,189,248,0.3); color:var(--accent); padding:9px 16px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; white-space:nowrap; }
+.ia-nav-btn:hover { background:rgba(56,189,248,0.22); }
+.ia-nav-btn:disabled { opacity:0.3; cursor:not-allowed; }
+
+/* IA FICHA */
+.ia-ficha { display:none; }
+.ia-ficha.active { display:block; }
+
+.ia-ficha-header { border-radius:10px; padding:20px 24px; margin-bottom:24px; display:flex; align-items:center; gap:16px; position:relative; overflow:hidden; }
+.ia-ficha-header::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px); background-size:24px 24px; }
+.ia-logo { font-size:36px; flex-shrink:0; position:relative; z-index:1; }
+.ia-header-text { position:relative; z-index:1; flex:1; }
+.ia-header-text h3 { font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; color:white; margin-bottom:2px; }
+.ia-header-text p { font-size:12px; color:rgba(255,255,255,0.65); }
+.btn-open-ia { position:relative; z-index:1; display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:white; text-decoration:none; padding:9px 18px; border-radius:6px; font-size:12.5px; font-weight:600; font-family:'DM Sans',sans-serif; transition:all 0.2s; white-space:nowrap; }
+.btn-open-ia:hover { background:rgba(255,255,255,0.25); }
+
+/* STAR RATING */
+.star-field { margin-top:20px; }
+.star-field:first-of-type { margin-top:0; }
+.star-label { display:block; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.stars { display:flex; gap:6px; }
+.star { font-size:26px; cursor:pointer; color:#d1d5db; transition:all 0.15s; line-height:1; }
+.star:hover, .star.on { color:#f59e0b; transform:scale(1.15); }
+.star-score { font-size:12px; color:var(--muted); margin-left:10px; align-self:center; font-style:italic; }
+
+/* KNOWN TOGGLE */
+.known-toggle { display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+.known-btn { padding:8px 20px; border-radius:20px; border:1.5px solid var(--border); background:var(--paper); font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; color:var(--muted); }
+.known-btn.selected-yes { background:#d1fae5; border-color:#10b981; color:#065f46; }
+.known-btn.selected-no  { background:#fee2e2; border-color:#ef4444; color:#991b1b; }
+.known-btn.selected-heard { background:#fef3c7; border-color:#f59e0b; color:#92400e; }
+
+/* PROMPT BUILDER */
+.prompt-builder { background:var(--night); border:1px solid rgba(59,130,196,0.3); border-radius:10px; padding:24px 28px; margin-top:8px; }
+.pb-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px; display:block; }
+.pb-desc { font-size:12.5px; color:rgba(176,210,240,0.6); margin-bottom:16px; line-height:1.5; }
+.pb-field { margin-bottom:14px; }
+.pb-field label { display:block; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--ice); margin-bottom:6px; }
+.pb-input, .pb-textarea { width:100%; background:rgba(255,255,255,0.06); border:1.5px solid rgba(59,130,196,0.25); border-radius:6px; padding:10px 13px; color:var(--white); font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.6; transition:border-color 0.2s; }
+.pb-input::placeholder, .pb-textarea::placeholder { color:rgba(176,210,240,0.3); }
+.pb-input:focus, .pb-textarea:focus { outline:none; border-color:var(--accent); background:rgba(255,255,255,0.09); }
+.pb-textarea { resize:vertical; min-height:70px; }
+.pb-generate-btn { background:var(--accent); color:var(--night); border:none; padding:12px 24px; border-radius:6px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:background 0.2s; margin-top:4px; }
+.pb-generate-btn:hover { background:#5dcffc; }
+.pb-result { margin-top:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(59,130,196,0.2); border-radius:6px; padding:14px 16px; font-size:13px; color:var(--frost); line-height:1.75; font-style:italic; display:none; white-space:pre-wrap; }
+.pb-result.show { display:block; }
+.pb-copy-btn { background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); color:var(--accent); padding:6px 14px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; margin-top:10px; transition:all 0.2s; }
+.pb-copy-btn:hover { background:rgba(56,189,248,0.25); }
+
+/* COMPARATIVA FINAL */
+.comp-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; }
+@media(max-width:640px) { .comp-grid { grid-template-columns:1fr; } }
+.comp-card { background:var(--white); border:1px solid var(--border); border-radius:8px; padding:20px 22px; }
+.comp-card-top { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.comp-icon { font-size:22px; }
+.comp-title { font-size:14px; font-weight:700; color:var(--text); }
+.comp-subtitle { font-size:11.5px; color:var(--muted); }
+.ia-pick-select { width:100%; border:1.5px solid var(--border); border-radius:6px; padding:10px 12px; font-family:'DM Sans',sans-serif; font-size:13.5px; color:var(--text); background:var(--paper); cursor:pointer; margin-bottom:10px; }
+.ia-pick-select:focus { outline:none; border-color:var(--steel); }
+
+/* DIVIDER */
+.divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:32px 0; }
+
+/* REFLECTION */
+.reflection { background:var(--mist); border:1px solid var(--frost); border-radius:8px; padding:24px 28px; margin-bottom:24px; }
+.reflection h3 { font-family:'DM Serif Display',serif; font-size:18px; margin-bottom:14px; color:var(--deep); }
+
+/* IA COLOR THEMES */
+.ia-chatgpt   { background:linear-gradient(135deg,#10a37f,#0d7d63); }
+.ia-claude    { background:linear-gradient(135deg,#c96442,#a0432a); }
+.ia-consensus { background:linear-gradient(135deg,#2563a8,#1a4a8a); }
+.ia-deepseek  { background:linear-gradient(135deg,#1a56db,#1240a0); }
+.ia-gemini    { background:linear-gradient(135deg,#4285f4,#1a6bdc); }
+.ia-grok      { background:linear-gradient(135deg,#1d1d1d,#3a3a3a); }
+.ia-metaai    { background:linear-gradient(135deg,#0064e0,#0050b3); }
+.ia-perplexity{ background:linear-gradient(135deg,#20b2aa,#178a83); }
+
+/* BOTTOM BAR */
+.dl-bar { position:fixed; bottom:0; left:0; right:0; background:var(--night); border-top:1px solid rgba(56,189,248,0.2); padding:12px 48px; display:flex; align-items:center; justify-content:flex-end; gap:10px; z-index:200; }
+.dl-note { color:rgba(176,210,240,0.35); font-size:12px; margin-right:auto; }
+.btn { padding:10px 20px; border:none; border-radius:6px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.btn-primary { background:var(--steel); color:white; }
+.btn-primary:hover { background:var(--sky); }
+.btn-accent { background:var(--accent); color:var(--night); }
+.btn-accent:hover { background:#5dcffc; }
+
+/* TOAST */
+.toast { position:fixed; top:20px; right:20px; background:var(--deep); border:1px solid var(--green); color:var(--frost); padding:12px 20px; border-radius:8px; font-size:13px; z-index:999; transform:translateY(-60px); opacity:0; transition:all 0.3s; pointer-events:none; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(8,14,26,0.75); z-index:1000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+.modal-overlay.show { opacity:1; pointer-events:all; }
+.modal-box { background:var(--white); border-radius:12px; padding:32px 36px; max-width:440px; width:90%; box-shadow:0 24px 60px rgba(0,0,0,0.4); border-top:4px solid var(--gold); }
+.modal-icon { font-size:32px; margin-bottom:12px; }
+.modal-box h3 { font-family:'DM Serif Display',serif; font-size:20px; color:var(--text); margin-bottom:8px; }
+.modal-box p { font-size:13.5px; color:var(--muted); line-height:1.6; margin-bottom:20px; }
+.modal-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.modal-btn-stay { background:var(--steel); color:white; border:none; padding:11px 20px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.modal-btn-leave { background:none; border:1.5px solid var(--border); color:var(--muted); padding:11px 20px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+@media(max-width:640px){
+  .header-inner,.main{ padding-left:20px; padding-right:20px; }
+  .nav-wrapper,.save-bar,.reload-banner{ padding-left:16px; padding-right:16px; }
+  .dl-bar{ padding:12px 20px; flex-wrap:wrap; gap:8px; }
+  .dl-note{ display:none; }
+  .comp-grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-bg"></div>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="session-badge">Módulo 2 · Sesión 5 · Viernes</div>
+      <a href="https://classroom.google.com/u/1/c/ODE5MzExOTc3MzAw" target="_blank" class="btn-classroom">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ir a Classroom
+      </a>
+    </div>
+    <h1>Comparativa de<br><em>modelos de IA</em></h1>
+    <div class="header-sub">Cuaderno de trabajo del alumno · 15:30–18:30</div>
+    <div class="header-chips">
+      <span class="chip">🎤 Preparación presentación</span>
+      <span class="chip">📋 Fichas de evaluación</span>
+      <span class="chip">🏆 Mi comparativa final</span>
+      <span class="chip">8 modelos de IA</span>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-bar-inner">
+    <div class="save-dot" id="saveDot"></div>
+    <span class="save-text" id="saveText">Empieza a escribir — tu progreso se guardará automáticamente</span>
+    <span class="unsaved-dot hidden" id="unsavedDot"></span>
+    <button class="btn-clear" onclick="confirmClear()">Borrar todo</button>
+  </div>
+</div>
+
+<!-- RELOAD BANNER -->
+<div class="reload-banner">
+  <div class="reload-banner-inner">
+    <span class="reload-icon">💾</span>
+    <span class="reload-text">
+      <strong>¿Vas a cerrar o cambiar de página?</strong>
+      Descarga el cuaderno antes de salir para no perder tu trabajo.
+    </span>
+    <button class="btn btn-accent" onclick="downloadPDF()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-wrapper">
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('preparacion',this)">🎤 Mi presentación</button>
+    <button class="tab-btn" onclick="showTab('fichas',this)">📋 Fichas de IAs</button>
+    <button class="tab-btn" onclick="showTab('comparativa',this)">🏆 Mi comparativa final</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════════
+     PESTAÑA 1 — PREPARACIÓN DE LA PRESENTACIÓN
+     ═══════════════════════════════════════════════ -->
+<div id="tab-preparacion" class="section active">
+  <div class="sec-head">
+    <div class="sec-kicker">Fase 1 · 15:30 — 17:00</div>
+    <h2>Prepara tu presentación</h2>
+    <p>Tienes 90 minutos para investigar y preparar una presentación de 5 minutos sobre la IA que te ha tocado.</p>
+  </div>
+
+  <div class="callout">
+    <strong>¿Cómo funciona esta sesión?</strong>
+    Cada equipo investiga una IA diferente usando las herramientas que ya conocéis (ChatGPT, búsqueda web, la propia IA asignada). Al terminar, presentáis al grupo durante 5 minutos. El resto de alumnos evalúa cada modelo en la pestaña "Fichas de IAs" mientras escucha.
+  </div>
+
+  <!-- SELECTOR DE IA -->
+  <div class="card accent-top">
+    <div class="card-label">Paso 1 — ¿Qué IA os ha tocado?</div>
+    <h3>Selecciona vuestra IA asignada</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px;">
+      <div class="ia-assign-card" data-ia="ChatGPT" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#10a37f,#0d7d63);">
+        <span style="font-size:22px;">🤖</span><span>ChatGPT</span>
+      </div>
+      <div class="ia-assign-card" data-ia="Claude" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#c96442,#a0432a);">
+        <span style="font-size:22px;">🧡</span><span>Claude</span>
+      </div>
+      <div class="ia-assign-card" data-ia="Consensus" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#2563a8,#1a4a8a);">
+        <span style="font-size:22px;">🔬</span><span>Consensus</span>
+      </div>
+      <div class="ia-assign-card" data-ia="DeepSeek" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#1a56db,#1240a0);">
+        <span style="font-size:22px;">🐋</span><span>DeepSeek</span>
+      </div>
+      <div class="ia-assign-card" data-ia="Gemini" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#4285f4,#1a6bdc);">
+        <span style="font-size:22px;">✨</span><span>Gemini</span>
+      </div>
+      <div class="ia-assign-card" data-ia="Grok" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#1d1d1d,#3a3a3a);">
+        <span style="font-size:22px;">⚡</span><span>Grok</span>
+      </div>
+      <div class="ia-assign-card" data-ia="Meta AI" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#0064e0,#0050b3);">
+        <span style="font-size:22px;">🌐</span><span>Meta AI</span>
+      </div>
+      <div class="ia-assign-card" data-ia="Perplexity" onclick="selectAssignedIA(this)" style="background:linear-gradient(135deg,#20b2aa,#178a83);">
+        <span style="font-size:22px;">🔍</span><span>Perplexity</span>
+      </div>
+    </div>
+    <input type="hidden" data-key="prep_ia_asignada" id="prep_ia_asignada">
+    <div id="ia-asignada-display" style="margin-top:14px;font-size:13.5px;color:var(--muted);font-style:italic;">Ninguna seleccionada todavía</div>
+  </div>
+
+  <!-- INVESTIGACIÓN -->
+  <div class="card accent-left">
+    <div class="card-label">Paso 2 — Investigación</div>
+    <h3>Rellena estos apartados antes de preparar la presentación</h3>
+    <p>Usa ChatGPT, la web o la propia IA que investiguéis para encontrar la información.</p>
+
+    <span class="field-label">Empresa que la desarrolla y país de origen</span>
+    <input type="text" data-key="prep_empresa" placeholder="Ej: OpenAI — San Francisco, EE.UU. (fundada en 2015)…">
+
+    <span class="field-label">Historia breve — ¿cuándo apareció y por qué fue relevante?</span>
+    <textarea data-key="prep_historia" placeholder="Ej: lanzada en noviembre de 2022, fue la primera IA generativa en llegar al gran público y alcanzó 100 millones de usuarios en 2 meses…"></textarea>
+
+    <span class="field-label">Modelo de IA en el que se basa (si se conoce)</span>
+    <input type="text" data-key="prep_modelo_base" placeholder="Ej: GPT-4o (modelo propio de OpenAI), modelo multimodal…">
+
+    <span class="field-label">Principales funcionalidades y casos de uso</span>
+    <textarea data-key="prep_funcionalidades" class="tall" placeholder="Lista las funcionalidades más destacadas: generación de texto, análisis de imágenes, búsqueda web, código, voz, etc.…"></textarea>
+
+    <span class="field-label">Versión gratuita vs. de pago — ¿qué diferencia hay?</span>
+    <textarea data-key="prep_precios" placeholder="Ej: versión gratuita limitada a GPT-4o mini / versión Plus a 20€/mes con acceso a GPT-4o, generación de imágenes y más…"></textarea>
+
+    <span class="field-label">Fortalezas (en qué destaca sobre las demás)</span>
+    <textarea data-key="prep_fortalezas" placeholder="¿Para qué tipo de tareas es especialmente buena esta IA? ¿Qué la hace diferente?…"></textarea>
+
+    <span class="field-label">Limitaciones o puntos débiles conocidos</span>
+    <textarea data-key="prep_limitaciones" placeholder="¿Qué no hace bien? ¿Qué restricciones tiene? ¿Qué ha salido en noticias negativas?…"></textarea>
+
+    <span class="field-label">Política de privacidad y datos — ¿qué hace con tu información?</span>
+    <textarea data-key="prep_privacidad" placeholder="¿Usa tus conversaciones para entrenar modelos? ¿Dónde se almacenan los datos? ¿Hay modo privado?…"></textarea>
+
+    <span class="field-label">Un dato curioso o sorprendente que hayas encontrado</span>
+    <input type="text" data-key="prep_curiosidad" placeholder="Algo que no sabíais y que merezca la pena compartir con el grupo…">
+  </div>
+
+  <!-- BORRADOR PRESENTACIÓN -->
+  <div class="card gold-left">
+    <div class="card-label">Paso 3 — Borrador de la presentación</div>
+    <h3>Estructura tu presentación de 5 minutos</h3>
+    <p>Cada bloque tiene una duración orientativa. No hace falta que sea un guion exacto — con puntos clave es suficiente.</p>
+
+    <span class="field-label">Gancho inicial · 30 segundos — algo que llame la atención</span>
+    <textarea data-key="prep_gancho" placeholder="Una estadística impactante, una anécdota, una pregunta al grupo… algo que enganche desde el primer momento."></textarea>
+
+    <span class="field-label">¿Qué es y quién la hace? · 45 segundos</span>
+    <textarea data-key="prep_que_es" placeholder="Presentación rápida: nombre, empresa, cuándo nació y por qué importa."></textarea>
+
+    <span class="field-label">Demo o ejemplo en directo · 2 minutos — lo más importante</span>
+    <textarea data-key="prep_demo" placeholder="¿Qué vais a enseñar en vivo? ¿Qué prompt usaréis? ¿Qué esperáis que pase? Preparadlo con antelación para que no falle."></textarea>
+
+    <span class="field-label">Lo mejor y lo peor · 1 minuto</span>
+    <textarea data-key="prep_mejor_peor" placeholder="Una fortaleza real con ejemplo concreto + una limitación o crítica honesta."></textarea>
+
+    <span class="field-label">Conclusión y pregunta al grupo · 45 segundos</span>
+    <textarea data-key="prep_conclusion" placeholder="¿Para qué la usaríais vosotros? Termina con una pregunta abierta al grupo."></textarea>
+  </div>
+
+  <!-- GENERADOR DE PROMPT PARA INFOGRAFÍA -->
+  <div class="card purple-left">
+    <div class="card-label">Paso 4 — Genera el prompt para la infografía</div>
+    <h3>Pídele a ChatGPT que cree una infografía con tu investigación</h3>
+    <p>Rellena los campos y el sistema generará automáticamente un prompt completo y detallado para que ChatGPT te cree una infografía visual con toda la información.</p>
+
+    <div class="prompt-builder">
+      <span class="pb-label">Constructor de prompt — infografía de IA</span>
+      <span class="pb-desc">Rellena cada campo con la información que has investigado. El prompt se generará solo al hacer clic en "Generar prompt".</span>
+
+      <div class="pb-field">
+        <label>Nombre de la IA</label>
+        <input class="pb-input" id="pb_nombre" type="text" placeholder="Ej: ChatGPT">
+      </div>
+      <div class="pb-field">
+        <label>Empresa y año de lanzamiento</label>
+        <input class="pb-input" id="pb_empresa" type="text" placeholder="Ej: OpenAI, lanzada en noviembre de 2022">
+      </div>
+      <div class="pb-field">
+        <label>3 funcionalidades principales (separadas por comas)</label>
+        <input class="pb-input" id="pb_funcionalidades" type="text" placeholder="Ej: generación de texto, análisis de imágenes, navegación web">
+      </div>
+      <div class="pb-field">
+        <label>2 fortalezas clave</label>
+        <input class="pb-input" id="pb_fortalezas" type="text" placeholder="Ej: ecosistema de GPTs, integración con herramientas externas">
+      </div>
+      <div class="pb-field">
+        <label>1 o 2 limitaciones importantes</label>
+        <input class="pb-input" id="pb_limitaciones" type="text" placeholder="Ej: puede alucinar datos, versión gratuita limitada">
+      </div>
+      <div class="pb-field">
+        <label>Precio o modelo de acceso</label>
+        <input class="pb-input" id="pb_precio" type="text" placeholder="Ej: gratuito con límites / Plus 20€/mes">
+      </div>
+      <div class="pb-field">
+        <label>Dato curioso o diferenciador</label>
+        <input class="pb-input" id="pb_curiosidad" type="text" placeholder="Ej: alcanzó 100 millones de usuarios en solo 2 meses">
+      </div>
+      <div class="pb-field">
+        <label>Estilo visual preferido para la infografía</label>
+        <input class="pb-input" id="pb_estilo" type="text" placeholder="Ej: moderno y minimalista, con colores verdes / estilo tech oscuro…">
+      </div>
+
+      <button class="pb-generate-btn" onclick="generatePrompt()">✨ Generar prompt automáticamente</button>
+
+      <div class="pb-result" id="pb_result"></div>
+      <button class="pb-copy-btn" id="pb_copy_btn" onclick="copyGeneratedPrompt()" style="display:none;">📋 Copiar prompt</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PESTAÑA 2 — FICHAS DE LAS 8 IAs
+     ═══════════════════════════════════════════════ -->
+<div id="tab-fichas" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Fase 2 · Desde las 17:15</div>
+    <h2>Fichas de evaluación</h2>
+    <p>Durante cada presentación, prueba la IA que se está presentando y rellena su ficha.</p>
+  </div>
+
+  <div class="callout tip">
+    <strong>Cómo usar esta sección</strong>
+    Selecciona la IA del menú desplegable mientras escuchas la presentación. Pruébala tú mismo con el botón de acceso directo y rellena la ficha. Usa las flechas para pasar a la siguiente sin tener que abrir el menú.
+  </div>
+
+  <!-- SELECTOR + NAVEGACIÓN -->
+  <div class="ia-selector-bar">
+    <label>IA activa:</label>
+    <select class="ia-select" id="iaSelect" onchange="switchIA(this.value)">
+      <option value="chatgpt">🤖 ChatGPT — OpenAI</option>
+      <option value="claude">🧡 Claude — Anthropic</option>
+      <option value="consensus">🔬 Consensus</option>
+      <option value="deepseek">🐋 DeepSeek</option>
+      <option value="gemini">✨ Gemini — Google</option>
+      <option value="grok">⚡ Grok — xAI</option>
+      <option value="metaai">🌐 Meta AI</option>
+      <option value="perplexity">🔍 Perplexity AI</option>
+    </select>
+    <div class="ia-nav-btns">
+      <button class="ia-nav-btn" id="btnPrev" onclick="navigateIA(-1)" disabled>← Anterior</button>
+      <button class="ia-nav-btn" id="btnNext" onclick="navigateIA(1)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ── ChatGPT ── -->
+  <div class="ia-ficha active" id="ficha-chatgpt">
+    <div class="ia-ficha-header ia-chatgpt">
+      <span class="ia-logo">🤖</span>
+      <div class="ia-header-text">
+        <h3>ChatGPT</h3>
+        <p>OpenAI · San Francisco, EE.UU. · Lanzado nov. 2022</p>
+      </div>
+      <a href="https://chat.openai.com" target="_blank" class="btn-open-ia">Abrir ChatGPT ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-chatgpt-general" data-key="chatgpt_stars_general">
+        <span class="star" onclick="setStar(this,'chatgpt_stars_general',1)">★</span>
+        <span class="star" onclick="setStar(this,'chatgpt_stars_general',2)">★</span>
+        <span class="star" onclick="setStar(this,'chatgpt_stars_general',3)">★</span>
+        <span class="star" onclick="setStar(this,'chatgpt_stars_general',4)">★</span>
+        <span class="star" onclick="setStar(this,'chatgpt_stars_general',5)">★</span>
+        <span class="star-score" id="score-chatgpt-general">Sin valorar</span>
+      </div>
+
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="chatgpt_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="chatgpt_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="chatgpt_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+
+      <span class="field-label">Prompt que has probado durante la presentación</span>
+      <input type="text" data-key="chatgpt_prompt_prueba" placeholder="¿Qué le has preguntado o pedido?">
+
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="chatgpt_respuesta_opinion" placeholder="¿Fue precisa, rápida, útil? ¿Te sorprendió algo?"></textarea>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" id="stars-chatgpt-usabilidad" data-key="chatgpt_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'chatgpt_stars_usabilidad',1)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_usabilidad',2)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_usabilidad',3)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_usabilidad',4)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" id="stars-chatgpt-calidad" data-key="chatgpt_stars_calidad">
+            <span class="star" onclick="setStar(this,'chatgpt_stars_calidad',1)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_calidad',2)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_calidad',3)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_calidad',4)">★</span>
+            <span class="star" onclick="setStar(this,'chatgpt_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="chatgpt_uso_personal" placeholder="Sé concreto: ¿para qué tarea exacta te sería más útil?">
+
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="chatgpt_mejorar" placeholder="Limitación, diseño, precio, privacidad…">
+    </div>
+  </div>
+
+  <!-- ── Claude ── -->
+  <div class="ia-ficha" id="ficha-claude">
+    <div class="ia-ficha-header ia-claude">
+      <span class="ia-logo">🧡</span>
+      <div class="ia-header-text">
+        <h3>Claude</h3>
+        <p>Anthropic · San Francisco, EE.UU. · Lanzado mar. 2023</p>
+      </div>
+      <a href="https://claude.ai" target="_blank" class="btn-open-ia">Abrir Claude ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-claude-general" data-key="claude_stars_general">
+        <span class="star" onclick="setStar(this,'claude_stars_general',1)">★</span>
+        <span class="star" onclick="setStar(this,'claude_stars_general',2)">★</span>
+        <span class="star" onclick="setStar(this,'claude_stars_general',3)">★</span>
+        <span class="star" onclick="setStar(this,'claude_stars_general',4)">★</span>
+        <span class="star" onclick="setStar(this,'claude_stars_general',5)">★</span>
+        <span class="star-score" id="score-claude-general">Sin valorar</span>
+      </div>
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="claude_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="claude_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="claude_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+      <span class="field-label">Prompt que has probado durante la presentación</span>
+      <input type="text" data-key="claude_prompt_prueba" placeholder="¿Qué le has preguntado o pedido?">
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="claude_respuesta_opinion" placeholder="¿Fue precisa, rápida, útil? ¿Te sorprendió algo?"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" id="stars-claude-usabilidad" data-key="claude_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'claude_stars_usabilidad',1)">★</span><span class="star" onclick="setStar(this,'claude_stars_usabilidad',2)">★</span><span class="star" onclick="setStar(this,'claude_stars_usabilidad',3)">★</span><span class="star" onclick="setStar(this,'claude_stars_usabilidad',4)">★</span><span class="star" onclick="setStar(this,'claude_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" id="stars-claude-calidad" data-key="claude_stars_calidad">
+            <span class="star" onclick="setStar(this,'claude_stars_calidad',1)">★</span><span class="star" onclick="setStar(this,'claude_stars_calidad',2)">★</span><span class="star" onclick="setStar(this,'claude_stars_calidad',3)">★</span><span class="star" onclick="setStar(this,'claude_stars_calidad',4)">★</span><span class="star" onclick="setStar(this,'claude_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="claude_uso_personal" placeholder="Sé concreto: ¿para qué tarea exacta te sería más útil?">
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="claude_mejorar" placeholder="Limitación, diseño, precio, privacidad…">
+    </div>
+  </div>
+
+  <!-- ── Consensus ── -->
+  <div class="ia-ficha" id="ficha-consensus">
+    <div class="ia-ficha-header ia-consensus">
+      <span class="ia-logo">🔬</span>
+      <div class="ia-header-text">
+        <h3>Consensus</h3>
+        <p>Consensus NLP Inc. · EE.UU. · Búsqueda en papers científicos</p>
+      </div>
+      <a href="https://consensus.app" target="_blank" class="btn-open-ia">Abrir Consensus ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-consensus-general" data-key="consensus_stars_general">
+        <span class="star" onclick="setStar(this,'consensus_stars_general',1)">★</span><span class="star" onclick="setStar(this,'consensus_stars_general',2)">★</span><span class="star" onclick="setStar(this,'consensus_stars_general',3)">★</span><span class="star" onclick="setStar(this,'consensus_stars_general',4)">★</span><span class="star" onclick="setStar(this,'consensus_stars_general',5)">★</span>
+        <span class="star-score" id="score-consensus-general">Sin valorar</span>
+      </div>
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="consensus_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="consensus_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="consensus_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+      <span class="field-label">Prompt que has probado durante la presentación</span>
+      <input type="text" data-key="consensus_prompt_prueba" placeholder="¿Qué pregunta científica le has hecho?">
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="consensus_respuesta_opinion" placeholder="¿Encontró artículos relevantes? ¿Las fuentes parecían fiables?"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" data-key="consensus_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'consensus_stars_usabilidad',1)">★</span><span class="star" onclick="setStar(this,'consensus_stars_usabilidad',2)">★</span><span class="star" onclick="setStar(this,'consensus_stars_usabilidad',3)">★</span><span class="star" onclick="setStar(this,'consensus_stars_usabilidad',4)">★</span><span class="star" onclick="setStar(this,'consensus_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" data-key="consensus_stars_calidad">
+            <span class="star" onclick="setStar(this,'consensus_stars_calidad',1)">★</span><span class="star" onclick="setStar(this,'consensus_stars_calidad',2)">★</span><span class="star" onclick="setStar(this,'consensus_stars_calidad',3)">★</span><span class="star" onclick="setStar(this,'consensus_stars_calidad',4)">★</span><span class="star" onclick="setStar(this,'consensus_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="consensus_uso_personal" placeholder="¿En qué situación te sería útil buscar en artículos científicos?">
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="consensus_mejorar" placeholder="Limitación, diseño, acceso, cobertura de temas…">
+    </div>
+  </div>
+
+  <!-- ── DeepSeek ── -->
+  <div class="ia-ficha" id="ficha-deepseek">
+    <div class="ia-ficha-header ia-deepseek">
+      <span class="ia-logo">🐋</span>
+      <div class="ia-header-text">
+        <h3>DeepSeek</h3>
+        <p>DeepSeek AI · China · Lanzado dic. 2023 · Open source</p>
+      </div>
+      <a href="https://chat.deepseek.com" target="_blank" class="btn-open-ia">Abrir DeepSeek ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-deepseek-general" data-key="deepseek_stars_general">
+        <span class="star" onclick="setStar(this,'deepseek_stars_general',1)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_general',2)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_general',3)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_general',4)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_general',5)">★</span>
+        <span class="star-score" id="score-deepseek-general">Sin valorar</span>
+      </div>
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="deepseek_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="deepseek_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="deepseek_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+      <span class="field-label">Prompt que has probado durante la presentación</span>
+      <input type="text" data-key="deepseek_prompt_prueba" placeholder="¿Qué le has preguntado o pedido?">
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="deepseek_respuesta_opinion" placeholder="¿Cómo se compara con otras IAs que ya conoces?"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" data-key="deepseek_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'deepseek_stars_usabilidad',1)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_usabilidad',2)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_usabilidad',3)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_usabilidad',4)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" data-key="deepseek_stars_calidad">
+            <span class="star" onclick="setStar(this,'deepseek_stars_calidad',1)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_calidad',2)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_calidad',3)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_calidad',4)">★</span><span class="star" onclick="setStar(this,'deepseek_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="deepseek_uso_personal" placeholder="Sé concreto: ¿para qué tarea exacta te sería más útil?">
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="deepseek_mejorar" placeholder="Privacidad de datos (China), diseño, limitaciones…">
+    </div>
+  </div>
+
+  <!-- ── Gemini ── -->
+  <div class="ia-ficha" id="ficha-gemini">
+    <div class="ia-ficha-header ia-gemini">
+      <span class="ia-logo">✨</span>
+      <div class="ia-header-text">
+        <h3>Gemini</h3>
+        <p>Google DeepMind · EE.UU. · Lanzado dic. 2023</p>
+      </div>
+      <a href="https://gemini.google.com" target="_blank" class="btn-open-ia">Abrir Gemini ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-gemini-general" data-key="gemini_stars_general">
+        <span class="star" onclick="setStar(this,'gemini_stars_general',1)">★</span><span class="star" onclick="setStar(this,'gemini_stars_general',2)">★</span><span class="star" onclick="setStar(this,'gemini_stars_general',3)">★</span><span class="star" onclick="setStar(this,'gemini_stars_general',4)">★</span><span class="star" onclick="setStar(this,'gemini_stars_general',5)">★</span>
+        <span class="star-score" id="score-gemini-general">Sin valorar</span>
+      </div>
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="gemini_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="gemini_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="gemini_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+      <span class="field-label">Prompt que has probado durante la presentación</span>
+      <input type="text" data-key="gemini_prompt_prueba" placeholder="¿Qué le has preguntado o pedido?">
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="gemini_respuesta_opinion" placeholder="¿Notaste la integración con Google? ¿Las búsquedas en tiempo real?"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" data-key="gemini_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'gemini_stars_usabilidad',1)">★</span><span class="star" onclick="setStar(this,'gemini_stars_usabilidad',2)">★</span><span class="star" onclick="setStar(this,'gemini_stars_usabilidad',3)">★</span><span class="star" onclick="setStar(this,'gemini_stars_usabilidad',4)">★</span><span class="star" onclick="setStar(this,'gemini_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" data-key="gemini_stars_calidad">
+            <span class="star" onclick="setStar(this,'gemini_stars_calidad',1)">★</span><span class="star" onclick="setStar(this,'gemini_stars_calidad',2)">★</span><span class="star" onclick="setStar(this,'gemini_stars_calidad',3)">★</span><span class="star" onclick="setStar(this,'gemini_stars_calidad',4)">★</span><span class="star" onclick="setStar(this,'gemini_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="gemini_uso_personal" placeholder="Sé concreto: ¿para qué tarea exacta te sería más útil?">
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="gemini_mejorar" placeholder="Limitación, diseño, precio, privacidad…">
+    </div>
+  </div>
+
+  <!-- ── Grok ── -->
+  <div class="ia-ficha" id="ficha-grok">
+    <div class="ia-ficha-header ia-grok">
+      <span class="ia-logo">⚡</span>
+      <div class="ia-header-text">
+        <h3>Grok</h3>
+        <p>xAI (Elon Musk) · EE.UU. · Lanzado nov. 2023 · Integrado en X</p>
+      </div>
+      <a href="https://grok.com" target="_blank" class="btn-open-ia">Abrir Grok ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-grok-general" data-key="grok_stars_general">
+        <span class="star" onclick="setStar(this,'grok_stars_general',1)">★</span><span class="star" onclick="setStar(this,'grok_stars_general',2)">★</span><span class="star" onclick="setStar(this,'grok_stars_general',3)">★</span><span class="star" onclick="setStar(this,'grok_stars_general',4)">★</span><span class="star" onclick="setStar(this,'grok_stars_general',5)">★</span>
+        <span class="star-score" id="score-grok-general">Sin valorar</span>
+      </div>
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="grok_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="grok_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="grok_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+      <span class="field-label">Prompt que has probado durante la presentación</span>
+      <input type="text" data-key="grok_prompt_prueba" placeholder="¿Qué le has preguntado o pedido?">
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="grok_respuesta_opinion" placeholder="¿Notaste el acceso a información de X (Twitter) en tiempo real?"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" data-key="grok_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'grok_stars_usabilidad',1)">★</span><span class="star" onclick="setStar(this,'grok_stars_usabilidad',2)">★</span><span class="star" onclick="setStar(this,'grok_stars_usabilidad',3)">★</span><span class="star" onclick="setStar(this,'grok_stars_usabilidad',4)">★</span><span class="star" onclick="setStar(this,'grok_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" data-key="grok_stars_calidad">
+            <span class="star" onclick="setStar(this,'grok_stars_calidad',1)">★</span><span class="star" onclick="setStar(this,'grok_stars_calidad',2)">★</span><span class="star" onclick="setStar(this,'grok_stars_calidad',3)">★</span><span class="star" onclick="setStar(this,'grok_stars_calidad',4)">★</span><span class="star" onclick="setStar(this,'grok_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="grok_uso_personal" placeholder="Sé concreto: ¿para qué tarea exacta te sería más útil?">
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="grok_mejorar" placeholder="Limitación, diseño, vinculación con X, privacidad…">
+    </div>
+  </div>
+
+  <!-- ── Meta AI ── -->
+  <div class="ia-ficha" id="ficha-metaai">
+    <div class="ia-ficha-header ia-metaai">
+      <span class="ia-logo">🌐</span>
+      <div class="ia-header-text">
+        <h3>Meta AI</h3>
+        <p>Meta (Facebook) · EE.UU. · Integrada en WhatsApp, Instagram, Facebook</p>
+      </div>
+      <a href="https://www.meta.ai" target="_blank" class="btn-open-ia">Abrir Meta AI ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-metaai-general" data-key="metaai_stars_general">
+        <span class="star" onclick="setStar(this,'metaai_stars_general',1)">★</span><span class="star" onclick="setStar(this,'metaai_stars_general',2)">★</span><span class="star" onclick="setStar(this,'metaai_stars_general',3)">★</span><span class="star" onclick="setStar(this,'metaai_stars_general',4)">★</span><span class="star" onclick="setStar(this,'metaai_stars_general',5)">★</span>
+        <span class="star-score" id="score-metaai-general">Sin valorar</span>
+      </div>
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="metaai_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="metaai_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="metaai_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+      <span class="field-label">Prompt que has probado durante la presentación</span>
+      <input type="text" data-key="metaai_prompt_prueba" placeholder="¿Qué le has preguntado o pedido?">
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="metaai_respuesta_opinion" placeholder="¿La probaste en WhatsApp o en la web? ¿Notaste diferencias?"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" data-key="metaai_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'metaai_stars_usabilidad',1)">★</span><span class="star" onclick="setStar(this,'metaai_stars_usabilidad',2)">★</span><span class="star" onclick="setStar(this,'metaai_stars_usabilidad',3)">★</span><span class="star" onclick="setStar(this,'metaai_stars_usabilidad',4)">★</span><span class="star" onclick="setStar(this,'metaai_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" data-key="metaai_stars_calidad">
+            <span class="star" onclick="setStar(this,'metaai_stars_calidad',1)">★</span><span class="star" onclick="setStar(this,'metaai_stars_calidad',2)">★</span><span class="star" onclick="setStar(this,'metaai_stars_calidad',3)">★</span><span class="star" onclick="setStar(this,'metaai_stars_calidad',4)">★</span><span class="star" onclick="setStar(this,'metaai_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="metaai_uso_personal" placeholder="¿La usarías por WhatsApp? ¿Para qué exactamente?">
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="metaai_mejorar" placeholder="Privacidad de datos con Meta, limitaciones, diseño…">
+    </div>
+  </div>
+
+  <!-- ── Perplexity ── -->
+  <div class="ia-ficha" id="ficha-perplexity">
+    <div class="ia-ficha-header ia-perplexity">
+      <span class="ia-logo">🔍</span>
+      <div class="ia-header-text">
+        <h3>Perplexity AI</h3>
+        <p>Perplexity AI Inc. · EE.UU. · Motor de búsqueda con IA · 2022</p>
+      </div>
+      <a href="https://www.perplexity.ai" target="_blank" class="btn-open-ia">Abrir Perplexity ↗</a>
+    </div>
+    <div class="card">
+      <div class="card-label">Tu evaluación durante la presentación</div>
+      <h3>Pruébala y valórala</h3>
+      <span class="star-label field-label" style="margin-top:0;">Valoración general (1–5 estrellas)</span>
+      <div class="stars" id="stars-perplexity-general" data-key="perplexity_stars_general">
+        <span class="star" onclick="setStar(this,'perplexity_stars_general',1)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_general',2)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_general',3)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_general',4)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_general',5)">★</span>
+        <span class="star-score" id="score-perplexity-general">Sin valorar</span>
+      </div>
+      <span class="field-label" style="margin-top:18px;">¿La conocías antes de hoy?</span>
+      <div class="known-toggle">
+        <button class="known-btn" data-key="perplexity_conocia" data-val="si" onclick="setKnown(this)">Sí, la uso habitualmente</button>
+        <button class="known-btn" data-key="perplexity_conocia" data-val="algo" onclick="setKnown(this)">La había oído pero poco</button>
+        <button class="known-btn" data-key="perplexity_conocia" data-val="no" onclick="setKnown(this)">No la conocía</button>
+      </div>
+      <span class="field-label">Prompt / búsqueda que has probado durante la presentación</span>
+      <input type="text" data-key="perplexity_prompt_prueba" placeholder="¿Qué has buscado? ¿Citó las fuentes?">
+      <span class="field-label">¿Qué te ha parecido la respuesta?</span>
+      <textarea data-key="perplexity_respuesta_opinion" placeholder="¿Las fuentes eran fiables? ¿Se diferencia de una búsqueda en Google?"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+        <div>
+          <span class="star-label field-label">Facilidad de uso</span>
+          <div class="stars" data-key="perplexity_stars_usabilidad">
+            <span class="star" onclick="setStar(this,'perplexity_stars_usabilidad',1)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_usabilidad',2)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_usabilidad',3)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_usabilidad',4)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_usabilidad',5)">★</span>
+          </div>
+        </div>
+        <div>
+          <span class="star-label field-label">Calidad de respuestas</span>
+          <div class="stars" data-key="perplexity_stars_calidad">
+            <span class="star" onclick="setStar(this,'perplexity_stars_calidad',1)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_calidad',2)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_calidad',3)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_calidad',4)">★</span><span class="star" onclick="setStar(this,'perplexity_stars_calidad',5)">★</span>
+          </div>
+        </div>
+      </div>
+      <span class="field-label">¿Para qué la usarías tú en tu vida diaria?</span>
+      <input type="text" data-key="perplexity_uso_personal" placeholder="¿La usarías en lugar de Google? ¿Para qué tipo de búsquedas?">
+      <span class="field-label">Una cosa que no te ha gustado o que mejorarías</span>
+      <input type="text" data-key="perplexity_mejorar" placeholder="Limitación, diseño, cobertura, fiabilidad de fuentes…">
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PESTAÑA 3 — COMPARATIVA FINAL
+     ═══════════════════════════════════════════════ -->
+<div id="tab-comparativa" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Cierre · 18:10</div>
+    <h2>Mi comparativa final</h2>
+    <p>Después de ver todas las presentaciones, elige la mejor IA para cada categoría y justifica tu elección.</p>
+  </div>
+
+  <div class="callout">
+    <strong>No hay respuesta correcta</strong>
+    Esta comparativa es tuya. Lo importante es que justifiques por qué eliges cada una. La misma IA puede ser la mejor en varios aspectos o ninguna puede ganar en todos.
+  </div>
+
+  <div class="comp-grid">
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">💬</span><div><div class="comp-title">Mejor para conversación general</div><div class="comp-subtitle">Redacción, consultas, asistente del día a día</div></div></div>
+      <select class="ia-pick-select" data-key="comp_conversacion"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Por qué?</span>
+      <textarea data-key="comp_conv_razon" placeholder="Justifica tu elección con lo que has visto hoy…"></textarea>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">🔎</span><div><div class="comp-title">Mejor para buscar información</div><div class="comp-subtitle">Investigación, noticias, búsqueda con fuentes</div></div></div>
+      <select class="ia-pick-select" data-key="comp_busqueda"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Por qué?</span>
+      <textarea data-key="comp_bus_razon" placeholder="Justifica tu elección con lo que has visto hoy…"></textarea>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">💼</span><div><div class="comp-title">Mejor para el trabajo</div><div class="comp-subtitle">Documentos, correos, análisis, productividad</div></div></div>
+      <select class="ia-pick-select" data-key="comp_trabajo"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Por qué?</span>
+      <textarea data-key="comp_trab_razon" placeholder="Justifica tu elección con lo que has visto hoy…"></textarea>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">🎓</span><div><div class="comp-title">Mejor para aprender</div><div class="comp-subtitle">Explicaciones, tutoriales, estudiar</div></div></div>
+      <select class="ia-pick-select" data-key="comp_aprender"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Por qué?</span>
+      <textarea data-key="comp_apr_razon" placeholder="Justifica tu elección con lo que has visto hoy…"></textarea>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">🔒</span><div><div class="comp-title">Mejor en privacidad y ética</div><div class="comp-subtitle">Protección de datos, transparencia, confianza</div></div></div>
+      <select class="ia-pick-select" data-key="comp_privacidad"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Por qué?</span>
+      <textarea data-key="comp_priv_razon" placeholder="Justifica tu elección con lo que has visto hoy…"></textarea>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">🎨</span><div><div class="comp-title">Mejor diseño y experiencia</div><div class="comp-subtitle">Interfaz, facilidad, sensación de uso</div></div></div>
+      <select class="ia-pick-select" data-key="comp_diseno"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Por qué?</span>
+      <textarea data-key="comp_dis_razon" placeholder="Justifica tu elección con lo que has visto hoy…"></textarea>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">🆓</span><div><div class="comp-title">Mejor relación gratuito/pago</div><div class="comp-subtitle">Lo que ofrece gratis vs. lo que cobra</div></div></div>
+      <select class="ia-pick-select" data-key="comp_precio"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Por qué?</span>
+      <textarea data-key="comp_prec_razon" placeholder="Justifica tu elección con lo que has visto hoy…"></textarea>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-top"><span class="comp-icon">🚀</span><div><div class="comp-title">La que más te ha sorprendido</div><div class="comp-subtitle">No la que más conocías, sino la que más te impactó hoy</div></div></div>
+      <select class="ia-pick-select" data-key="comp_sorpresa"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+      <span class="field-label" style="margin-top:4px;">¿Qué te sorprendió?</span>
+      <textarea data-key="comp_sorp_razon" placeholder="Sé específico: ¿qué hizo o dijo que no esperabas?"></textarea>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MI STACK PERSONAL -->
+  <div class="card accent-top">
+    <div class="card-label">Mi stack personal de IA</div>
+    <h3>¿Qué herramientas vas a usar a partir de ahora?</h3>
+    <p>Esto no es un ejercicio — es tu plan real. Sé honesto sobre lo que realmente usarás.</p>
+
+    <span class="field-label">IA principal (la que usarás más)</span>
+    <select class="ia-pick-select" data-key="stack_principal" style="margin-bottom:8px;"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option></select>
+    <span class="field-label">¿Para qué la usarás principalmente?</span>
+    <input type="text" data-key="stack_principal_uso" placeholder="Sé concreto: ¿qué tarea, cuándo, con qué frecuencia?">
+
+    <span class="field-label" style="margin-top:18px;">IA secundaria (para un caso de uso específico)</span>
+    <select class="ia-pick-select" data-key="stack_secundaria" style="margin-bottom:8px;"><option value="">— Elige una IA —</option><option>ChatGPT</option><option>Claude</option><option>Consensus</option><option>DeepSeek</option><option>Gemini</option><option>Grok</option><option>Meta AI</option><option>Perplexity</option><option>Ninguna, con una tengo suficiente</option></select>
+    <span class="field-label">¿Para qué caso concreto?</span>
+    <input type="text" data-key="stack_secundaria_uso" placeholder="Ej: Perplexity solo cuando necesito buscar algo con fuentes verificadas…">
+  </div>
+
+  <div class="reflection">
+    <h3>💬 Cierre del Módulo 2</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:16px;">Lleváis una semana entera trabajando con IA. Este es el momento de parar y mirar atrás.</p>
+
+    <span class="field-label">¿Qué sabías el lunes que no sabías?</span>
+    <textarea data-key="cierre_sabia" placeholder="No lo que has aprendido en abstracto — algo concreto que ahora sabes hacer o entender que antes no sabías."></textarea>
+
+    <span class="field-label">Una cosa que cambiarás en cómo usas la IA a partir de hoy</span>
+    <input type="text" data-key="cierre_cambio" placeholder="Algo concreto y accionable, no una intención vaga.">
+
+    <span class="field-label">La herramienta de IA que más vas a recomendar a alguien de tu entorno — ¿a quién y para qué?</span>
+    <textarea data-key="cierre_recomendar" placeholder="Piensa en alguien real: un familiar, un amigo, un compañero. ¿Qué le dirías que hiciera con la IA?"></textarea>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="warnModal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <h3>¿Seguro que quieres salir?</h3>
+    <p>Tu progreso <strong>sobrevivirá si recargas esta página</strong>, pero si cierras la pestaña lo perderás. Descarga el cuaderno antes de salir.</p>
+    <div class="modal-actions">
+      <button class="modal-btn-stay" onclick="closeWarnModal();downloadPDF()">⬇ Descargar y salir</button>
+      <button class="modal-btn-stay" onclick="closeWarnModal()" style="background:var(--sky);">⬅ Quedarme</button>
+      <button class="modal-btn-leave" id="modalLeaveBtn">Salir sin guardar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="dl-bar">
+  <span class="dl-note">Sesión 5 · ChatGPT e IA · Lanbide</span>
+  <button class="btn btn-accent" onclick="downloadPDF()">⬇ Descargar cuaderno PDF</button>
+</div>
+
+<style>
+/* IA ASSIGN CARDS */
+.ia-assign-card { display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 10px; border-radius:8px; cursor:pointer; transition:all 0.15s; border:3px solid transparent; color:white; font-size:13px; font-weight:600; text-align:center; user-select:none; }
+.ia-assign-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,0.2); }
+.ia-assign-card.selected { border-color:white; box-shadow:0 0 0 3px rgba(56,189,248,0.5); transform:translateY(-3px); }
+</style>
+
+<script>
+const STORAGE_KEY = 'sesion5_lanbide_v1';
+const IA_ORDER = ['chatgpt','claude','consensus','deepseek','gemini','grok','metaai','perplexity'];
+let currentIAIndex = 0;
+let hasUnsavedChanges = false;
+let saveDebounce = null;
+let pendingUrl = null;
+
+// ── TABS ──────────────────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── IA FICHA NAVIGATION ───────────────────────────────────────────
+function switchIA(val) {
+  document.querySelectorAll('.ia-ficha').forEach(f => f.classList.remove('active'));
+  const target = document.getElementById('ficha-' + val);
+  if (target) target.classList.add('active');
+  currentIAIndex = IA_ORDER.indexOf(val);
+  updateNavBtns();
+  window.scrollTo({ top: document.querySelector('.ia-selector-bar').offsetTop - 80, behavior: 'smooth' });
+}
+
+function navigateIA(dir) {
+  const newIdx = currentIAIndex + dir;
+  if (newIdx < 0 || newIdx >= IA_ORDER.length) return;
+  currentIAIndex = newIdx;
+  const val = IA_ORDER[currentIAIndex];
+  document.getElementById('iaSelect').value = val;
+  switchIA(val);
+}
+
+function updateNavBtns() {
+  document.getElementById('btnPrev').disabled = currentIAIndex === 0;
+  document.getElementById('btnNext').disabled = currentIAIndex === IA_ORDER.length - 1;
+}
+
+// ── STAR RATING ───────────────────────────────────────────────────
+function setStar(star, key, val) {
+  const container = star.closest('.stars') || document.querySelector('[data-key="' + key + '"]');
+  const stars = container.querySelectorAll('.star');
+  stars.forEach((s, i) => s.classList.toggle('on', i < val));
+  const scoreEl = document.getElementById('score-' + key.replace('_stars_', '-'));
+  if (scoreEl) {
+    const labels = ['','⭐ Muy mala','⭐⭐ Floja','⭐⭐⭐ Normal','⭐⭐⭐⭐ Buena','⭐⭐⭐⭐⭐ Excelente'];
+    scoreEl.textContent = labels[val] || '';
+  }
+  container.dataset.value = val;
+  saveAll();
+}
+
+function restoreStars(key, val) {
+  const container = document.querySelector('[data-key="' + key + '"]');
+  if (!container || !val) return;
+  const stars = container.querySelectorAll('.star');
+  stars.forEach((s, i) => s.classList.toggle('on', i < parseInt(val)));
+  container.dataset.value = val;
+  const scoreEl = document.getElementById('score-' + key.replace('_stars_', '-'));
+  if (scoreEl) {
+    const labels = ['','⭐ Muy mala','⭐⭐ Floja','⭐⭐⭐ Normal','⭐⭐⭐⭐ Buena','⭐⭐⭐⭐⭐ Excelente'];
+    scoreEl.textContent = labels[parseInt(val)] || '';
+  }
+}
+
+// ── KNOWN TOGGLE ──────────────────────────────────────────────────
+function setKnown(btn) {
+  const key = btn.dataset.key;
+  const val = btn.dataset.val;
+  document.querySelectorAll(`[data-key="${key}"]`).forEach(b => {
+    b.className = 'known-btn';
+  });
+  btn.classList.add('selected-' + val);
+  saveAll();
+}
+
+function restoreKnown(key, val) {
+  if (!val) return;
+  const btn = document.querySelector(`[data-key="${key}"][data-val="${val}"]`);
+  if (btn) { btn.className = 'known-btn selected-' + val; }
+}
+
+// ── IA ASSIGN ─────────────────────────────────────────────────────
+function selectAssignedIA(card) {
+  document.querySelectorAll('.ia-assign-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  const ia = card.dataset.ia;
+  document.getElementById('prep_ia_asignada').value = ia;
+  document.getElementById('ia-asignada-display').innerHTML =
+    `<strong style="color:var(--steel)">IA asignada: ${ia}</strong> — Ya podéis empezar a investigar.`;
+  saveAll();
+}
+
+// ── PROMPT BUILDER ────────────────────────────────────────────────
+function generatePrompt() {
+  const n    = document.getElementById('pb_nombre').value.trim() || '[nombre de la IA]';
+  const emp  = document.getElementById('pb_empresa').value.trim() || '[empresa y año]';
+  const func = document.getElementById('pb_funcionalidades').value.trim() || '[funcionalidades]';
+  const fort = document.getElementById('pb_fortalezas').value.trim() || '[fortalezas]';
+  const lim  = document.getElementById('pb_limitaciones').value.trim() || '[limitaciones]';
+  const prec = document.getElementById('pb_precio').value.trim() || '[precio]';
+  const cur  = document.getElementById('pb_curiosidad').value.trim() || '[dato curioso]';
+  const est  = document.getElementById('pb_estilo').value.trim() || 'moderno, limpio y profesional';
+
+  const prompt = `Crea una infografía visual completa y atractiva sobre ${n}, un modelo de inteligencia artificial.
+
+La infografía debe incluir los siguientes bloques de información claramente diferenciados:
+
+1. CABECERA: Nombre "${n}", logo o icono representativo, y el nombre de la empresa creadora: ${emp}.
+
+2. ¿QUÉ ES?: Una descripción en 2-3 líneas que explique de forma sencilla para qué sirve ${n} y qué la hace especial.
+
+3. FUNCIONALIDADES PRINCIPALES (iconos + texto breve):
+   ${func}
+
+4. FORTALEZAS (en verde o color positivo):
+   ${fort}
+
+5. LIMITACIONES (en rojo o color de aviso):
+   ${lim}
+
+6. PRECIO Y ACCESO:
+   ${prec}
+
+7. DATO CURIOSO O DIFERENCIADOR (destacado visualmente):
+   ${cur}
+
+8. PIE: "Presentado en el curso ChatGPT e IA · Lanbide 2025"
+
+ESTILO VISUAL: ${est}. Usa colores coherentes con la identidad visual de ${n}. La infografía debe ser clara, legible y visualmente impactante. Genera el código HTML y CSS completo que pueda abrirse en un navegador, con todo en un único archivo. Usa Google Fonts para tipografía. El resultado debe verse como una infografía profesional, no como una página web normal.`;
+
+  const resultEl = document.getElementById('pb_result');
+  resultEl.textContent = prompt;
+  resultEl.classList.add('show');
+  document.getElementById('pb_copy_btn').style.display = 'inline-block';
+  saveAll();
+}
+
+function copyGeneratedPrompt() {
+  const text = document.getElementById('pb_result').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Prompt copiado — pégalo en ChatGPT');
+    const btn = document.getElementById('pb_copy_btn');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => btn.textContent = '📋 Copiar prompt', 2000);
+  });
+}
+
+// ── COLLECT DATA ──────────────────────────────────────────────────
+function getAllData() {
+  const data = {};
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (el.tagName === 'SELECT') data[key] = el.value;
+    else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') data[key] = el.value || '';
+  });
+  // Stars
+  document.querySelectorAll('.stars[data-key]').forEach(el => {
+    data[el.dataset.key] = el.dataset.value || '0';
+  });
+  // Known toggles
+  document.querySelectorAll('.known-btn[class*="selected-"]').forEach(btn => {
+    const cls = btn.className.match(/selected-(\w+)/);
+    if (cls) data[btn.dataset.key] = btn.dataset.val;
+  });
+  // Assigned IA
+  const assignedCard = document.querySelector('.ia-assign-card.selected');
+  if (assignedCard) data['assigned_ia_card'] = assignedCard.dataset.ia;
+  return data;
+}
+
+function applyData(data) {
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (!(key in data)) return;
+    if (el.tagName === 'SELECT') el.value = data[key];
+    else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = data[key];
+  });
+  // Stars
+  document.querySelectorAll('.stars[data-key]').forEach(el => {
+    restoreStars(el.dataset.key, data[el.dataset.key]);
+  });
+  // Known
+  const knownKeys = [...new Set([...document.querySelectorAll('.known-btn')].map(b => b.dataset.key))];
+  knownKeys.forEach(k => { if (data[k]) restoreKnown(k, data[k]); });
+  // Assigned IA
+  if (data['assigned_ia_card']) {
+    const card = document.querySelector(`.ia-assign-card[data-ia="${data['assigned_ia_card']}"]`);
+    if (card) {
+      document.querySelectorAll('.ia-assign-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      document.getElementById('prep_ia_asignada').value = data['assigned_ia_card'];
+      document.getElementById('ia-asignada-display').innerHTML =
+        `<strong style="color:var(--steel)">IA asignada: ${data['assigned_ia_card']}</strong> — Ya podéis empezar a investigar.`;
+    }
+  }
+}
+
+// ── SAVE TO URL HASH ──────────────────────────────────────────────
+function saveAll() {
+  document.getElementById('unsavedDot').classList.remove('hidden');
+  document.getElementById('saveDot').classList.add('saving');
+  hasUnsavedChanges = true;
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(() => {
+    try {
+      const json = JSON.stringify(getAllData());
+      const enc = btoa(unescape(encodeURIComponent(json)));
+      history.replaceState(null, '', '#' + enc);
+      try { sessionStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+      try { localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+      document.getElementById('saveDot').classList.remove('saving');
+      document.getElementById('saveDot').style.background = 'var(--green)';
+      document.getElementById('saveText').textContent = '✓ Guardado — si recargas, tus datos se restaurarán';
+    } catch(e) {
+      document.getElementById('saveText').textContent = '⚠ Error al guardar — descarga el cuaderno';
+    }
+  }, 800);
+}
+
+function loadAll() {
+  try {
+    const hash = location.hash.replace('#','');
+    if (hash && hash.length > 10) {
+      applyData(JSON.parse(decodeURIComponent(escape(atob(hash)))));
+      document.getElementById('saveText').textContent = '✓ Progreso restaurado';
+      document.getElementById('saveDot').style.background = 'var(--green)';
+      return true;
+    }
+  } catch(e) {}
+  try { const r = sessionStorage.getItem(STORAGE_KEY); if (r) { applyData(JSON.parse(r)); return true; } } catch(e) {}
+  try { const r = localStorage.getItem(STORAGE_KEY);   if (r) { applyData(JSON.parse(r)); return true; } } catch(e) {}
+  return false;
+}
+
+function confirmClear() {
+  if (!confirm('¿Seguro que quieres borrar todo el progreso?')) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  try { sessionStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  document.querySelectorAll('[data-key]').forEach(el => {
+    if (el.tagName === 'SELECT') el.value = '';
+    else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = '';
+  });
+  document.querySelectorAll('.stars').forEach(el => {
+    el.querySelectorAll('.star').forEach(s => s.classList.remove('on'));
+    el.dataset.value = '0';
+  });
+  document.querySelectorAll('.known-btn').forEach(b => { b.className = 'known-btn'; });
+  document.querySelectorAll('.ia-assign-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('ia-asignada-display').textContent = 'Ninguna seleccionada todavía';
+  hasUnsavedChanges = false;
+  document.getElementById('unsavedDot').classList.add('hidden');
+  showToast('🗑️ Progreso borrado');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────
+function closeWarnModal() {
+  document.getElementById('warnModal').classList.remove('show');
+  pendingUrl = null;
+}
+document.getElementById('warnModal').addEventListener('click', function(e) {
+  if (e.target === this) closeWarnModal();
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── PDF EXPORT (jsPDF texto puro) ─────────────────────────────────
+function downloadPDF() {
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const d = getAllData();
+    const pW=210, pH=297, ml=15, mr=15, cW=pW-ml-mr;
+    let y=0;
+
+    function newPage() {
+      footer();
+      doc.addPage();
+      y=14;
+    }
+    function footer() {
+      doc.setFillColor(8,14,26);
+      doc.rect(0,pH-9,pW,9,'F');
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(7);
+      doc.setTextColor(120,160,200);
+      const p=doc.internal.getNumberOfPages();
+      doc.text('ChatGPT e IA · Lanbide · Sesión 5 · Comparativa de modelos',ml,pH-3);
+      doc.text(String(p),pW-mr,pH-3,{align:'right'});
+    }
+    function need(h) { if(y+h>pH-14) newPage(); }
+
+    function sectionHdr(title, sub) {
+      need(22);
+      doc.setFillColor(13,27,53);
+      doc.rect(0,y-2,pW,18,'F');
+      doc.setFillColor(37,99,168);
+      doc.rect(0,y+16,pW,1.5,'F');
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(13);
+      doc.setTextColor(240,247,255);
+      doc.text(title,ml,y+9);
+      if(sub){
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(8);
+        doc.setTextColor(120,160,200);
+        doc.text(sub,ml,y+15);
+      }
+      y+=24;
+    }
+
+    function fld(label, key, empty) {
+      const val=(d[key]||'').trim();
+      const text = val || (empty||'(sin respuesta)');
+      need(8);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(74,107,138);
+      doc.text(label.toUpperCase(),ml,y);
+      y+=5;
+      const lines=doc.splitTextToSize(text,cW-4);
+      const bh=lines.length*5+6;
+      need(bh+2);
+      doc.setFillColor(val?248:252,val?251:252,255);
+      doc.setDrawColor(197,221,240);
+      doc.rect(ml,y,cW,bh,'FD');
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(val?15:180,val?32:180,val?64:180);
+      doc.text(lines,ml+3,y+5);
+      y+=bh+5;
+    }
+
+    function starLine(label, key) {
+      need(8);
+      const val=parseInt(d[key]||'0');
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(8);
+      doc.setTextColor(74,107,138);
+      doc.text(label.toUpperCase()+': ',ml,y);
+      doc.setTextColor(245,158,11);
+      doc.text('★'.repeat(val)+'☆'.repeat(5-val),ml+50,y);
+      doc.setTextColor(100,120,140);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8);
+      const labels=['','Muy mala','Floja','Normal','Buena','Excelente'];
+      doc.text(labels[val]||'Sin valorar',ml+80,y);
+      y+=8;
+    }
+
+    // COVER
+    doc.setFillColor(8,14,26);
+    doc.rect(0,0,pW,52,'F');
+    doc.setFillColor(37,99,168);
+    doc.rect(0,52,pW,2.5,'F');
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.setTextColor(56,189,248);
+    doc.text('MÓDULO 2 · SESIÓN 5 · LANBIDE',ml,14);
+    doc.setFontSize(20); doc.setFont('helvetica','bold');
+    doc.setTextColor(240,247,255);
+    doc.text('Comparativa de modelos de IA',ml,28);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.setTextColor(120,160,200);
+    doc.text('Cuaderno de trabajo · Viernes 15:30–18:30',ml,40);
+    const ia=d['assigned_ia_card']||'';
+    if(ia){
+      doc.setTextColor(56,189,248);
+      doc.setFontSize(10);
+      doc.setFont('helvetica','bold');
+      doc.text('IA presentada: '+ia,ml,48);
+    }
+    y=62;
+
+    // SECCIÓN 1: PREPARACIÓN
+    sectionHdr('1. PREPARACIÓN DE LA PRESENTACIÓN','Investigación y borrador');
+    fld('IA asignada al equipo','assigned_ia_card');
+    fld('Empresa y país de origen','prep_empresa');
+    fld('Historia','prep_historia');
+    fld('Modelo base','prep_modelo_base');
+    fld('Funcionalidades principales','prep_funcionalidades');
+    fld('Versión gratuita vs. pago','prep_precios');
+    fld('Fortalezas','prep_fortalezas');
+    fld('Limitaciones','prep_limitaciones');
+    fld('Privacidad y datos','prep_privacidad');
+    fld('Dato curioso','prep_curiosidad');
+    newPage();
+    sectionHdr('BORRADOR DE LA PRESENTACIÓN','Estructura 5 minutos');
+    fld('Gancho inicial (30 seg)','prep_gancho');
+    fld('¿Qué es y quién la hace? (45 seg)','prep_que_es');
+    fld('Demo o ejemplo en directo (2 min)','prep_demo');
+    fld('Lo mejor y lo peor (1 min)','prep_mejor_peor');
+    fld('Conclusión y pregunta al grupo (45 seg)','prep_conclusion');
+
+    // SECCIÓN 2: FICHAS
+    const ias = [
+      {key:'chatgpt',name:'ChatGPT'},
+      {key:'claude',name:'Claude'},
+      {key:'consensus',name:'Consensus'},
+      {key:'deepseek',name:'DeepSeek'},
+      {key:'gemini',name:'Gemini'},
+      {key:'grok',name:'Grok'},
+      {key:'metaai',name:'Meta AI'},
+      {key:'perplexity',name:'Perplexity AI'},
+    ];
+    ias.forEach(({key,name}) => {
+      newPage();
+      sectionHdr('FICHA: '+name.toUpperCase(),'Evaluación durante la presentación');
+      starLine('Valoración general',key+'_stars_general');
+      starLine('Facilidad de uso',key+'_stars_usabilidad');
+      starLine('Calidad de respuestas',key+'_stars_calidad');
+      const kv=d[key+'_conocia']||'';
+      need(8);
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(74,107,138);
+      doc.text('¿LA CONOCÍAS ANTES?',ml,y); y+=5;
+      doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(15,32,64);
+      const kvLabels={si:'Sí, la uso habitualmente',algo:'La había oído pero poco',no:'No la conocía'};
+      doc.text(kvLabels[kv]||'(sin respuesta)',ml+3,y); y+=8;
+      fld('Prompt probado durante la presentación',key+'_prompt_prueba');
+      fld('¿Qué te ha parecido la respuesta?',key+'_respuesta_opinion');
+      fld('¿Para qué la usarías en tu vida diaria?',key+'_uso_personal');
+      fld('Una cosa que mejorarías',key+'_mejorar');
+    });
+
+    // SECCIÓN 3: COMPARATIVA
+    newPage();
+    sectionHdr('3. MI COMPARATIVA FINAL','Mejor IA por categoría');
+    const comps=[
+      ['Mejor para conversación general','comp_conversacion','comp_conv_razon'],
+      ['Mejor para buscar información','comp_busqueda','comp_bus_razon'],
+      ['Mejor para el trabajo','comp_trabajo','comp_trab_razon'],
+      ['Mejor para aprender','comp_aprender','comp_apr_razon'],
+      ['Mejor en privacidad y ética','comp_privacidad','comp_priv_razon'],
+      ['Mejor diseño y experiencia','comp_diseno','comp_dis_razon'],
+      ['Mejor relación gratuito/pago','comp_precio','comp_prec_razon'],
+      ['La que más te ha sorprendido','comp_sorpresa','comp_sorp_razon'],
+    ];
+    comps.forEach(([label,pickKey,razonKey])=>{
+      need(20);
+      const pick=d[pickKey]||'';
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(74,107,138);
+      doc.text(label.toUpperCase(),ml,y); y+=5;
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      doc.setTextColor(pick?37:150,pick?99:150,pick?168:150);
+      doc.text(pick||'(sin elegir)',ml+3,y); y+=6;
+      const razon=(d[razonKey]||'').trim();
+      if(razon){
+        const lines=doc.splitTextToSize(razon,cW-8);
+        need(lines.length*5+4);
+        doc.setFont('helvetica','italic'); doc.setFontSize(8.5); doc.setTextColor(74,107,138);
+        doc.text(lines,ml+6,y); y+=lines.length*5+4;
+      }
+      y+=3;
+    });
+
+    newPage();
+    sectionHdr('MI STACK PERSONAL Y CIERRE DEL MÓDULO','');
+    fld('IA principal que usaré','stack_principal');
+    fld('¿Para qué?','stack_principal_uso');
+    fld('IA secundaria','stack_secundaria');
+    fld('¿Para qué caso concreto?','stack_secundaria_uso');
+    fld('¿Qué sabías el lunes que no sabías?','cierre_sabia');
+    fld('Una cosa que cambiarás a partir de hoy','cierre_cambio');
+    fld('¿A quién recomendarías la IA y para qué?','cierre_recomendar');
+
+    // FOOTERS
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){
+      doc.setPage(p);
+      doc.setFillColor(8,14,26);
+      doc.rect(0,pH-9,pW,9,'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(120,160,200);
+      doc.text('ChatGPT e IA · Lanbide · Sesión 5 · Comparativa de modelos de IA',ml,pH-3);
+      doc.text(p+' / '+total,pW-mr,pH-3,{align:'right'});
+    }
+    doc.save('sesion5_comparativa_modelos.pdf');
+    hasUnsavedChanges=false;
+    document.getElementById('unsavedDot').classList.add('hidden');
+    showToast('📄 PDF descargado correctamente');
+  } catch(err) {
+    console.error(err);
+    showToast('⚠ Error: '+err.message);
+  }
+}
+
+// ── AUTO SAVE ─────────────────────────────────────────────────────
+document.addEventListener('input', saveAll);
+document.addEventListener('change', saveAll);
+
+// ── INIT ──────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const restored = loadAll();
+  if (!restored) {
+    document.getElementById('saveText').textContent = 'Empieza a escribir — tu progreso se guardará automáticamente';
+  }
+  updateNavBtns();
+});
+</script>
+</body>
+</html>
