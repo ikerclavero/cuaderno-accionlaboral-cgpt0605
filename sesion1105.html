@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 11 · Reset + Imágenes con IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --night:#080e1a;--deep:#0d1b35;--navy:#132347;--steel:#2563a8;--sky:#3b82c4;
+  --ice:#7bb3e0;--frost:#bdd8f0;--mist:#deeef9;--white:#f0f7ff;--paper:#f8fbff;
+  --accent:#38bdf8;--gold:#f59e0b;--green:#10b981;--purple:#7c3aed;
+  --text:#0f2040;--muted:#4a6b8a;--border:#c5ddf0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:var(--text);font-size:15px;line-height:1.7;}
+
+/* HEADER */
+.header{background:var(--night);position:relative;overflow:hidden;}
+.header-bg{position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 70% at 10% 50%,rgba(37,99,168,0.4) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 60% at 90% 20%,rgba(56,189,248,0.12) 0%,transparent 55%),
+             radial-gradient(ellipse 40% 40% at 50% 90%,rgba(16,185,129,0.1) 0%,transparent 55%);}
+.header-bg::after{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(59,130,196,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,196,0.06) 1px,transparent 1px);
+  background-size:32px 32px;}
+.header-inner{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:44px 48px 38px;}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
+.session-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.3);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);}
+.session-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.btn-classroom{display:inline-flex;align-items:center;gap:7px;background:#1a73e8;color:white;text-decoration:none;padding:8px 18px;border-radius:6px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;transition:background 0.2s;border:none;cursor:pointer;white-space:nowrap;}
+.btn-classroom:hover{background:#1557b0;}
+.header h1{font-family:'DM Serif Display',serif;font-size:clamp(26px,5vw,44px);font-weight:400;color:var(--white);line-height:1.15;margin-bottom:10px;}
+.header h1 em{font-style:italic;color:var(--accent);}
+.header-sub{color:rgba(176,210,240,0.7);font-size:14px;margin-bottom:24px;}
+.header-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:5px 14px;border-radius:4px;font-size:12px;color:rgba(176,210,240,0.85);font-weight:500;}
+
+/* SAVE BAR */
+.save-bar{background:var(--deep);border-bottom:1px solid rgba(56,189,248,0.15);padding:8px 48px;}
+.save-bar-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+.save-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;transition:background 0.3s;}
+.save-text{font-size:12px;color:rgba(176,210,240,0.5);flex:1;}
+.unsaved-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:4px;animation:pulse 1.5s infinite;}
+.unsaved-dot.hidden{display:none;}
+.btn-clear{background:none;border:1px solid rgba(255,100,100,0.3);color:rgba(255,130,130,0.6);padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-clear:hover{border-color:rgba(255,100,100,0.6);color:rgba(255,130,130,0.9);}
+
+/* RELOAD BANNER */
+.reload-banner{background:linear-gradient(90deg,#7c3700 0%,#92400e 100%);border-bottom:2px solid var(--gold);padding:10px 48px;}
+.reload-banner-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.reload-icon{font-size:18px;flex-shrink:0;}
+.reload-text{font-size:12.5px;color:rgba(255,237,180,0.95);line-height:1.4;flex:1;min-width:200px;}
+.reload-text strong{color:#fef3c7;display:block;margin-bottom:2px;}
+
+/* NAV */
+.nav-wrapper{background:var(--deep);border-bottom:1px solid rgba(59,130,196,0.25);padding:0 48px;overflow-x:auto;}
+.nav-tabs{display:flex;max-width:860px;margin:0 auto;}
+.tab-btn{padding:15px 18px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:rgba(176,210,240,0.5);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all 0.2s;}
+.tab-btn:hover{color:var(--ice);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:40px 48px 120px;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* SEC HEAD */
+.sec-head{margin-bottom:28px;}
+.sec-kicker{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--sky);margin-bottom:8px;}
+.sec-head h2{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:var(--text);margin-bottom:6px;}
+.sec-head p{color:var(--muted);font-size:14px;}
+
+/* CALLOUT */
+.callout{background:linear-gradient(135deg,var(--deep) 0%,var(--navy) 100%);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:24px;color:var(--mist);font-size:13.5px;line-height:1.65;}
+.callout strong{display:block;color:var(--accent);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;font-weight:600;}
+.callout.gold{border-left-color:var(--gold);}
+.callout.gold strong{color:#fde68a;}
+
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:26px 30px;margin-bottom:20px;}
+.card.accent-top{border-top:3px solid var(--steel);}
+.card.accent-left{border-left:3px solid var(--sky);}
+.card.green-left{border-left:3px solid var(--green);}
+.card.gold-left{border-left:3px solid var(--gold);}
+.card.purple-left{border-left:3px solid var(--purple);}
+.card-label{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--sky);margin-bottom:8px;}
+.card h3{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:8px;color:var(--text);}
+.card>p{color:var(--muted);font-size:13.5px;margin-bottom:14px;line-height:1.6;}
+
+/* FIELDS */
+.field-label{display:block;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;margin-top:18px;}
+.field-label:first-of-type{margin-top:0;}
+textarea,input[type="text"]{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:11px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--paper);resize:vertical;transition:border-color 0.2s,box-shadow 0.2s;line-height:1.6;}
+textarea:focus,input[type="text"]:focus{outline:none;border-color:var(--steel);box-shadow:0 0 0 3px rgba(37,99,168,0.1);}
+textarea{min-height:88px;}
+
+/* PROMPT BOX */
+.prompt-box{background:var(--night);border:1px solid rgba(59,130,196,0.3);border-radius:8px;padding:16px 20px;margin:12px 0 18px;font-size:13.5px;color:var(--frost);line-height:1.7;font-style:italic;position:relative;}
+.prompt-box::before{content:'PROMPT';display:block;font-style:normal;font-size:9px;font-weight:600;letter-spacing:2.5px;color:var(--accent);margin-bottom:7px;}
+.copy-btn{position:absolute;top:12px;right:12px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:var(--accent);padding:4px 10px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;font-style:normal;transition:all 0.2s;}
+.copy-btn:hover{background:rgba(56,189,248,0.25);}
+.bracket{color:var(--gold);font-style:normal;}
+
+/* CHECKLIST */
+.check-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--mist);}
+.check-row:last-child{border-bottom:none;}
+.chk{width:22px;height:22px;border:2px solid var(--border);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background:var(--white);transition:all 0.15s;}
+.chk:hover{border-color:var(--steel);}
+.chk.on{background:var(--green);border-color:var(--green);}
+.chk.on::after{content:'✓';color:white;font-size:13px;font-weight:700;}
+.chk-content{flex:1;}
+.chk-content strong{font-size:14px;font-weight:600;display:block;margin-bottom:2px;}
+.chk-content span{font-size:12.5px;color:var(--muted);}
+
+/* PROGRESS BAR */
+.progress-wrap{background:var(--mist);border:1px solid var(--frost);border-radius:8px;padding:20px 24px;margin-top:20px;}
+.progress-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;letter-spacing:0.5px;}
+.progress-bar-bg{background:var(--border);border-radius:20px;height:14px;overflow:hidden;margin-bottom:10px;}
+.progress-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),var(--accent));transition:width 0.6s ease;width:0%;}
+.progress-score{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:var(--text);margin-bottom:4px;}
+.progress-msg{font-size:13px;color:var(--muted);font-style:italic;}
+
+/* LINK CARD */
+.link-card{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--deep) 0%,var(--navy) 100%);border:1.5px solid rgba(56,189,248,0.3);border-radius:10px;padding:18px 22px;text-decoration:none;transition:all 0.2s;margin:8px 0 20px;}
+.link-card:hover{border-color:var(--accent);transform:translateX(3px);}
+.link-card-icon{font-size:28px;flex-shrink:0;}
+.link-card-text{flex:1;}
+.link-card-title{font-size:14px;font-weight:700;color:var(--white);display:block;margin-bottom:2px;}
+.link-card-desc{font-size:12px;color:rgba(176,210,240,0.6);display:block;}
+.link-card-arrow{color:var(--accent);font-size:20px;font-weight:700;flex-shrink:0;}
+
+/* VISUAL PROMPT BUILDER */
+.vp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+@media(max-width:580px){.vp-grid{grid-template-columns:1fr;}}
+.vp-field{background:var(--paper);border:1.5px solid var(--border);border-radius:6px;padding:11px 13px;}
+.vp-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sky);margin-bottom:5px;display:block;}
+.vp-input{width:100%;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);line-height:1.5;}
+.vp-input:focus{outline:none;}
+.vp-input::placeholder{color:#b0bec5;}
+.vp-btn{background:var(--steel);color:white;border:none;padding:11px 22px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:6px;}
+.vp-btn:hover{background:var(--sky);}
+.vp-result{margin-top:12px;background:var(--night);border:1px solid rgba(59,130,196,0.3);border-radius:6px;padding:14px 16px;font-size:13.5px;color:var(--frost);line-height:1.7;font-style:italic;display:none;white-space:pre-wrap;}
+.vp-result::before{content:'PROMPT GENERADO';display:block;font-style:normal;font-size:9px;font-weight:600;letter-spacing:2.5px;color:var(--accent);margin-bottom:7px;}
+.vp-result.show{display:block;}
+.vp-copy{background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:var(--accent);padding:6px 14px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;display:none;transition:all 0.2s;}
+.vp-copy:hover{background:rgba(56,189,248,0.25);}
+.vp-copy.show{display:inline-block;}
+
+/* TIPO SELECTOR */
+.tipo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0 16px;}
+.tipo-card{background:var(--white);border:2px solid var(--border);border-radius:8px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;}
+.tipo-card:hover{border-color:var(--sky);transform:translateY(-2px);}
+.tipo-card.selected{border-color:var(--accent);background:var(--mist);}
+
+/* IA BTNS */
+.ia-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.ia-btn{display:flex;align-items:center;gap:10px;color:white;text-decoration:none;padding:12px 16px;border-radius:8px;font-weight:600;font-size:13.5px;transition:opacity 0.2s;}
+.ia-btn:hover{opacity:0.85;}
+
+/* DIVIDER */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:28px 0;}
+
+/* REFLECTION */
+.reflection{background:var(--mist);border:1px solid var(--frost);border-radius:8px;padding:22px 26px;margin-bottom:20px;}
+.reflection h3{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:12px;color:var(--deep);}
+
+/* DL BAR */
+.dl-bar{position:fixed;bottom:0;left:0;right:0;background:var(--night);border-top:1px solid rgba(56,189,248,0.2);padding:12px 48px;display:flex;align-items:center;justify-content:flex-end;gap:10px;z-index:200;}
+.dl-note{color:rgba(176,210,240,0.35);font-size:12px;margin-right:auto;}
+.btn{padding:10px 20px;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-accent{background:var(--accent);color:var(--night);}
+.btn-accent:hover{background:#5dcffc;}
+
+/* TOAST */
+.toast{position:fixed;top:20px;right:20px;background:var(--deep);border:1px solid var(--green);color:var(--frost);padding:12px 20px;border-radius:8px;font-size:13px;z-index:999;transform:translateY(-60px);opacity:0;transition:all 0.3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(8,14,26,0.75);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal-box{background:var(--white);border-radius:12px;padding:30px 34px;max-width:420px;width:90%;border-top:4px solid var(--gold);}
+.modal-box h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:8px;}
+.modal-box p{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:18px;}
+.modal-box p strong{color:var(--text);}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.modal-btn-stay{background:var(--steel);color:white;border:none;padding:10px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.modal-btn-leave{background:none;border:1.5px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+@media(max-width:640px){
+  .header-inner,.main{padding-left:20px;padding-right:20px;}
+  .nav-wrapper,.save-bar,.reload-banner{padding-left:16px;padding-right:16px;}
+  .dl-bar{padding:12px 20px;flex-wrap:wrap;gap:8px;}
+  .dl-note{display:none;}
+  .ia-btns{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-bg"></div>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="session-badge">Bloque 3 · Sesión 11 · Lunes</div>
+      <a href="https://classroom.google.com/u/1/c/ODE5MzExOTc3MzAw" target="_blank" class="btn-classroom">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ir a Classroom
+      </a>
+    </div>
+    <h1>Reset + <em>Imágenes con IA</em></h1>
+    <div class="header-sub">Cuaderno de trabajo del alumno · Lunes 15:30–18:30</div>
+    <div class="header-chips">
+      <span class="chip">🔄 Reset</span>
+      <span class="chip">✅ Autoevaluación</span>
+      <span class="chip">📋 Completar fichas</span>
+      <span class="chip">🎨 Imágenes con IA</span>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-bar-inner">
+    <div class="save-dot" id="saveDot"></div>
+    <span class="save-text" id="saveText">Empieza a escribir — tu progreso se guardará automáticamente</span>
+    <span class="unsaved-dot hidden" id="unsavedDot"></span>
+    <button class="btn-clear" onclick="confirmClear()">Borrar todo</button>
+  </div>
+</div>
+
+<!-- RELOAD BANNER -->
+<div class="reload-banner">
+  <div class="reload-banner-inner">
+    <span class="reload-icon">💾</span>
+    <span class="reload-text">
+      <strong>¿Vas a cerrar o cambiar de página?</strong>
+      Descarga el cuaderno antes de salir para no perder tu trabajo.
+    </span>
+    <button class="btn btn-accent" onclick="downloadPDF()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-wrapper">
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('reset',this)">🔄 Reset</button>
+    <button class="tab-btn" onclick="showTab('autoevaluacion',this)">✅ Autoevaluación</button>
+    <button class="tab-btn" onclick="showTab('fichas',this)">📋 Fichas sesión 5</button>
+    <button class="tab-btn" onclick="showTab('reto',this)">🎨 Reto imágenes</button>
+    <button class="tab-btn" onclick="showTab('prompt',this)">✨ Prompt visual</button>
+    <button class="tab-btn" onclick="showTab('taller',this)">🖼️ Taller</button>
+    <button class="tab-btn" onclick="showTab('cierre',this)">✅ Cierre</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══ RESET ═══ -->
+<div id="tab-reset" class="section active">
+  <div class="sec-head">
+    <div class="sec-kicker">15:30 — Sin ordenadores · 20 min</div>
+    <h2>¿Cómo van las cosas?</h2>
+    <p>Tomamos el pulso antes de seguir. Sin juicios, sin respuestas correctas.</p>
+  </div>
+
+  <div class="card accent-left">
+    <div class="card-label">Tu opinión</div>
+    <h3>Tres preguntas rápidas</h3>
+
+    <span class="field-label">¿Qué es lo que mejor te ha parecido del curso hasta ahora?</span>
+    <input type="text" data-key="reset_bien" placeholder="Una sesión, una herramienta, algo que te haya gustado…">
+
+    <span class="field-label">¿Qué te ha resultado más difícil o confuso?</span>
+    <input type="text" data-key="reset_dificil" placeholder="Ritmo, ejercicios, lenguaje, tiempo…">
+
+    <span class="field-label">¿Hay algo que quieras que el docente explique mejor?</span>
+    <input type="text" data-key="reset_pedir" placeholder="Un tema, una herramienta, una duda que tienes…">
+  </div>
+</div>
+
+<!-- ═══ AUTOEVALUACIÓN ═══ -->
+<div id="tab-autoevaluacion" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">15:50 — 40 min</div>
+    <h2>¿Qué sé hacer ya?</h2>
+    <p>Marca todo lo que sientes que dominas. Al final verás tu porcentaje.</p>
+  </div>
+
+  <div class="callout">
+    <strong>Cómo usarlo</strong>
+    Marca solo lo que sabes hacer de verdad, no lo que has visto de pasada. No hay nota — es para que tú sepas dónde estás.
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Bloque 1 · Lo básico de la IA</div>
+    <h3>Fundamentos</h3>
+    <div class="check-row"><div class="chk" data-key="a01" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué es la inteligencia artificial</strong><span>Y puedo explicarlo con mis palabras</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a02" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué es un modelo de lenguaje (LLM)</strong><span>ChatGPT, Claude, Gemini… y por qué generan texto</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a03" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué es una alucinación en la IA</strong><span>Y por qué hay que verificar siempre los datos importantes</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a04" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Conozco al menos 5 herramientas de IA diferentes</strong><span>ChatGPT, Claude, Gemini, Perplexity, Consensus, DeepSeek…</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a05" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé la diferencia entre la versión gratuita y de pago de ChatGPT</strong><span>Qué puedo hacer con cada una</span></div></div>
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Bloque 2 · Prompting</div>
+    <h3>Escribir buenos prompts</h3>
+    <div class="check-row"><div class="chk" data-key="a06" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué es el prompting</strong><span>Y por qué importa cómo le hablo a la IA</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a07" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Conozco las 5 palancas del prompt</strong><span>Rol, contexto, tarea, formato, restricciones</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a08" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé mejorar un prompt vago para obtener mejores respuestas</strong><span>Puedo pasar de "dame ideas" a un prompt completo y útil</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a09" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He usado ChatGPT para reescribir o mejorar un texto real</strong><span>Un correo, un punto del CV, una descripción…</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a10" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé pedir a la IA que responda en un formato específico</strong><span>Lista, tabla, puntos, menos de X palabras…</span></div></div>
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Bloque 3 · ChatGPT en el trabajo</div>
+    <h3>Usos laborales reales</h3>
+    <div class="check-row"><div class="chk" data-key="a11" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He usado ChatGPT para mejorar mi CV</strong><span>Al menos un punto reescrito con IA</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a12" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He escrito un correo difícil con ayuda de la IA</strong><span>Petición de aumento, queja, candidatura…</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a13" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He practicado una entrevista de trabajo con ChatGPT</strong><span>La IA hacía de entrevistador y me daba feedback</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a14" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé usar ChatGPT con archivos e imágenes</strong><span>Subir un documento y pedir que lo analice</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a15" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He analizado una oferta de trabajo con IA</strong><span>Comparando mis competencias con lo que pide la oferta</span></div></div>
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Bloque 4 · Personalización</div>
+    <h3>Hacer que la IA me conozca</h3>
+    <div class="check-row"><div class="chk" data-key="a16" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He configurado las instrucciones personalizadas de ChatGPT</strong><span>Le he dicho quién soy y cómo quiero que me responda</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a17" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué es la memoria de ChatGPT y cómo funciona</strong><span>Qué recuerda entre conversaciones y qué no</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a18" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué es un GPT personalizado</strong><span>Un ChatGPT con instrucciones propias para una tarea concreta</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a19" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He explorado GPTs públicos de la tienda de ChatGPT</strong><span>CV Reviewer, Interview Coach u otros</span></div></div>
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Bloque 5 · Comparativa de modelos</div>
+    <h3>Elegir la IA adecuada</h3>
+    <div class="check-row"><div class="chk" data-key="a20" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Conozco las diferencias principales entre ChatGPT, Claude y Gemini</strong><span>Cuándo usar cada uno según la tarea</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a21" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He probado al menos 3 IAs diferentes</strong><span>No solo ChatGPT — también otras del grupo</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a22" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué es Perplexity y para qué sirve</strong><span>Búsqueda con fuentes verificadas, alternativa a Google</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a23" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Tengo claro qué IA voy a usar y para qué</strong><span>Mi stack personal: herramienta + caso de uso concreto</span></div></div>
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">Bloque 6 · Uso responsable</div>
+    <h3>Privacidad y sentido crítico</h3>
+    <div class="check-row"><div class="chk" data-key="a24" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Sé qué datos no debo compartir con una IA gratuita</strong><span>DNI, datos bancarios, contraseñas, información médica…</span></div></div>
+    <div class="check-row"><div class="chk" data-key="a25" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Siempre verifico los datos importantes que me da la IA</strong><span>Especialmente números, fechas y citas</span></div></div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label">TU RESULTADO</div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-score" id="progressScore">0 / 25</div>
+    <div class="progress-msg" id="progressMsg">Marca los ítems que dominas para ver tu resultado.</div>
+  </div>
+</div>
+
+<!-- ═══ FICHAS SESIÓN 5 ═══ -->
+<div id="tab-fichas" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">16:30 — 30 min</div>
+    <h2>Completar las fichas de la sesión 5</h2>
+    <p>La semana pasada no dio tiempo. Ábrelas aquí y termínalas.</p>
+  </div>
+
+  <a href="https://ikerclavero.github.io/cuaderno-accionlaboral-cgpt0605/clase0805.html" target="_blank" class="link-card">
+    <span class="link-card-icon">📋</span>
+    <div class="link-card-text">
+      <span class="link-card-title">Abrir cuaderno — Sesión 5: Comparativa de modelos</span>
+      <span class="link-card-desc">Fichas de las 8 IAs · Comparativa final · Mi stack personal</span>
+    </div>
+    <span class="link-card-arrow">→</span>
+  </a>
+</div>
+
+<!-- ═══ RETO IMÁGENES ═══ -->
+<div id="tab-reto" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">17:15 — 15 min (después del descanso)</div>
+    <h2>Reto inicial — Crea una imagen</h2>
+    <p>Sin instrucciones. Prueba y ve qué sale.</p>
+  </div>
+
+  <div class="callout">
+    <strong>El reto</strong>
+    Tienes 15 minutos para crear una imagen en ChatGPT o Canva para un negocio ficticio que te inventes. No importa si queda bien o mal.
+  </div>
+
+  <div class="ia-btns">
+    <a href="https://chat.openai.com" target="_blank" class="ia-btn" style="background:linear-gradient(135deg,#10a37f,#0d7d63);">
+      <span style="font-size:20px;">🤖</span> ChatGPT — DALL·E →
+    </a>
+    <a href="https://canva.com" target="_blank" class="ia-btn" style="background:linear-gradient(135deg,#7b38d8,#6226c0);">
+      <span style="font-size:20px;">🎨</span> Canva IA →
+    </a>
+  </div>
+
+  <div class="card accent-top">
+    <span class="field-label" style="margin-top:0;">El negocio ficticio que has elegido</span>
+    <input type="text" data-key="reto_negocio" placeholder="Ej: una cafetería, un estudio de yoga, una tienda de ropa vintage…">
+
+    <span class="field-label">El prompt que has usado</span>
+    <textarea data-key="reto_prompt" placeholder="Escribe exactamente lo que pusiste en ChatGPT o Canva…"></textarea>
+
+    <span class="field-label">¿Qué cambiarías del prompt para mejorar el resultado?</span>
+    <input type="text" data-key="reto_cambio" placeholder="Ej: añadiría el estilo, especificaría los colores…">
+  </div>
+</div>
+
+<!-- ═══ PROMPT VISUAL ═══ -->
+<div id="tab-prompt" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">17:30 — 15 min</div>
+    <h2>La estructura del prompt visual</h2>
+    <p>6 elementos para pasar de una imagen genérica a una imagen profesional.</p>
+  </div>
+
+  <div class="prompt-box">
+    "<span class="bracket">[Sujeto]</span> + <span class="bracket">[entorno/fondo]</span> + <span class="bracket">[estilo visual]</span> + <span class="bracket">[iluminación]</span> + <span class="bracket">[composición]</span> + alta resolución, calidad profesional"
+    <button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button>
+  </div>
+
+  <div class="card purple-left">
+    <div class="card-label">Constructor de prompt visual</div>
+    <h3>Rellena los campos y genera el prompt</h3>
+    <div class="vp-grid">
+      <div class="vp-field"><span class="vp-label">🎯 Sujeto</span><input class="vp-input" id="vp_sujeto" type="text" placeholder="¿Qué aparece?"></div>
+      <div class="vp-field"><span class="vp-label">🏞️ Entorno / Fondo</span><input class="vp-input" id="vp_entorno" type="text" placeholder="¿Dónde está?"></div>
+      <div class="vp-field"><span class="vp-label">🎨 Estilo visual</span><input class="vp-input" id="vp_estilo" type="text" placeholder="Ej: fotografía realista, minimalista…"></div>
+      <div class="vp-field"><span class="vp-label">💡 Iluminación</span><input class="vp-input" id="vp_luz" type="text" placeholder="Ej: luz natural, estudio, dorada…"></div>
+      <div class="vp-field"><span class="vp-label">📐 Composición</span><input class="vp-input" id="vp_comp" type="text" placeholder="Ej: primer plano, plano general…"></div>
+      <div class="vp-field"><span class="vp-label">⚙️ Extras</span><input class="vp-input" id="vp_extras" type="text" placeholder="Colores, formato, marca…"></div>
+    </div>
+    <button class="vp-btn" onclick="generatePrompt()">✨ Generar prompt</button>
+    <div class="vp-result" id="vp_result"></div>
+    <button class="vp-copy" id="vp_copy" onclick="copyGeneratedPrompt()">📋 Copiar prompt</button>
+  </div>
+</div>
+
+<!-- ═══ TALLER ═══ -->
+<div id="tab-taller" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">17:45 — 30 min</div>
+    <h2>Taller — Tu imagen real</h2>
+    <p>Crea una imagen que puedas usar esta semana de verdad.</p>
+  </div>
+
+  <div class="ia-btns">
+    <a href="https://chat.openai.com" target="_blank" class="ia-btn" style="background:linear-gradient(135deg,#10a37f,#0d7d63);">
+      <span style="font-size:20px;">🤖</span> ChatGPT — DALL·E →
+    </a>
+    <a href="https://canva.com" target="_blank" class="ia-btn" style="background:linear-gradient(135deg,#7b38d8,#6226c0);">
+      <span style="font-size:20px;">🎨</span> Canva IA →
+    </a>
+  </div>
+
+  <div class="card accent-top">
+    <div class="card-label">¿Para qué es tu imagen?</div>
+    <div class="tipo-grid">
+      <div class="tipo-card" data-val="perfil" onclick="selectTipo(this)"><span style="font-size:22px;display:block;margin-bottom:5px;">👤</span><span style="font-size:13px;font-weight:600;">Foto de perfil</span></div>
+      <div class="tipo-card" data-val="logo" onclick="selectTipo(this)"><span style="font-size:22px;display:block;margin-bottom:5px;">🏷️</span><span style="font-size:13px;font-weight:600;">Logo</span></div>
+      <div class="tipo-card" data-val="rrss" onclick="selectTipo(this)"><span style="font-size:22px;display:block;margin-bottom:5px;">📱</span><span style="font-size:13px;font-weight:600;">Redes sociales</span></div>
+      <div class="tipo-card" data-val="otro" onclick="selectTipo(this)"><span style="font-size:22px;display:block;margin-bottom:5px;">✨</span><span style="font-size:13px;font-weight:600;">Otro</span></div>
+    </div>
+    <input type="hidden" data-key="taller_tipo" id="taller_tipo">
+
+    <span class="field-label">El prompt que has usado (con los 6 elementos)</span>
+    <textarea data-key="taller_prompt" placeholder="Escribe aquí el prompt completo que has construido…"></textarea>
+
+    <span class="field-label">¿Lo usarías tal cual?</span>
+    <input type="text" data-key="taller_resultado" placeholder="Sí / No / Lo retocaría porque…">
+  </div>
+
+  <div class="card gold-left">
+    <div class="card-label">Prompts de referencia</div>
+    <h3>Si no sabes por dónde empezar</h3>
+
+    <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;">FOTO DE PERFIL</span>
+    <div class="prompt-box" style="margin-top:0;">Professional headshot, neutral light grey background, soft studio lighting, business casual attire, warm confident smile, LinkedIn profile photo style, high resolution<button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button></div>
+
+    <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;margin-top:14px;">LOGO MINIMALISTA</span>
+    <div class="prompt-box" style="margin-top:0;">Minimalist logo for a <span class="bracket">[tipo de negocio]</span> called <span class="bracket">[nombre]</span>, clean line illustration style, <span class="bracket">[colores]</span> palette, white background, professional branding, high resolution<button class="copy-btn" onclick="copyPrompt(this)">COPIAR</button></div>
+  </div>
+</div>
+
+<!-- ═══ CIERRE ═══ -->
+<div id="tab-cierre" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">18:15 — 15 min</div>
+    <h2>Cierre</h2>
+  </div>
+
+  <div class="reflection">
+    <h3>💬 Antes de salir</h3>
+    <span class="field-label" style="margin-top:0;">¿Para qué usarías la generación de imágenes esta semana?</span>
+    <input type="text" data-key="cierre_uso" placeholder="Sé concreto: ¿qué imagen, para qué, cuándo?">
+    <span class="field-label">Una cosa que te llevas de la sesión de hoy</span>
+    <input type="text" data-key="cierre_llevas" placeholder="Un prompt, una técnica, una herramienta…">
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <button class="btn btn-accent" onclick="downloadPDF()" style="font-size:14px;padding:13px 28px;">⬇ Descargar cuaderno PDF</button>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="warnModal">
+  <div class="modal-box">
+    <div style="font-size:32px;margin-bottom:12px;">⚠️</div>
+    <h3>¿Seguro que quieres salir?</h3>
+    <p>Tu progreso <strong>sobrevivirá si recargas</strong>, pero si cierras la pestaña lo perderás.</p>
+    <div class="modal-actions">
+      <button class="modal-btn-stay" onclick="closeWarnModal();downloadPDF()">⬇ Descargar y salir</button>
+      <button class="modal-btn-stay" onclick="closeWarnModal()" style="background:var(--sky);">⬅ Quedarme</button>
+      <button class="modal-btn-leave" id="modalLeaveBtn">Salir →</button>
+    </div>
+  </div>
+</div>
+
+<div class="dl-bar">
+  <span class="dl-note">Sesión 11 · Bloque 3 · ChatGPT e IA · Lanbide</span>
+  <button class="btn btn-accent" onclick="downloadPDF()">⬇ Descargar cuaderno PDF</button>
+</div>
+
+<script>
+const STORAGE_KEY='sesion11_v2';
+let hasUnsavedChanges=false;
+let saveDebounce=null;
+const TOTAL_ITEMS=25;
+
+// TABS
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// CHECKLIST
+function toggleChk(el){
+  el.classList.toggle('on');
+  updateProgress();
+  saveAll();
+}
+
+// PROGRESS
+function updateProgress(){
+  const keys=['a01','a02','a03','a04','a05','a06','a07','a08','a09','a10',
+               'a11','a12','a13','a14','a15','a16','a17','a18','a19',
+               'a20','a21','a22','a23','a24','a25'];
+  let count=0;
+  keys.forEach(k=>{
+    const el=document.querySelector(`.chk[data-key="${k}"]`);
+    if(el&&el.classList.contains('on')) count++;
+  });
+  const pct=Math.round((count/TOTAL_ITEMS)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressScore').textContent=count+' / '+TOTAL_ITEMS;
+  const msgs=[
+    [0,19,'Acabas de empezar — queda mucho por aprender y eso está bien.'],
+    [20,39,'Tienes una base. Hay bastantes cosas que todavía puedes reforzar.'],
+    [40,59,'Vas por la mitad. Sigues avanzando bien.'],
+    [60,79,'Dominas más de la mitad del curso. Muy bien.'],
+    [80,94,'Casi todo controlado. Queda poco por pulir.'],
+    [95,100,'Dominas prácticamente todo lo del curso. Excelente.'],
+  ];
+  for(const [min,max,msg] of msgs){
+    if(pct>=min&&pct<=max){
+      document.getElementById('progressMsg').textContent=pct+'% — '+msg;
+      break;
+    }
+  }
+}
+
+// TIPO SELECTOR
+function selectTipo(card){
+  document.querySelectorAll('.tipo-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('taller_tipo').value=card.dataset.val;
+  saveAll();
+}
+
+// COPY PROMPT
+function copyPrompt(btn){
+  const box=btn.closest('.prompt-box');
+  const text=box.innerText.replace('COPIAR','').replace('PROMPT\n','').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✓';
+    setTimeout(()=>btn.textContent='COPIAR',2000);
+  });
+}
+
+// VISUAL PROMPT GENERATOR
+function generatePrompt(){
+  const s=document.getElementById('vp_sujeto').value.trim();
+  const e=document.getElementById('vp_entorno').value.trim();
+  const es=document.getElementById('vp_estilo').value.trim();
+  const l=document.getElementById('vp_luz').value.trim();
+  const c=document.getElementById('vp_comp').value.trim();
+  const x=document.getElementById('vp_extras').value.trim();
+  const parts=[s||'[sujeto]',e||null,es?es+' style':null,l?l+' lighting':null,c||null,x||null,'high resolution, professional quality'].filter(Boolean);
+  const result=document.getElementById('vp_result');
+  result.textContent='"'+parts.join(', ')+'"';
+  result.classList.add('show');
+  document.getElementById('vp_copy').classList.add('show');
+  saveAll();
+}
+function copyGeneratedPrompt(){
+  const text=document.getElementById('vp_result').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('📋 Prompt copiado');
+    const btn=document.getElementById('vp_copy');
+    btn.textContent='✓ Copiado';
+    setTimeout(()=>btn.textContent='📋 Copiar prompt',2000);
+  });
+}
+
+// DATA
+function getAllData(){
+  const data={};
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(el.classList.contains('chk')) data[k]=el.classList.contains('on');
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') data[k]=el.value||'';
+  });
+  const sel=document.querySelector('.tipo-card.selected');
+  if(sel) data['taller_tipo_sel']=sel.dataset.val;
+  return data;
+}
+function applyData(data){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(!(k in data)) return;
+    if(el.classList.contains('chk')){ if(data[k]) el.classList.add('on'); }
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value=data[k];
+  });
+  if(data['taller_tipo_sel']){
+    document.querySelectorAll('.tipo-card').forEach(c=>{
+      c.classList.toggle('selected',c.dataset.val===data['taller_tipo_sel']);
+    });
+  }
+  updateProgress();
+}
+
+// SAVE
+function saveAll(){
+  document.getElementById('unsavedDot').classList.remove('hidden');
+  document.getElementById('saveDot').classList.add('saving');
+  hasUnsavedChanges=true;
+  clearTimeout(saveDebounce);
+  saveDebounce=setTimeout(()=>{
+    try{
+      const json=JSON.stringify(getAllData());
+      history.replaceState(null,'','#'+btoa(unescape(encodeURIComponent(json))));
+      try{sessionStorage.setItem(STORAGE_KEY,json);}catch(e){}
+      try{localStorage.setItem(STORAGE_KEY,json);}catch(e){}
+      document.getElementById('saveDot').classList.remove('saving');
+      document.getElementById('saveDot').style.background='var(--green)';
+      document.getElementById('saveText').textContent='✓ Guardado — si recargas, tus datos se restaurarán';
+    }catch(e){document.getElementById('saveText').textContent='⚠ Error al guardar';}
+  },800);
+}
+function loadAll(){
+  try{const h=location.hash.replace('#','');if(h&&h.length>10){applyData(JSON.parse(decodeURIComponent(escape(atob(h)))));document.getElementById('saveText').textContent='✓ Progreso restaurado';document.getElementById('saveDot').style.background='var(--green)';return true;}}catch(e){}
+  try{const r=sessionStorage.getItem(STORAGE_KEY);if(r){applyData(JSON.parse(r));return true;}}catch(e){}
+  try{const r=localStorage.getItem(STORAGE_KEY);if(r){applyData(JSON.parse(r));return true;}}catch(e){}
+  return false;
+}
+function confirmClear(){
+  if(!confirm('¿Seguro que quieres borrar todo el progreso?')) return;
+  history.replaceState(null,'',location.pathname+location.search);
+  try{sessionStorage.removeItem(STORAGE_KEY);localStorage.removeItem(STORAGE_KEY);}catch(e){}
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(el.classList.contains('chk')) el.classList.remove('on');
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value='';
+  });
+  document.querySelectorAll('.tipo-card').forEach(c=>c.classList.remove('selected'));
+  hasUnsavedChanges=false;
+  document.getElementById('unsavedDot').classList.add('hidden');
+  updateProgress();
+  showToast('🗑️ Progreso borrado');
+}
+
+// MODAL
+function closeWarnModal(){document.getElementById('warnModal').classList.remove('show');}
+document.getElementById('warnModal').addEventListener('click',function(e){if(e.target===this)closeWarnModal();});
+
+// TOAST
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// PDF
+function downloadPDF(){
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const d=getAllData();
+    const pW=210,pH=297,ml=15,mr=15,cW=pW-ml-mr;
+    let y=0;
+    function ftr(){doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);const p=doc.internal.getNumberOfPages();doc.text('ChatGPT e IA · Lanbide · Sesion 11 · Reset + Imagenes con IA',ml,pH-3);doc.text(String(p),pW-mr,pH-3,{align:'right'});}
+    function np(){ftr();doc.addPage();y=14;}
+    function need(h){if(y+h>pH-14)np();}
+    function sHdr(t,s){need(22);doc.setFillColor(13,27,53);doc.rect(0,y-2,pW,18,'F');doc.setFillColor(37,99,168);doc.rect(0,y+16,pW,1.5,'F');doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(240,247,255);doc.text(t,ml,y+9);if(s){doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,160,200);doc.text(s,ml,y+15);}y+=24;}
+    function fld(label,key,empty){const val=(d[key]||'').trim();const text=val||(empty||'(sin respuesta)');need(8);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(74,107,138);doc.text(label.toUpperCase(),ml,y);y+=5;const lines=doc.splitTextToSize(text,cW-4);const bh=lines.length*5+6;need(bh+2);doc.setFillColor(val?248:252,val?251:252,255);doc.setDrawColor(197,221,240);doc.rect(ml,y,cW,bh,'FD');doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(val?15:180,val?32:180,val?64:180);doc.text(lines,ml+3,y+5);y+=bh+5;}
+    function chk(label,key){need(8);const on=d[key]===true||d[key]==='true';doc.setFillColor(on?16:220,on?185:220,on?129:220);doc.rect(ml,y-3.5,5,5,'F');doc.setFont('helvetica',on?'bold':'normal');doc.setFontSize(9);doc.setTextColor(on?16:130,on?185:130,on?129:130);doc.text(on?'SI':'NO',ml+1,y+0.5);doc.setTextColor(15,32,64);doc.setFont('helvetica','normal');const lines=doc.splitTextToSize(label,cW-12);doc.text(lines,ml+10,y+0.5);y+=lines.length*5+3;}
+
+    // COVER
+    doc.setFillColor(8,14,26);doc.rect(0,0,pW,52,'F');doc.setFillColor(37,99,168);doc.rect(0,52,pW,2.5,'F');
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(56,189,248);doc.text('BLOQUE 3 · SESION 11 · LANBIDE',ml,14);
+    doc.setFontSize(20);doc.setFont('helvetica','bold');doc.setTextColor(240,247,255);doc.text('Reset + Imagenes con IA',ml,28);
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,160,200);doc.text('Cuaderno de trabajo · Lunes 15:30-18:30',ml,40);
+    y=62;
+
+    // RESET
+    sHdr('1. RESET','15:30 · Sin ordenadores');
+    fld('Lo que mejor te ha parecido','reset_bien');
+    fld('Lo que ha resultado mas dificil','reset_dificil');
+    fld('Lo que quieres que se explique mejor','reset_pedir');
+
+    // AUTOEVALUACION
+    np();
+    sHdr('2. AUTOEVALUACION — Lo que se hacer ya','15:50');
+    const items=[
+      ['a01','Se que es la inteligencia artificial'],['a02','Se que es un LLM'],['a03','Se que es una alucinacion'],
+      ['a04','Conozco al menos 5 herramientas de IA'],['a05','Se la diferencia gratis vs pago ChatGPT'],
+      ['a06','Se que es el prompting'],['a07','Conozco las 5 palancas del prompt'],['a08','Se mejorar un prompt vago'],
+      ['a09','He usado ChatGPT para reescribir un texto real'],['a10','Se pedir formato especifico a la IA'],
+      ['a11','He mejorado mi CV con IA'],['a12','He escrito un correo dificil con IA'],['a13','He practicado entrevista con ChatGPT'],
+      ['a14','Se usar ChatGPT con archivos e imagenes'],['a15','He analizado una oferta de trabajo con IA'],
+      ['a16','He configurado las instrucciones personalizadas'],['a17','Se como funciona la memoria de ChatGPT'],
+      ['a18','Se que es un GPT personalizado'],['a19','He explorado GPTs publicos'],
+      ['a20','Se las diferencias entre ChatGPT, Claude y Gemini'],['a21','He probado al menos 3 IAs diferentes'],
+      ['a22','Se para que sirve Perplexity'],['a23','Tengo claro que IA voy a usar y para que'],
+      ['a24','Se que datos no compartir con una IA gratuita'],['a25','Siempre verifico los datos importantes'],
+    ];
+    items.forEach(([k,l])=>chk(l,k));
+    const count=items.filter(([k])=>d[k]===true||d[k]==='true').length;
+    const pct=Math.round((count/25)*100);
+    need(16);
+    doc.setFillColor(13,27,53);doc.rect(ml,y,cW,12,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(56,189,248);
+    doc.text(`RESULTADO: ${count} / 25 items (${pct}%)`,ml+6,y+8);
+    y+=18;
+
+    // RETO IMAGENES
+    np();
+    sHdr('3. RETO INICIAL — Imagenes','17:15');
+    fld('Negocio ficticio elegido','reto_negocio');
+    fld('Prompt usado','reto_prompt');
+    fld('Que cambiarias','reto_cambio');
+
+    // TALLER
+    sHdr('4. TALLER — Tu imagen real','17:45');
+    fld('Para que es la imagen','taller_tipo_sel');
+    fld('Prompt completo con los 6 elementos','taller_prompt');
+    fld('Lo usarias tal cual?','taller_resultado');
+
+    // CIERRE
+    sHdr('5. CIERRE','18:15');
+    fld('Para que usaras esto esta semana','cierre_uso');
+    fld('Una cosa que te llevas','cierre_llevas');
+
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);doc.text('ChatGPT e IA · Lanbide · Sesion 11',ml,pH-3);doc.text(p+' / '+total,pW-mr,pH-3,{align:'right'});}
+
+    doc.save('sesion11_reset_imagenes.pdf');
+    hasUnsavedChanges=false;
+    document.getElementById('unsavedDot').classList.add('hidden');
+    showToast('📄 PDF descargado');
+  }catch(err){console.error(err);showToast('⚠ Error: '+err.message);}
+}
+
+document.addEventListener('input',saveAll);
+document.addEventListener('change',saveAll);
+window.addEventListener('load',()=>{
+  const r=loadAll();
+  if(!r) document.getElementById('saveText').textContent='Empieza a escribir — tu progreso se guardará automáticamente';
+  updateProgress();
+});
+</script>
+</body>
+</html>
