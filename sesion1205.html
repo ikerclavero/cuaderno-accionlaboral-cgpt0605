@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sesión 12 · Audio con IA</title>
+<title>Sesión 12 · Tu anuncio de radio con IA</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -16,14 +16,13 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:var(--text);font-size:15px;line-height:1.7;}
 
+/* HEADER */
 .header{background:var(--night);position:relative;overflow:hidden;}
 .header-bg{position:absolute;inset:0;
   background:radial-gradient(ellipse 70% 70% at 10% 50%,rgba(13,148,136,0.3) 0%,transparent 60%),
              radial-gradient(ellipse 50% 60% at 90% 20%,rgba(56,189,248,0.12) 0%,transparent 55%),
              radial-gradient(ellipse 40% 40% at 50% 90%,rgba(124,58,237,0.1) 0%,transparent 55%);}
-.header-bg::after{content:'';position:absolute;inset:0;
-  background-image:linear-gradient(rgba(59,130,196,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,196,0.06) 1px,transparent 1px);
-  background-size:32px 32px;}
+.header-bg::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(59,130,196,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,196,0.06) 1px,transparent 1px);background-size:32px 32px;}
 .header-inner{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:44px 48px 38px;}
 .header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
 .session-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(13,148,136,0.15);border:1px solid rgba(13,148,136,0.4);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#5eead4;}
@@ -31,142 +30,177 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:va
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .btn-classroom{display:inline-flex;align-items:center;gap:7px;background:#1a73e8;color:white;text-decoration:none;padding:8px 18px;border-radius:6px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;transition:background 0.2s;border:none;cursor:pointer;white-space:nowrap;}
 .btn-classroom:hover{background:#1557b0;}
-.header h1{font-family:'DM Serif Display',serif;font-size:clamp(26px,5vw,44px);font-weight:400;color:var(--white);line-height:1.15;margin-bottom:10px;}
+.header h1{font-family:'DM Serif Display',serif;font-size:clamp(24px,5vw,42px);font-weight:400;color:var(--white);line-height:1.15;margin-bottom:10px;}
 .header h1 em{font-style:italic;color:#5eead4;}
 .header-sub{color:rgba(176,210,240,0.7);font-size:14px;margin-bottom:24px;}
 .header-chips{display:flex;flex-wrap:wrap;gap:8px;}
 .chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:5px 14px;border-radius:4px;font-size:12px;color:rgba(176,210,240,0.85);font-weight:500;}
 
-.save-bar{background:var(--deep);border-bottom:1px solid rgba(13,148,136,0.2);padding:8px 48px;}
-.save-bar-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;}
-.save-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;transition:background 0.3s;}
-.save-text{font-size:12px;color:rgba(176,210,240,0.5);flex:1;}
-.unsaved-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:4px;animation:pulse 1.5s infinite;}
-.unsaved-dot.hidden{display:none;}
-.btn-clear{background:none;border:1px solid rgba(255,100,100,0.3);color:rgba(255,130,130,0.6);padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+/* PROGRESS STEPS */
+.progress-steps{background:var(--deep);border-bottom:1px solid rgba(13,148,136,0.2);padding:0 48px;}
+.progress-steps-inner{max-width:860px;margin:0 auto;display:flex;align-items:stretch;overflow-x:auto;}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 16px;cursor:pointer;position:relative;min-width:90px;flex:1;transition:all 0.2s;border-bottom:2px solid transparent;user-select:none;}
+.step-item.active{border-bottom-color:#5eead4;}
+.step-item.locked{opacity:0.4;cursor:not-allowed;}
+.step-item.done .step-circle{background:var(--green);border-color:var(--green);}
+.step-item.done .step-circle::after{content:'✓';font-weight:700;}
+.step-circle{width:28px;height:28px;border-radius:50%;border:2px solid rgba(176,210,240,0.3);display:flex;align-items:center;justify-content:center;font-size:13px;color:rgba(176,210,240,0.5);transition:all 0.3s;background:transparent;font-weight:600;}
+.step-item.active .step-circle{border-color:#5eead4;color:#5eead4;}
+.step-item.done .step-circle{color:white;}
+.step-label{font-size:11px;color:rgba(176,210,240,0.45);text-align:center;line-height:1.3;font-weight:500;}
+.step-item.active .step-label{color:#5eead4;}
+.step-item.done .step-label{color:var(--green);}
 
-.reload-banner{background:linear-gradient(90deg,#7c3700,#92400e);border-bottom:2px solid var(--gold);padding:10px 48px;}
+/* SAVE BAR */
+.save-bar{background:var(--night);border-bottom:1px solid rgba(13,148,136,0.15);padding:7px 48px;}
+.save-bar-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;transition:background 0.3s;}
+.save-text{font-size:11.5px;color:rgba(176,210,240,0.4);flex:1;}
+.btn-clear{background:none;border:1px solid rgba(255,100,100,0.25);color:rgba(255,130,130,0.5);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* RELOAD BANNER */
+.reload-banner{background:linear-gradient(90deg,#7c3700,#92400e);border-bottom:2px solid var(--gold);padding:9px 48px;}
 .reload-banner-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .reload-text{font-size:12.5px;color:rgba(255,237,180,0.95);line-height:1.4;flex:1;min-width:200px;}
 .reload-text strong{color:#fef3c7;display:block;margin-bottom:2px;}
 
-.nav-wrapper{background:var(--deep);border-bottom:1px solid rgba(13,148,136,0.25);padding:0 48px;overflow-x:auto;}
-.nav-tabs{display:flex;max-width:860px;margin:0 auto;}
-.tab-btn{padding:15px 18px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:rgba(176,210,240,0.5);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all 0.2s;}
-.tab-btn:hover{color:var(--ice);}
-.tab-btn.active{color:#5eead4;border-bottom-color:#5eead4;}
-
-.main{max-width:860px;margin:0 auto;padding:40px 48px 120px;}
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:36px 48px 110px;}
 .section{display:none;}
 .section.active{display:block;}
 
-.sec-head{margin-bottom:28px;}
-.sec-kicker{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
-.sec-head h2{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:var(--text);margin-bottom:6px;}
+/* SEC HEAD */
+.sec-head{margin-bottom:24px;}
+.sec-kicker{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
+.sec-head h2{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;color:var(--text);margin-bottom:5px;}
 .sec-head p{color:var(--muted);font-size:14px;}
 
-.callout{background:linear-gradient(135deg,var(--deep),var(--navy));border-left:3px solid #5eead4;border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:24px;color:var(--mist);font-size:13.5px;line-height:1.65;}
-.callout strong{display:block;color:#5eead4;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;font-weight:600;}
+/* CALLOUT */
+.callout{background:linear-gradient(135deg,var(--deep),var(--navy));border-left:3px solid #5eead4;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;color:var(--mist);font-size:13.5px;line-height:1.65;}
+.callout strong{display:block;color:#5eead4;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-weight:600;}
 .callout.purple{border-left-color:#a78bfa;}
 .callout.purple strong{color:#c4b5fd;}
-.callout.gold{border-left-color:var(--gold);}
-.callout.gold strong{color:#fde68a;}
 
-.card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:26px 30px;margin-bottom:20px;}
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:24px 28px;margin-bottom:18px;}
 .card.teal-top{border-top:3px solid var(--teal);}
 .card.teal-left{border-left:3px solid var(--teal);}
 .card.purple-left{border-left:3px solid var(--purple);}
 .card.gold-left{border-left:3px solid var(--gold);}
-.card.green-left{border-left:3px solid var(--green);}
-.card-label{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
-.card h3{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:8px;color:var(--text);}
-.card>p{color:var(--muted);font-size:13.5px;margin-bottom:14px;line-height:1.6;}
+.card-label{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:7px;}
+.card h3{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:7px;color:var(--text);}
+.card>p{color:var(--muted);font-size:13.5px;margin-bottom:12px;line-height:1.6;}
 
-.field-label{display:block;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;margin-top:18px;}
+/* FIELDS */
+.field-label{display:block;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;margin-top:16px;}
 .field-label:first-of-type{margin-top:0;}
-textarea,input[type="text"]{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:11px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--paper);resize:vertical;transition:border-color 0.2s,box-shadow 0.2s;line-height:1.6;}
+textarea,input[type="text"]{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--paper);resize:vertical;transition:border-color 0.2s,box-shadow 0.2s;line-height:1.6;}
 textarea:focus,input[type="text"]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,0.12);}
-textarea{min-height:100px;}
+textarea{min-height:90px;}
 
-/* TOOL BUTTON — el botón estrella de la sesión */
-.tool-btn{display:flex;align-items:center;gap:14px;color:white;text-decoration:none;padding:16px 20px;border-radius:10px;margin-bottom:12px;transition:all 0.2s;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;}
+/* SELECTOR CARDS */
+.selector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:10px 0 16px;}
+.sel-card{background:var(--white);border:2px solid var(--border);border-radius:8px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;}
+.sel-card:hover{border-color:var(--teal);transform:translateY(-2px);}
+.sel-card.selected{border-color:var(--teal);background:rgba(13,148,136,0.08);}
+.sel-card span:first-child{font-size:24px;display:block;margin-bottom:5px;}
+.sel-card span:last-child{font-size:12.5px;font-weight:600;color:var(--text);}
+
+/* TONO CARDS */
+.tono-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:10px 0 16px;}
+.tono-card{border:2px solid var(--border);border-radius:8px;padding:10px 8px;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;font-size:12.5px;font-weight:600;color:var(--text);}
+.tono-card:hover{transform:translateY(-1px);}
+.tono-card.selected{color:white;}
+
+/* PROMPT RESULT */
+.prompt-result-box{background:var(--night);border:1.5px solid rgba(13,148,136,0.4);border-radius:10px;padding:20px 22px;margin-top:14px;display:none;}
+.prompt-result-box.show{display:block;}
+.prompt-result-box::before{content:'PROMPT GENERADO — CÓPIALO EN CHATGPT';display:block;font-size:9px;font-weight:700;letter-spacing:2px;color:#5eead4;margin-bottom:10px;}
+.prompt-result-text{font-size:13.5px;color:var(--frost);line-height:1.75;font-style:italic;white-space:pre-wrap;}
+.copy-prompt-btn{margin-top:12px;background:var(--teal);border:none;color:white;padding:9px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.copy-prompt-btn:hover{background:#0f766e;}
+.gen-btn{background:linear-gradient(135deg,var(--teal),var(--sky));border:none;color:white;padding:12px 26px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:6px;display:block;width:100%;}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(13,148,136,0.35);}
+
+/* TOOL BUTTON */
+.tool-btn{display:flex;align-items:center;gap:14px;color:white;text-decoration:none;padding:15px 18px;border-radius:10px;margin-bottom:10px;transition:all 0.2s;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;}
 .tool-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.2);}
-.tool-btn-icon{font-size:28px;flex-shrink:0;}
+.tool-btn-icon{font-size:26px;flex-shrink:0;}
 .tool-btn-text{flex:1;text-align:left;}
-.tool-btn-title{font-size:15px;font-weight:700;display:block;margin-bottom:2px;}
-.tool-btn-desc{font-size:12.5px;opacity:0.75;display:block;}
+.tool-btn-title{font-size:14.5px;font-weight:700;display:block;margin-bottom:1px;}
+.tool-btn-desc{font-size:12px;opacity:0.72;display:block;}
 .tool-btn-arrow{font-size:20px;font-weight:700;flex-shrink:0;}
 
-/* PHONE INSTRUCTIONS */
-.phone-box{background:var(--night);border:1.5px solid rgba(13,148,136,0.3);border-radius:10px;padding:18px 22px;margin:14px 0;}
-.phone-box-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.phone-box-header span{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5eead4;}
-.phone-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+/* PHONE BOX */
+.phone-box{background:var(--night);border:1.5px solid rgba(13,148,136,0.3);border-radius:10px;padding:16px 20px;margin:12px 0 16px;}
+.phone-box-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.phone-box-header span.ph-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5eead4;}
+.phone-step{display:flex;gap:11px;align-items:flex-start;margin-bottom:9px;}
 .phone-step:last-child{margin-bottom:0;}
-.step-num{width:22px;height:22px;border-radius:50%;background:rgba(13,148,136,0.3);border:1.5px solid #5eead4;color:#5eead4;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-.step-text{font-size:13.5px;color:var(--frost);line-height:1.55;}
+.step-num{width:20px;height:20px;border-radius:50%;background:rgba(13,148,136,0.25);border:1.5px solid #5eead4;color:#5eead4;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-num.purple{background:rgba(124,58,237,0.2);border-color:#a78bfa;color:#a78bfa;}
+.step-text{font-size:13px;color:var(--frost);line-height:1.55;}
 .step-text strong{color:white;}
 
-/* PROMPT BOX */
-.prompt-box{background:var(--night);border:1px solid rgba(13,148,136,0.3);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-size:13.5px;color:var(--frost);line-height:1.7;font-style:italic;position:relative;}
-.prompt-box::before{content:'PROMPT';display:block;font-style:normal;font-size:9px;font-weight:600;letter-spacing:2.5px;color:#5eead4;margin-bottom:7px;}
-.bracket{color:var(--gold);font-style:normal;}
-.copy-btn{position:absolute;top:12px;right:12px;background:rgba(13,148,136,0.2);border:1px solid rgba(13,148,136,0.4);color:#5eead4;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;font-style:normal;transition:all 0.2s;}
-.copy-btn:hover{background:rgba(13,148,136,0.35);}
-
 /* SUNO BUILDER */
-.suno-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+.suno-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
 @media(max-width:560px){.suno-grid{grid-template-columns:1fr;}}
-.suno-field{background:var(--paper);border:1.5px solid var(--border);border-radius:6px;padding:11px 13px;}
-.suno-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:5px;display:block;}
+.suno-field{background:var(--paper);border:1.5px solid var(--border);border-radius:6px;padding:10px 12px;}
+.suno-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:4px;display:block;}
 .suno-input{width:100%;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);line-height:1.5;}
 .suno-input:focus{outline:none;}
 .suno-input::placeholder{color:#b0bec5;}
-.suno-btn{background:var(--purple);color:white;border:none;padding:11px 22px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:6px;}
-.suno-btn:hover{background:#6d28d9;}
-.suno-result{margin-top:12px;background:var(--night);border:1px solid rgba(124,58,237,0.3);border-radius:6px;padding:14px 16px;font-size:13.5px;color:var(--frost);line-height:1.7;font-style:italic;display:none;white-space:pre-wrap;}
-.suno-result::before{content:'PROMPT PARA SUNO';display:block;font-style:normal;font-size:9px;font-weight:600;letter-spacing:2.5px;color:#a78bfa;margin-bottom:7px;}
+.suno-result{margin-top:12px;background:var(--night);border:1px solid rgba(124,58,237,0.35);border-radius:8px;padding:16px 18px;font-size:13.5px;color:var(--frost);line-height:1.7;font-style:italic;display:none;white-space:pre-wrap;}
+.suno-result::before{content:'PROMPT PARA SUNO — CÓPIALO';display:block;font-style:normal;font-size:9px;font-weight:700;letter-spacing:2px;color:#a78bfa;margin-bottom:7px;}
 .suno-result.show{display:block;}
-.suno-copy{background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;padding:6px 14px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;display:none;transition:all 0.2s;}
-.suno-copy:hover{background:rgba(124,58,237,0.25);}
+.suno-copy{background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.4);color:#a78bfa;padding:7px 16px;border-radius:5px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;display:none;transition:all 0.2s;}
+.suno-copy:hover{background:rgba(124,58,237,0.32);}
 .suno-copy.show{display:inline-block;}
 
 /* DIVIDER */
-.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:28px 0;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:24px 0;}
 
-/* REFLECTION */
-.reflection{background:var(--mist);border:1px solid var(--frost);border-radius:8px;padding:22px 26px;margin-bottom:20px;}
-.reflection h3{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:12px;color:var(--deep);}
+/* GUION DISPLAY */
+.guion-area{background:var(--paper);border:2px solid var(--teal);border-radius:8px;padding:16px 18px;min-height:140px;font-size:14px;color:var(--text);line-height:1.7;width:100%;font-family:'DM Sans',sans-serif;resize:vertical;}
+.guion-area:focus{outline:none;box-shadow:0 0 0 3px rgba(13,148,136,0.15);}
 
-.dl-bar{position:fixed;bottom:0;left:0;right:0;background:var(--night);border-top:1px solid rgba(13,148,136,0.2);padding:12px 48px;display:flex;align-items:center;justify-content:flex-end;gap:10px;z-index:200;}
-.dl-note{color:rgba(176,210,240,0.35);font-size:12px;margin-right:auto;}
-.btn{padding:10px 20px;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
-.btn-teal{background:var(--teal);color:white;}
+/* COMPLETE BUTTON */
+.complete-section{background:linear-gradient(135deg,rgba(13,148,136,0.08),rgba(13,148,136,0.04));border:2px dashed rgba(13,148,136,0.3);border-radius:10px;padding:22px 24px;margin-top:24px;text-align:center;}
+.complete-section h4{font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);margin-bottom:6px;}
+.complete-section p{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.complete-btn{background:var(--teal);color:white;border:none;padding:13px 32px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.complete-btn:hover{background:#0f766e;transform:translateY(-1px);}
+.complete-btn:disabled{background:var(--green);cursor:default;transform:none;}
+.complete-done{display:none;align-items:center;gap:10px;justify-content:center;color:var(--green);font-weight:700;font-size:15px;}
+.complete-done.show{display:flex;}
+
+/* LOCKED OVERLAY */
+.locked-msg{background:linear-gradient(135deg,var(--deep),var(--navy));border:1.5px solid rgba(56,189,248,0.2);border-radius:10px;padding:40px 30px;text-align:center;margin-top:20px;}
+.locked-msg .lock-icon{font-size:40px;margin-bottom:14px;display:block;}
+.locked-msg h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--white);margin-bottom:8px;}
+.locked-msg p{font-size:13.5px;color:rgba(176,210,240,0.6);line-height:1.6;}
+.locked-msg .which-step{color:var(--accent);font-weight:600;}
+
+/* DL BAR */
+.dl-bar{position:fixed;bottom:0;left:0;right:0;background:var(--night);border-top:1px solid rgba(13,148,136,0.2);padding:11px 48px;display:flex;align-items:center;justify-content:flex-end;gap:10px;z-index:200;}
+.dl-note{color:rgba(176,210,240,0.3);font-size:12px;margin-right:auto;}
+.btn-teal{background:var(--teal);color:white;border:none;padding:10px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;}
 .btn-teal:hover{background:#0f766e;}
 
 .toast{position:fixed;top:20px;right:20px;background:var(--deep);border:1px solid var(--green);color:var(--frost);padding:12px 20px;border-radius:8px;font-size:13px;z-index:999;transform:translateY(-60px);opacity:0;transition:all 0.3s;pointer-events:none;}
 .toast.show{transform:translateY(0);opacity:1;}
 
-.modal-overlay{position:fixed;inset:0;background:rgba(8,14,26,0.75);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
-.modal-overlay.show{opacity:1;pointer-events:all;}
-.modal-box{background:var(--white);border-radius:12px;padding:30px 34px;max-width:420px;width:90%;border-top:4px solid var(--gold);}
-.modal-box h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:8px;}
-.modal-box p{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:18px;}
-.modal-box p strong{color:var(--text);}
-.modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
-.modal-btn-stay{background:var(--teal);color:white;border:none;padding:10px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.modal-btn-leave{background:none;border:1.5px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
-
 @media(max-width:640px){
   .header-inner,.main{padding-left:20px;padding-right:20px;}
-  .nav-wrapper,.save-bar,.reload-banner{padding-left:16px;padding-right:16px;}
-  .dl-bar{padding:12px 20px;flex-wrap:wrap;}
+  .progress-steps,.save-bar,.reload-banner{padding-left:16px;padding-right:16px;}
+  .dl-bar{padding:11px 20px;flex-wrap:wrap;}
   .dl-note{display:none;}
 }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <div class="header-bg"></div>
   <div class="header-inner">
@@ -177,397 +211,517 @@ textarea{min-height:100px;}
         Ir a Classroom
       </a>
     </div>
-    <h1><em>Audio</em> con IA</h1>
-    <div class="header-sub">Cuaderno de trabajo del alumno · Martes 15:30–18:30</div>
+    <h1>Crea tu <em>anuncio de radio</em><br>con IA</h1>
+    <div class="header-sub">Cuaderno de trabajo · Martes 15:30–18:30</div>
     <div class="header-chips">
-      <span class="chip">🎙️ Voz a texto — Whisper</span>
-      <span class="chip">🔊 Texto a voz — ElevenLabs</span>
-      <span class="chip">💬 ChatGPT por voz</span>
-      <span class="chip">🎵 Música — Suno</span>
+      <span class="chip">💡 La idea</span>
+      <span class="chip">🎙️ El guión — Whisper</span>
+      <span class="chip">🔊 La voz — ElevenLabs</span>
+      <span class="chip">🎵 El jingle — Suno</span>
     </div>
   </div>
 </div>
 
+<!-- PROGRESS STEPS -->
+<div class="progress-steps">
+  <div class="progress-steps-inner">
+    <div class="step-item active" id="step-nav-0" onclick="tryGoToStep(0)">
+      <div class="step-circle">1</div>
+      <span class="step-label">La idea</span>
+    </div>
+    <div class="step-item locked" id="step-nav-1" onclick="tryGoToStep(1)">
+      <div class="step-circle">2</div>
+      <span class="step-label">El guión</span>
+    </div>
+    <div class="step-item locked" id="step-nav-2" onclick="tryGoToStep(2)">
+      <div class="step-circle">3</div>
+      <span class="step-label">La voz</span>
+    </div>
+    <div class="step-item locked" id="step-nav-3" onclick="tryGoToStep(3)">
+      <div class="step-circle">4</div>
+      <span class="step-label">El jingle</span>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE BAR -->
 <div class="save-bar">
   <div class="save-bar-inner">
     <div class="save-dot" id="saveDot"></div>
-    <span class="save-text" id="saveText">Empieza a escribir — tu progreso se guardará automáticamente</span>
-    <span class="unsaved-dot hidden" id="unsavedDot"></span>
+    <span class="save-text" id="saveText">Tu progreso se guarda automáticamente</span>
     <button class="btn-clear" onclick="confirmClear()">Borrar todo</button>
   </div>
 </div>
 
+<!-- RELOAD BANNER -->
 <div class="reload-banner">
   <div class="reload-banner-inner">
     <span style="font-size:18px;flex-shrink:0;">💾</span>
-    <span class="reload-text">
-      <strong>¿Vas a cerrar o cambiar de página?</strong>
-      Descarga el cuaderno antes de salir para no perder tu trabajo.
-    </span>
-    <button class="btn btn-teal" onclick="downloadPDF()" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;">⬇ Descargar ahora</button>
-  </div>
-</div>
-
-<div class="nav-wrapper">
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="showTab('whisper',this)">🎙️ Whisper</button>
-    <button class="tab-btn" onclick="showTab('elevenlabs',this)">🔊 ElevenLabs</button>
-    <button class="tab-btn" onclick="showTab('voz-chatgpt',this)">💬 Voz ChatGPT</button>
-    <button class="tab-btn" onclick="showTab('suno',this)">🎵 Suno</button>
-    <button class="tab-btn" onclick="showTab('cierre',this)">✅ Cierre</button>
+    <span class="reload-text"><strong>¿Vas a cerrar la página?</strong>Descarga el cuaderno antes de salir.</span>
+    <button class="btn-teal" onclick="downloadPDF()" style="padding:7px 14px;font-size:12px;white-space:nowrap;">⬇ Descargar</button>
   </div>
 </div>
 
 <div class="main">
 
-<!-- ═══ WHISPER ═══ -->
-<div id="tab-whisper" class="section active">
+<!-- ═══════════════ PASO 1: LA IDEA ═══════════════ -->
+<div id="tab-0" class="section active">
   <div class="sec-head">
-    <div class="sec-kicker">15:30 — Primera parte · Desde el móvil</div>
-    <h2>Voz a texto — Whisper</h2>
-    <p>Graba lo que quieras con el móvil y ChatGPT lo convierte en texto al instante.</p>
+    <div class="sec-kicker">15:30 — Empezamos aquí</div>
+    <h2>La idea de tu anuncio</h2>
+    <p>Decide qué vas a anunciar. Puede ser real o completamente inventado — lo que quieras.</p>
   </div>
 
   <div class="callout">
-    <strong>¿Para qué sirve esto?</strong>
-    Imagina que grabas una nota de voz con el móvil — una idea, una lista de la compra, lo que te dijo el médico — y en segundos tienes el texto limpio y editable. Sin escribir nada.
+    <strong>¿Qué vamos a hacer hoy?</strong>
+    Al final de la sesión tendrás un anuncio de radio completo: guión escrito por IA, voz generada con ElevenLabs y música de fondo creada con Suno. Todo en 3 horas, sin saber nada de producción de audio.
   </div>
 
-  <!-- ACCESO -->
+  <!-- TIPO DE NEGOCIO -->
+  <div class="card teal-top">
+    <div class="card-label">Paso 1 de 3 · El negocio</div>
+    <h3>¿Qué vas a anunciar?</h3>
+    <div class="selector-grid">
+      <div class="sel-card" data-val="restaurante" onclick="selectCard(this,'tipo')"><span>🍕</span><span>Restaurante</span></div>
+      <div class="sel-card" data-val="tienda" onclick="selectCard(this,'tipo')"><span>🛍️</span><span>Tienda</span></div>
+      <div class="sel-card" data-val="servicio" onclick="selectCard(this,'tipo')"><span>🔧</span><span>Servicio</span></div>
+      <div class="sel-card" data-val="evento" onclick="selectCard(this,'tipo')"><span>🎉</span><span>Evento</span></div>
+      <div class="sel-card" data-val="producto" onclick="selectCard(this,'tipo')"><span>📦</span><span>Producto</span></div>
+      <div class="sel-card" data-val="otro" onclick="selectCard(this,'tipo')"><span>✨</span><span>Otra cosa</span></div>
+    </div>
+    <input type="hidden" id="tipo_val" data-key="anuncio_tipo">
+
+    <span class="field-label">Nombre del negocio o producto</span>
+    <input type="text" data-key="anuncio_nombre" id="anuncio_nombre" placeholder="Ej: Pizzería Volcán, Academia Eki, El Rincón de María…">
+
+    <span class="field-label">¿Qué ofrece o qué hace especial?</span>
+    <input type="text" data-key="anuncio_oferta" id="anuncio_oferta" placeholder="Ej: pizzas artesanales a domicilio, clases de inglés para adultos, cortes de pelo sin cita…">
+  </div>
+
+  <!-- TONO -->
+  <div class="card teal-left">
+    <div class="card-label">Paso 2 de 3 · El tono</div>
+    <h3>¿Cómo suena tu anuncio?</h3>
+    <div class="tono-grid">
+      <div class="tono-card" data-val="divertido" data-color="#10b981" onclick="selectTono(this)" style="background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3);">😄 Divertido</div>
+      <div class="tono-card" data-val="serio" data-color="#2563a8" onclick="selectTono(this)" style="background:rgba(37,99,168,0.08);border-color:rgba(37,99,168,0.3);">💼 Serio</div>
+      <div class="tono-card" data-val="emocionante" data-color="#dc2626" onclick="selectTono(this)" style="background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.3);">🔥 Emocionante</div>
+      <div class="tono-card" data-val="cercano" data-color="#f59e0b" onclick="selectTono(this)" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.3);">🤝 Cercano</div>
+      <div class="tono-card" data-val="misterioso" data-color="#7c3aed" onclick="selectTono(this)" style="background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.3);">🌙 Misterioso</div>
+      <div class="tono-card" data-val="urgente" data-color="#ea580c" onclick="selectTono(this)" style="background:rgba(234,88,12,0.08);border-color:rgba(234,88,12,0.3);">⚡ Urgente</div>
+    </div>
+    <input type="hidden" id="tono_val" data-key="anuncio_tono">
+  </div>
+
+  <!-- DETALLES -->
+  <div class="card gold-left">
+    <div class="card-label">Paso 3 de 3 · Los detalles</div>
+    <h3>Un poco más de información</h3>
+
+    <span class="field-label">¿A quién va dirigido el anuncio?</span>
+    <input type="text" data-key="anuncio_publico" id="anuncio_publico" placeholder="Ej: familias con niños, jóvenes de 20-30 años, personas mayores…">
+
+    <span class="field-label">¿Hay alguna oferta, promoción o llamada a la acción?</span>
+    <input type="text" data-key="anuncio_cta" id="anuncio_cta" placeholder="Ej: 2x1 este fin de semana, llama ahora, visítanos en la calle Mayor…">
+
+    <span class="field-label">Duración del anuncio</span>
+    <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;"><input type="radio" name="duracion" value="15" data-key="anuncio_duracion" onchange="saveAll()" style="width:auto;margin:0;"> 15 segundos</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;"><input type="radio" name="duracion" value="30" data-key="anuncio_duracion" onchange="saveAll()" style="width:auto;margin:0;" checked> 30 segundos</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;"><input type="radio" name="duracion" value="60" data-key="anuncio_duracion" onchange="saveAll()" style="width:auto;margin:0;"> 60 segundos</label>
+    </div>
+  </div>
+
+  <!-- GENERADOR DE PROMPT -->
+  <div class="card" style="border:2px solid var(--teal);background:linear-gradient(135deg,rgba(13,148,136,0.04),var(--white));">
+    <div class="card-label">¡Ya tienes todo! Genera el prompt para ChatGPT</div>
+    <h3>Construye el prompt para el guión</h3>
+    <p>Con la información que has rellenado arriba, el sistema crea el prompt perfecto para pedirle a ChatGPT que escriba el guión de tu anuncio. Lo usarás en el siguiente paso.</p>
+    <button class="gen-btn" onclick="generateAnuncioPrompt()">✨ Generar prompt para ChatGPT</button>
+    <div class="prompt-result-box" id="prompt_result_box">
+      <div class="prompt-result-text" id="prompt_result_text"></div>
+      <button class="copy-prompt-btn" onclick="copyAnuncioPrompt()">📋 Copiar prompt</button>
+    </div>
+  </div>
+
+  <!-- COMPLETE -->
+  <div class="complete-section" id="complete-0">
+    <h4>¿Tienes la idea clara y el prompt generado?</h4>
+    <p>Cuando hayas generado el prompt y lo tengas copiado, marca esta fase como completada para desbloquear el siguiente paso.</p>
+    <button class="complete-btn" onclick="completeStep(0)">✅ Fase 1 completada — ir al guión</button>
+    <div class="complete-done" id="done-0">✓ Fase completada</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PASO 2: EL GUIÓN — WHISPER ═══════════════ -->
+<div id="tab-1" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">16:00 — Whisper · Voz a texto</div>
+    <h2>El guión del anuncio</h2>
+    <p>Dicta la idea de tu anuncio por voz — ChatGPT escribe el guión.</p>
+  </div>
+
+  <div class="callout">
+    <strong>¿Qué vamos a hacer?</strong>
+    En lugar de escribir el prompt con el teclado, lo vamos a <strong>dictar por voz</strong> usando el móvil. Graba una nota de voz describiendo tu anuncio, súbela a ChatGPT y pídele que escriba el guión.
+  </div>
+
   <a href="https://chat.openai.com" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#10a37f,#0d7d63);">
     <span class="tool-btn-icon">🤖</span>
     <div class="tool-btn-text">
-      <span class="tool-btn-title">Abrir ChatGPT (Whisper)</span>
-      <span class="tool-btn-desc">La transcripción de voz funciona directamente en ChatGPT — gratis</span>
+      <span class="tool-btn-title">Abrir ChatGPT</span>
+      <span class="tool-btn-desc">chat.openai.com — gratis, sin necesidad de cuenta Plus</span>
     </div>
     <span class="tool-btn-arrow">→</span>
   </a>
 
-  <!-- INSTRUCCIONES MÓVIL -->
   <div class="phone-box">
-    <div class="phone-box-header">
-      <span style="font-size:20px;">📱</span>
-      <span>Cómo hacerlo desde el móvil</span>
-    </div>
-    <div class="phone-step"><div class="step-num">1</div><div class="step-text">Abre <strong>ChatGPT en el móvil</strong> (app o navegador en chat.openai.com)</div></div>
-    <div class="phone-step"><div class="step-num">2</div><div class="step-text">Graba un audio con la app de <strong>notas de voz</strong> de tu móvil o con el micrófono de WhatsApp. Dura lo que quieras.</div></div>
-    <div class="phone-step"><div class="step-num">3</div><div class="step-text">Adjunta el archivo de audio en ChatGPT usando el <strong>icono del clip 📎</strong></div></div>
-    <div class="phone-step"><div class="step-num">4</div><div class="step-text">Escribe: <strong>"Transcribe este audio"</strong> y envía</div></div>
-    <div class="phone-step"><div class="step-num">5</div><div class="step-text">ChatGPT te devuelve el texto completo. Puedes pedirle que lo <strong>corrija, resuma o organice</strong></div></div>
+    <div class="phone-box-header"><span style="font-size:20px;">📱</span><span class="ph-label">Cómo hacerlo paso a paso</span></div>
+    <div class="phone-step"><div class="step-num">1</div><div class="step-text">Coge el <strong>móvil</strong> y abre la app de <strong>notas de voz</strong> (iPhone) o <strong>grabadora de voz</strong> (Android)</div></div>
+    <div class="phone-step"><div class="step-num">2</div><div class="step-text">Graba un audio describiendo tu anuncio. Puedes usar el prompt generado en el paso anterior como guía. <strong>Habla con naturalidad.</strong></div></div>
+    <div class="phone-step"><div class="step-num">3</div><div class="step-text">En ChatGPT (ordenador o móvil), haz clic en el <strong>icono 📎</strong> y adjunta el audio</div></div>
+    <div class="phone-step"><div class="step-num">4</div><div class="step-text">Escribe en ChatGPT: <strong>"Transcribe este audio y con esa información escribe el guión del anuncio"</strong></div></div>
+    <div class="phone-step"><div class="step-num">5</div><div class="step-text">ChatGPT te dará el guión. <strong>Cópialo</strong> y pégalo en el campo de abajo. Puedes pedirle cambios si no te convence.</div></div>
   </div>
 
   <div class="card teal-top">
-    <div class="card-label">Tu experimento</div>
-    <h3>¿Qué has grabado?</h3>
+    <div class="card-label">Tu guión</div>
+    <h3>Pega aquí el guión que ha generado ChatGPT</h3>
+    <p>Edítalo si quieres cambiar algo — es tu anuncio, tiene que sonar a ti.</p>
+    <textarea class="guion-area" data-key="guion_texto" id="guion_texto" placeholder="Pega aquí el guión generado por ChatGPT y edítalo si quieres…"></textarea>
+  </div>
 
-    <span class="field-label">¿Qué has grabado? (puede ser cualquier cosa)</span>
-    <input type="text" data-key="w_que" placeholder="Ej: una presentación mía, una lista de cosas, algo que quería recordar…">
-
-    <span class="field-label">¿Ha transcrito bien? ¿Qué errores ha cometido?</span>
-    <input type="text" data-key="w_errores" placeholder="Ej: casi perfecto / confundió algunas palabras en euskera…">
-
-    <span class="field-label">¿Le has pedido algo más después de la transcripción?</span>
-    <input type="text" data-key="w_extra" placeholder="Ej: que lo resumiera, que lo reescribiera más formal…">
+  <div class="complete-section" id="complete-1">
+    <h4>¿Tienes el guión listo?</h4>
+    <p>Cuando tengas el texto del anuncio pegado y revisado, pasa al siguiente paso para crear la voz.</p>
+    <button class="complete-btn" onclick="completeStep(1)">✅ Guión listo — crear la voz</button>
+    <div class="complete-done" id="done-1">✓ Fase completada</div>
   </div>
 </div>
 
-<!-- ═══ ELEVENLABS ═══ -->
-<div id="tab-elevenlabs" class="section">
+
+<!-- ═══════════════ PASO 3: LA VOZ — ELEVENLABS ═══════════════ -->
+<div id="tab-2" class="section">
   <div class="sec-head">
-    <div class="sec-kicker">16:05 — Primera parte · Texto a voz</div>
-    <h2>Texto a voz — ElevenLabs</h2>
-    <p>Escribe cualquier cosa y conviértelo en audio con una voz que eliges tú.</p>
+    <div class="sec-kicker">16:45 — ElevenLabs · Texto a voz</div>
+    <h2>La voz del narrador</h2>
+    <p>Convierte el guión en audio con la voz que mejor encaje con tu anuncio.</p>
   </div>
 
   <div class="callout">
-    <strong>¿Para qué sirve esto?</strong>
-    Cualquier texto que escribas puede convertirse en audio con una voz humana de alta calidad. Puedes usarlo para escuchar textos largos, crear contenido para redes, o simplemente experimentar con tu propia "voz de IA".
+    <strong>¿Qué vamos a hacer?</strong>
+    Pega el guión que has escrito en ElevenLabs, elige la voz del narrador y genera el audio. Lo descargas y te lo mandas al móvil por WhatsApp para escucharlo.
   </div>
 
   <a href="https://elevenlabs.io" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">
     <span class="tool-btn-icon">🔊</span>
     <div class="tool-btn-text">
       <span class="tool-btn-title">Abrir ElevenLabs</span>
-      <span class="tool-btn-desc">elevenlabs.io — plan gratuito con créditos mensuales. Crea cuenta con Google.</span>
+      <span class="tool-btn-desc">elevenlabs.io — crea cuenta gratis con Google · tiene créditos mensuales</span>
     </div>
     <span class="tool-btn-arrow">→</span>
   </a>
 
-  <div class="phone-box">
-    <div class="phone-box-header">
-      <span style="font-size:20px;">📱</span>
-      <span>Cómo usarlo y enviarlo al móvil</span>
+  <!-- GUIÓN DE REFERENCIA -->
+  <div class="card teal-left">
+    <div class="card-label">Tu guión (de referencia)</div>
+    <h3>Esto es lo que vas a convertir en audio</h3>
+    <div id="guion_referencia" style="background:var(--mist);border-radius:6px;padding:14px 16px;font-size:14px;color:var(--text);line-height:1.7;min-height:60px;font-style:italic;border-left:3px solid var(--teal);">
+      (Aquí aparecerá el guión del paso anterior)
     </div>
-    <div class="phone-step"><div class="step-num">1</div><div class="step-text">Ve a <strong>elevenlabs.io</strong> desde el ordenador y crea una cuenta gratuita (con Google)</div></div>
-    <div class="phone-step"><div class="step-num">2</div><div class="step-text">Haz clic en <strong>"Text to Speech"</strong> en el menú lateral</div></div>
-    <div class="phone-step"><div class="step-num">3</div><div class="step-text">Escribe o pega el texto que quieres convertir en audio — <strong>lo que quieras</strong></div></div>
-    <div class="phone-step"><div class="step-num">4</div><div class="step-text">Elige una <strong>voz</strong> de la lista (prueba varias antes de decidirte)</div></div>
-    <div class="phone-step"><div class="step-num">5</div><div class="step-text">Haz clic en <strong>"Generate"</strong> y descarga el audio con el botón ⬇</div></div>
-    <div class="phone-step"><div class="step-num">6</div><div class="step-text">Mándate el archivo por <strong>WhatsApp, email o Google Drive</strong> para escucharlo en el móvil</div></div>
   </div>
 
-  <div class="card teal-top">
-    <div class="card-label">Tu creación</div>
-    <h3>¿Qué has convertido en audio?</h3>
+  <div class="phone-box">
+    <div class="phone-box-header"><span style="font-size:20px;">📱</span><span class="ph-label">Paso a paso en ElevenLabs</span></div>
+    <div class="phone-step"><div class="step-num">1</div><div class="step-text">Entra en <strong>elevenlabs.io</strong> y crea una cuenta gratuita con Google</div></div>
+    <div class="phone-step"><div class="step-num">2</div><div class="step-text">Haz clic en <strong>"Text to Speech"</strong> en el menú de la izquierda</div></div>
+    <div class="phone-step"><div class="step-num">3</div><div class="step-text"><strong>Pega el guión</strong> en el cuadro de texto</div></div>
+    <div class="phone-step"><div class="step-num">4</div><div class="step-text">Explora las voces disponibles — haz clic en <strong>"Voice"</strong> y prueba varias hasta encontrar la que mejor encaje con tu anuncio</div></div>
+    <div class="phone-step"><div class="step-num">5</div><div class="step-text">Haz clic en <strong>"Generate"</strong> y escucha el resultado</div></div>
+    <div class="phone-step"><div class="step-num">6</div><div class="step-text">Descarga el audio con el botón ⬇ y <strong>mándate el archivo por WhatsApp</strong> para escucharlo desde el móvil</div></div>
+  </div>
 
-    <span class="field-label">El texto que has usado (o de qué trataba)</span>
-    <textarea data-key="el_texto" placeholder="Puedes ser tan creativo como quieras — no hay respuesta incorrecta…"></textarea>
+  <div class="card gold-left">
+    <div class="card-label">Tu resultado</div>
+    <h3>¿Qué voz has elegido?</h3>
+    <span class="field-label" style="margin-top:0;">Nombre de la voz y por qué encaja con tu anuncio</span>
+    <input type="text" data-key="el_voz" placeholder="Ej: Rachel — suena cercana y natural, perfecta para un anuncio de cafetería…">
+  </div>
 
-    <span class="field-label">¿Qué voz has elegido y por qué?</span>
-    <input type="text" data-key="el_voz" placeholder="Ej: Rachel porque suena natural, Adam porque me parece más serio…">
-
-    <span class="field-label">¿Lo has escuchado en el móvil? ¿Qué te ha parecido?</span>
-    <input type="text" data-key="el_opinion" placeholder="Suena natural / raro / mejor de lo que esperaba…">
+  <div class="complete-section" id="complete-2">
+    <h4>¿Tienes el audio de la voz generado?</h4>
+    <p>Cuando hayas descargado el audio y te lo hayas mandado al móvil, pasa al último paso.</p>
+    <button class="complete-btn" onclick="completeStep(2)">✅ Voz lista — crear el jingle</button>
+    <div class="complete-done" id="done-2">✓ Fase completada</div>
   </div>
 </div>
 
-<!-- ═══ VOZ CHATGPT ═══ -->
-<div id="tab-voz-chatgpt" class="section">
+
+<!-- ═══════════════ PASO 4: EL JINGLE — SUNO ═══════════════ -->
+<div id="tab-3" class="section">
   <div class="sec-head">
-    <div class="sec-kicker">16:35 — Primera parte · Desde el móvil</div>
-    <h2>ChatGPT por voz</h2>
-    <p>Habla con ChatGPT como si fuera una llamada. Sin teclado.</p>
-  </div>
-
-  <div class="callout">
-    <strong>¿Para qué sirve esto?</strong>
-    Puedes hacer preguntas, pedir que te explique algo, o mantener una conversación — todo por voz, desde el móvil. Es la forma más natural de usar la IA para mucha gente.
-  </div>
-
-  <a href="https://chat.openai.com" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#10a37f,#0d7d63);">
-    <span class="tool-btn-icon">💬</span>
-    <div class="tool-btn-text">
-      <span class="tool-btn-title">Abrir ChatGPT en el móvil</span>
-      <span class="tool-btn-desc">App de ChatGPT o chat.openai.com desde el navegador del móvil</span>
-    </div>
-    <span class="tool-btn-arrow">→</span>
-  </a>
-
-  <div class="phone-box">
-    <div class="phone-box-header">
-      <span style="font-size:20px;">📱</span>
-      <span>Cómo activar el modo voz en el móvil</span>
-    </div>
-    <div class="phone-step"><div class="step-num">1</div><div class="step-text">Abre la <strong>app de ChatGPT</strong> en el móvil (si no la tienes, descárgala gratis)</div></div>
-    <div class="phone-step"><div class="step-num">2</div><div class="step-text">En la pantalla de chat, toca el icono del <strong>micrófono 🎤</strong> en la esquina inferior derecha</div></div>
-    <div class="phone-step"><div class="step-num">3</div><div class="step-text">Selecciona <strong>"Modo de voz avanzado"</strong> si te lo ofrece (más natural) o el modo estándar</div></div>
-    <div class="phone-step"><div class="step-num">4</div><div class="step-text"><strong>Habla</strong> directamente — ChatGPT te responde también en voz alta</div></div>
-    <div class="phone-step"><div class="step-num">5</div><div class="step-text">Puedes interrumpirlo, pedirle que repita, cambiar de tema — funciona como una conversación real</div></div>
-  </div>
-
-  <div class="card teal-top">
-    <div class="card-label">Tu experimento</div>
-    <h3>¿De qué has hablado con ChatGPT?</h3>
-
-    <span class="field-label">¿Qué le has preguntado o pedido por voz?</span>
-    <input type="text" data-key="cv_pregunta" placeholder="Ej: que me explicara algo, que me ayudara a preparar una respuesta, que jugáramos…">
-
-    <span class="field-label">¿Qué te ha sorprendido de usarlo por voz?</span>
-    <input type="text" data-key="cv_sorpresa" placeholder="Ej: lo natural que suena, lo rápido que responde, que entiende el euskera…">
-
-    <span class="field-label">¿Para qué lo usarías en tu día a día?</span>
-    <input type="text" data-key="cv_uso" placeholder="Ej: para preguntar cosas mientras cocino, para practicar inglés, para no tener que escribir…">
-  </div>
-</div>
-
-<!-- ═══ SUNO ═══ -->
-<div id="tab-suno" class="section">
-  <div class="sec-head">
-    <div class="sec-kicker">17:15 — Después del descanso · La estrella de la sesión</div>
-    <h2>Música con IA — Suno</h2>
-    <p>Genera una canción completa a partir de una descripción. Sin saber música. Sin instrumentos.</p>
+    <div class="sec-kicker">17:15 — Suno · La estrella de la sesión</div>
+    <h2>El jingle del anuncio</h2>
+    <p>Genera la música de fondo o el jingle de tu anuncio. Sin saber nada de música.</p>
   </div>
 
   <div class="callout purple">
-    <strong>¿Para qué sirve esto?</strong>
-    Suno crea canciones completas — con melodía, letra y producción — a partir de una descripción en texto. Puedes pedir cualquier género, cualquier tema, cualquier mood. El resultado se escucha directamente en el navegador y se puede descargar.
+    <strong>¿Qué vamos a hacer?</strong>
+    Suno genera canciones completas a partir de una descripción. Crea el jingle de tu anuncio — puede ser música de fondo, un estribillo pegadizo, o los dos. Lo escuchas en el móvil y lo compartes con el grupo.
   </div>
 
   <a href="https://suno.com" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#4c1d95,#6d28d9);">
     <span class="tool-btn-icon">🎵</span>
     <div class="tool-btn-text">
       <span class="tool-btn-title">Abrir Suno</span>
-      <span class="tool-btn-desc">suno.com — plan gratuito, sin necesidad de conocimientos musicales</span>
+      <span class="tool-btn-desc">suno.com — plan gratuito, sin conocimientos musicales necesarios</span>
     </div>
     <span class="tool-btn-arrow">→</span>
   </a>
 
-  <div class="phone-box" style="border-color:rgba(124,58,237,0.3);">
-    <div class="phone-box-header">
-      <span style="font-size:20px;">📱</span>
-      <span style="color:#a78bfa;">Cómo usar Suno y escucharlo en el móvil</span>
-    </div>
-    <div class="phone-step"><div class="step-num" style="border-color:#a78bfa;color:#a78bfa;background:rgba(124,58,237,0.15);">1</div><div class="step-text">Ve a <strong>suno.com</strong> desde el ordenador y entra con tu cuenta de Google</div></div>
-    <div class="phone-step"><div class="step-num" style="border-color:#a78bfa;color:#a78bfa;background:rgba(124,58,237,0.15);">2</div><div class="step-text">Haz clic en <strong>"Create"</strong> y escribe una descripción de la canción que quieres</div></div>
-    <div class="phone-step"><div class="step-num" style="border-color:#a78bfa;color:#a78bfa;background:rgba(124,58,237,0.15);">3</div><div class="step-text">Pulsa <strong>"Create"</strong> y espera unos segundos — Suno genera dos versiones</div></div>
-    <div class="phone-step"><div class="step-num" style="border-color:#a78bfa;color:#a78bfa;background:rgba(124,58,237,0.15);">4</div><div class="step-text">Escucha las dos versiones en el ordenador (o con los auriculares del móvil)</div></div>
-    <div class="phone-step"><div class="step-num" style="border-color:#a78bfa;color:#a78bfa;background:rgba(124,58,237,0.15);">5</div><div class="step-text">Para escucharla en el móvil: haz clic en los <strong>tres puntos ···</strong> → <strong>"Share"</strong> → copia el enlace y mándatelo por WhatsApp</div></div>
-  </div>
-
-  <!-- GENERADOR DE PROMPT SUNO -->
+  <!-- GENERADOR SUNO -->
   <div class="card purple-left">
-    <div class="card-label">Constructor de canción</div>
-    <h3>Describe la canción que quieres crear</h3>
-    <p>Rellena los campos que quieras y genera el prompt para Suno. No hace falta rellenarlos todos.</p>
-
+    <div class="card-label">Constructor de jingle</div>
+    <h3>Describe la música que quieres</h3>
+    <p>Rellena los campos y genera el prompt para Suno. Cuanto más específico seas, mejor resultado.</p>
     <div class="suno-grid">
-      <div class="suno-field">
-        <span class="suno-label">🎸 Género musical</span>
-        <input class="suno-input" id="su_genero" type="text" placeholder="Ej: pop, rock, reggaeton, flamenco, lo-fi…">
-      </div>
-      <div class="suno-field">
-        <span class="suno-label">😊 Mood / Ambiente</span>
-        <input class="suno-input" id="su_mood" type="text" placeholder="Ej: alegre, melancólico, energético, relajante…">
-      </div>
-      <div class="suno-field">
-        <span class="suno-label">🎹 Instrumentos</span>
-        <input class="suno-input" id="su_inst" type="text" placeholder="Ej: guitarra, piano, batería, sin instrumentos…">
-      </div>
-      <div class="suno-field">
-        <span class="suno-label">🗣️ Idioma / Voz</span>
-        <input class="suno-input" id="su_idioma" type="text" placeholder="Ej: en español, femenina, masculina, instrumental…">
-      </div>
-      <div class="suno-field" style="grid-column:1/-1;">
-        <span class="suno-label">📝 Tema o letra (opcional)</span>
-        <input class="suno-input" id="su_tema" type="text" placeholder="Ej: una canción sobre mi barrio, sobre el verano, jingle de una panadería llamada 'Eki'…">
-      </div>
+      <div class="suno-field"><span class="suno-label">🎸 Género / Estilo</span><input class="suno-input" id="su_genero" type="text" placeholder="Ej: pop, jingle publicitario, rock, flamenco…"></div>
+      <div class="suno-field"><span class="suno-label">😊 Ambiente</span><input class="suno-input" id="su_mood" type="text" placeholder="Ej: alegre, épico, relajante, urgente…"></div>
+      <div class="suno-field"><span class="suno-label">🎹 Instrumentos</span><input class="suno-input" id="su_inst" type="text" placeholder="Ej: guitarra, piano, trompetas, electrónico…"></div>
+      <div class="suno-field"><span class="suno-label">🗣️ ¿Con letra?</span><input class="suno-input" id="su_letra" type="text" placeholder="Ej: instrumental, con letra sobre [negocio]…"></div>
+      <div class="suno-field" style="grid-column:1/-1;"><span class="suno-label">📝 Tema de la letra (si la lleva)</span><input class="suno-input" id="su_tema" type="text" placeholder="Ej: jingle para una pizzería llamada Volcán, con estribillo pegadizo…"></div>
     </div>
-    <button class="suno-btn" onclick="generateSunoPrompt()">🎵 Generar prompt para Suno</button>
+    <button class="gen-btn" style="background:linear-gradient(135deg,var(--purple),#6d28d9);" onclick="generateSunoPrompt()">🎵 Generar prompt para Suno</button>
     <div class="suno-result" id="suno_result"></div>
     <button class="suno-copy" id="suno_copy" onclick="copySunoPrompt()">📋 Copiar prompt</button>
   </div>
 
-  <div class="card teal-left">
-    <div class="card-label">Tu canción</div>
-    <h3>¿Qué has creado?</h3>
-
-    <span class="field-label">¿De qué trata la canción que has generado?</span>
-    <input type="text" data-key="su_creacion" placeholder="Ej: un jingle para una pizzería imaginaria, una canción sobre el fútbol…">
-
-    <span class="field-label">¿Qué te ha parecido el resultado?</span>
-    <input type="text" data-key="su_opinion" placeholder="Sorprendente / mejor de lo esperado / raro / increíble…">
-
-    <span class="field-label">¿La has compartido con alguien? ¿Lo harías?</span>
-    <input type="text" data-key="su_compartir" placeholder="Ej: se la he mandado a mi familia por WhatsApp / la pondría en Instagram…">
-  </div>
-</div>
-
-<!-- ═══ CIERRE ═══ -->
-<div id="tab-cierre" class="section">
-  <div class="sec-head">
-    <div class="sec-kicker">18:00 — Escucha colectiva y cierre</div>
-    <h2>Escuchamos y cerramos</h2>
-    <p>Compartimos lo que hemos creado y nos llevamos algo al móvil.</p>
+  <div class="phone-box" style="border-color:rgba(124,58,237,0.3);">
+    <div class="phone-box-header"><span style="font-size:20px;">📱</span><span class="ph-label" style="color:#a78bfa;">Cómo usarlo y compartirlo</span></div>
+    <div class="phone-step"><div class="step-num purple">1</div><div class="step-text">Ve a <strong>suno.com</strong> y entra con tu cuenta de Google</div></div>
+    <div class="phone-step"><div class="step-num purple">2</div><div class="step-text">Clic en <strong>"Create"</strong> y pega el prompt generado arriba</div></div>
+    <div class="phone-step"><div class="step-num purple">3</div><div class="step-text">Pulsa <strong>"Create"</strong> y espera — Suno genera dos versiones en unos segundos</div></div>
+    <div class="phone-step"><div class="step-num purple">4</div><div class="step-text">Escucha las dos versiones. Si no te gusta ninguna, genera otra con el prompt modificado</div></div>
+    <div class="phone-step"><div class="step-num purple">5</div><div class="step-text">Para compartir: haz clic en <strong>···</strong> → <strong>"Share"</strong> → copia el enlace y mándatelo por <strong>WhatsApp</strong></div></div>
   </div>
 
-  <div class="callout gold">
-    <strong>Antes de salir</strong>
-    Asegúrate de mandarte al móvil al menos una de las cosas que has creado hoy: el audio de ElevenLabs, el enlace de Suno, o la transcripción de Whisper.
+  <div class="card gold-left">
+    <div class="card-label">Tu jingle</div>
+    <h3>¿Cómo ha quedado?</h3>
+    <span class="field-label" style="margin-top:0;">¿De qué trata la música que has generado?</span>
+    <input type="text" data-key="su_resultado" placeholder="Ej: un jingle de rock para mi pizzería con estribillo 'Volcán, sabor sin igual'…">
   </div>
 
-  <div class="card teal-top">
-    <div class="card-label">Escucha colectiva</div>
-    <h3>Lo mejor del grupo</h3>
-
-    <span class="field-label">La canción de Suno del grupo que más te ha gustado</span>
-    <input type="text" data-key="c_mejor_suno" placeholder="¿De qué trataba? ¿Qué la hacía especial?">
-
-    <span class="field-label">El uso de Whisper o ElevenLabs que más te ha sorprendido</span>
-    <input type="text" data-key="c_sorpresa" placeholder="¿Qué hizo alguien que no se te habría ocurrido a ti?">
+  <!-- ANUNCIO COMPLETO -->
+  <div style="background:linear-gradient(135deg,var(--deep),var(--navy));border:2px solid rgba(13,148,136,0.4);border-radius:12px;padding:24px 28px;margin-top:8px;margin-bottom:20px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5eead4;margin-bottom:10px;">🎉 TU ANUNCIO DE RADIO ESTÁ COMPLETO</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--white);margin-bottom:6px;">Tienes los 3 ingredientes</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+      <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--frost);"><span style="font-size:18px;">📝</span> <strong style="color:white;">Guión</strong> — escrito por ChatGPT a partir de tu voz</div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--frost);"><span style="font-size:18px;">🔊</span> <strong style="color:white;">Voz del narrador</strong> — generada con ElevenLabs</div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--frost);"><span style="font-size:18px;">🎵</span> <strong style="color:white;">Música / jingle</strong> — creado con Suno</div>
+    </div>
   </div>
 
-  <div class="reflection">
-    <h3>💬 Antes de salir</h3>
-    <span class="field-label" style="margin-top:0;">¿Qué te llevas al móvil hoy?</span>
-    <input type="text" data-key="c_llevas" placeholder="Ej: la canción de Suno, el audio de ElevenLabs, la transcripción…">
-    <span class="field-label">¿Para qué usarías alguna de estas herramientas esta semana?</span>
-    <input type="text" data-key="c_uso_semana" placeholder="Ej: transcribir notas de voz del trabajo, crear música para un vídeo, hablar con ChatGPT mientras paseo…">
+  <div class="complete-section" id="complete-3">
+    <h4>¿Tienes el jingle y quieres guardar tu trabajo?</h4>
+    <p>Descarga el cuaderno en PDF para llevarte un registro de todo lo que has creado hoy.</p>
+    <button class="complete-btn" onclick="completeStep(3);downloadPDF()">🎉 ¡Anuncio completado! Descargar cuaderno</button>
+    <div class="complete-done" id="done-3">✓ Anuncio completado — ¡enhorabuena!</div>
   </div>
-
-  <button class="btn btn-teal" onclick="downloadPDF()" style="font-size:14px;padding:13px 28px;">⬇ Descargar cuaderno PDF</button>
 </div>
 
 </div><!-- end main -->
 
 <div class="toast" id="toast"></div>
 
-<div class="modal-overlay" id="warnModal">
-  <div class="modal-box">
-    <div style="font-size:32px;margin-bottom:12px;">⚠️</div>
-    <h3>¿Seguro que quieres salir?</h3>
-    <p>Tu progreso <strong>sobrevivirá si recargas</strong>, pero si cierras la pestaña lo perderás.</p>
-    <div class="modal-actions">
-      <button class="modal-btn-stay" onclick="closeWarnModal();downloadPDF()">⬇ Descargar y salir</button>
-      <button class="modal-btn-stay" onclick="closeWarnModal()" style="background:var(--sky);">⬅ Quedarme</button>
-      <button class="modal-btn-leave" id="modalLeaveBtn">Salir →</button>
-    </div>
-  </div>
-</div>
-
 <div class="dl-bar">
   <span class="dl-note">Sesión 12 · Bloque 3 · ChatGPT e IA · Lanbide</span>
-  <button class="btn btn-teal" onclick="downloadPDF()">⬇ Descargar cuaderno PDF</button>
+  <button class="btn-teal" onclick="downloadPDF()">⬇ Descargar cuaderno PDF</button>
 </div>
 
 <script>
-const STORAGE_KEY='sesion12_v1';
-let hasUnsavedChanges=false,saveDebounce=null;
+const STORAGE_KEY='sesion12_anuncio_v1';
+let hasUnsavedChanges=false, saveDebounce=null;
+// stepsUnlocked[i] = true means step i is accessible
+let stepsUnlocked=[true,false,false,false];
+let stepsDone=[false,false,false,false];
+let currentStep=0;
 
-function showTab(id,btn){
+// ── NAVIGATION ──────────────────────────────────────────────
+function tryGoToStep(i){
+  if(!stepsUnlocked[i]){
+    const prevName=['la idea','el guión','la voz'];
+    showToast('🔒 Completa "'+(prevName[i-1]||'el paso anterior')+'" primero');
+    return;
+  }
+  goToStep(i);
+}
+
+function goToStep(i){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
+  document.getElementById('tab-'+i).classList.add('active');
+  currentStep=i;
+  updateStepNav();
   window.scrollTo({top:0,behavior:'smooth'});
+  // refresh guion reference on step 2
+  if(i===2){
+    const g=document.getElementById('guion_texto');
+    const ref=document.getElementById('guion_referencia');
+    if(g&&ref) ref.textContent=g.value.trim()||'(Aquí aparecerá el guión del paso anterior)';
+    ref.style.fontStyle=g.value.trim()?'normal':'italic';
+  }
 }
 
-function copyPrompt(btn){
-  const box=btn.closest('.prompt-box');
-  const text=box.innerText.replace('COPIAR','').replace('PROMPT\n','').trim();
-  navigator.clipboard.writeText(text).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='COPIAR',2000);});
+function updateStepNav(){
+  for(let i=0;i<4;i++){
+    const el=document.getElementById('step-nav-'+i);
+    el.classList.remove('active','locked','done');
+    if(stepsDone[i]) el.classList.add('done');
+    else if(i===currentStep) el.classList.add('active');
+    else if(!stepsUnlocked[i]) el.classList.add('locked');
+  }
 }
 
+function completeStep(i){
+  stepsDone[i]=true;
+  if(i<3) stepsUnlocked[i+1]=true;
+  // Update UI
+  const btn=document.querySelector(`#complete-${i} .complete-btn`);
+  const done=document.getElementById(`done-${i}`);
+  if(btn){ btn.disabled=true; btn.textContent='✓ Completado'; }
+  if(done) done.classList.add('show');
+  updateStepNav();
+  saveAll();
+  if(i<3){
+    showToast('✅ ¡Perfecto! Puedes pasar al siguiente paso');
+    setTimeout(()=>goToStep(i+1),1200);
+  } else {
+    showToast('🎉 ¡Anuncio completado!');
+  }
+}
+
+// ── SELECTORS ──────────────────────────────────────────────
+function selectCard(card,group){
+  document.querySelectorAll(`.sel-card`).forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('tipo_val').value=card.dataset.val;
+  saveAll();
+}
+function selectTono(card){
+  document.querySelectorAll('.tono-card').forEach(c=>{c.classList.remove('selected');c.style.color='';});
+  card.classList.add('selected');
+  card.style.color='white';
+  card.style.background=card.dataset.color;
+  card.style.borderColor=card.dataset.color;
+  document.getElementById('tono_val').value=card.dataset.val;
+  saveAll();
+}
+
+// ── PROMPT GENERATOR ──────────────────────────────────────
+function generateAnuncioPrompt(){
+  const tipo=document.getElementById('tipo_val').value||'negocio';
+  const nombre=document.getElementById('anuncio_nombre').value.trim()||'[nombre del negocio]';
+  const oferta=document.getElementById('anuncio_oferta').value.trim()||'[descripción del producto/servicio]';
+  const tono=document.getElementById('tono_val').value||'cercano y natural';
+  const publico=document.getElementById('anuncio_publico').value.trim()||'público general';
+  const cta=document.getElementById('anuncio_cta').value.trim()||'';
+  const duracion=document.querySelector('input[name="duracion"]:checked')?.value||'30';
+  let prompt=`Escribe el guión de un anuncio de radio de ${duracion} segundos para "${nombre}", un ${tipo} que ofrece ${oferta}.\n\nTono: ${tono}.\nDirigido a: ${publico}.`;
+  if(cta) prompt+=`\nLlamada a la acción: ${cta}.`;
+  prompt+=`\n\nEl guión debe estar escrito para ser leído en voz alta, con ritmo natural. Incluye solo el texto que dirá el narrador, sin indicaciones técnicas. Máximo ${duracion === '15' ? '35' : duracion === '30' ? '75' : '150'} palabras.`;
+  const box=document.getElementById('prompt_result_box');
+  document.getElementById('prompt_result_text').textContent=prompt;
+  box.classList.add('show');
+  saveAll();
+  showToast('✨ Prompt generado — cópialo en ChatGPT');
+}
+function copyAnuncioPrompt(){
+  const text=document.getElementById('prompt_result_text').textContent;
+  navigator.clipboard.writeText(text).then(()=>{showToast('📋 Prompt copiado — pégalo en ChatGPT');});
+}
+
+// ── SUNO PROMPT ───────────────────────────────────────────
 function generateSunoPrompt(){
   const g=document.getElementById('su_genero').value.trim();
   const m=document.getElementById('su_mood').value.trim();
   const i=document.getElementById('su_inst').value.trim();
-  const l=document.getElementById('su_idioma').value.trim();
+  const l=document.getElementById('su_letra').value.trim();
   const t=document.getElementById('su_tema').value.trim();
-  let p='';
-  if(g) p+=g+' song, ';
-  if(m) p+=m+' mood, ';
-  if(i) p+=i+', ';
-  if(l) p+=l+', ';
-  if(t) p+='about: '+t;
-  if(!p.trim()) p='upbeat pop song, energetic, catchy melody, in Spanish';
-  p=p.replace(/,\s*$/,'').trim();
+  const nombre=document.getElementById('anuncio_nombre')?.value.trim()||'';
+  let parts=[];
+  if(g) parts.push(g);
+  if(m) parts.push(m+' mood');
+  if(i) parts.push(i);
+  if(l) parts.push(l);
+  if(t) parts.push(t);
+  else if(nombre) parts.push('jingle for "'+nombre+'"');
+  if(!parts.length) parts=['upbeat advertising jingle, catchy, energetic, short'];
+  const prompt='"'+parts.join(', ')+'"';
   const r=document.getElementById('suno_result');
-  r.textContent='"'+p+'"';
+  r.textContent=prompt;
   r.classList.add('show');
   document.getElementById('suno_copy').classList.add('show');
   saveAll();
 }
 function copySunoPrompt(){
-  const text=document.getElementById('suno_result').textContent;
-  navigator.clipboard.writeText(text).then(()=>{showToast('📋 Prompt copiado — pégalo en Suno');const btn=document.getElementById('suno_copy');btn.textContent='✓ Copiado';setTimeout(()=>btn.textContent='📋 Copiar prompt',2000);});
+  navigator.clipboard.writeText(document.getElementById('suno_result').textContent).then(()=>{
+    showToast('📋 Prompt copiado — pégalo en Suno');
+    const btn=document.getElementById('suno_copy');
+    btn.textContent='✓ Copiado';
+    setTimeout(()=>btn.textContent='📋 Copiar prompt',2000);
+  });
 }
 
+// ── DATA ──────────────────────────────────────────────────
 function getAllData(){
-  const data={};
+  const data={steps_unlocked:[...stepsUnlocked],steps_done:[...stepsDone]};
   document.querySelectorAll('[data-key]').forEach(el=>{
-    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') data[el.dataset.key]=el.value||'';
+    const k=el.dataset.key;
+    if(el.type==='radio'){ if(el.checked) data[k]=el.value; }
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') data[k]=el.value||'';
   });
+  const tipo=document.querySelector('.sel-card.selected');
+  if(tipo) data['anuncio_tipo_sel']=tipo.dataset.val;
+  const tono=document.querySelector('.tono-card.selected');
+  if(tono) data['anuncio_tono_sel']=tono.dataset.val;
+  data['current_step']=currentStep;
   return data;
 }
 function applyData(data){
+  if(data.steps_unlocked) stepsUnlocked=data.steps_unlocked;
+  if(data.steps_done) stepsDone=data.steps_done;
   document.querySelectorAll('[data-key]').forEach(el=>{
     const k=el.dataset.key;
-    if(k in data&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA')) el.value=data[k];
+    if(!(k in data)) return;
+    if(el.type==='radio'){ el.checked=(el.value===data[k]); }
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value=data[k];
   });
+  if(data['anuncio_tipo_sel']){
+    const c=document.querySelector(`.sel-card[data-val="${data['anuncio_tipo_sel']}"]`);
+    if(c){c.classList.add('selected');}
+  }
+  if(data['anuncio_tono_sel']){
+    const c=document.querySelector(`.tono-card[data-val="${data['anuncio_tono_sel']}"]`);
+    if(c){selectTono(c);}
+  }
+  // Restore done states
+  stepsDone.forEach((done,i)=>{
+    if(done){
+      const btn=document.querySelector(`#complete-${i} .complete-btn`);
+      const doneEl=document.getElementById(`done-${i}`);
+      if(btn){btn.disabled=true;btn.textContent='✓ Completado';}
+      if(doneEl) doneEl.classList.add('show');
+    }
+  });
+  const step=data['current_step']||0;
+  if(stepsUnlocked[step]) goToStep(step);
+  updateStepNav();
 }
 
+// ── SAVE ─────────────────────────────────────────────────
 function saveAll(){
-  document.getElementById('unsavedDot').classList.remove('hidden');
   document.getElementById('saveDot').classList.add('saving');
   hasUnsavedChanges=true;
   clearTimeout(saveDebounce);
@@ -579,8 +733,8 @@ function saveAll(){
       try{localStorage.setItem(STORAGE_KEY,json);}catch(e){}
       document.getElementById('saveDot').classList.remove('saving');
       document.getElementById('saveDot').style.background='var(--green)';
-      document.getElementById('saveText').textContent='✓ Guardado — si recargas, tus datos se restaurarán';
-    }catch(e){document.getElementById('saveText').textContent='⚠ Error al guardar';}
+      document.getElementById('saveText').textContent='✓ Guardado automáticamente';
+    }catch(e){}
   },800);
 }
 function loadAll(){
@@ -593,16 +747,28 @@ function confirmClear(){
   if(!confirm('¿Seguro que quieres borrar todo el progreso?')) return;
   history.replaceState(null,'',location.pathname+location.search);
   try{sessionStorage.removeItem(STORAGE_KEY);localStorage.removeItem(STORAGE_KEY);}catch(e){}
-  document.querySelectorAll('[data-key]').forEach(el=>{if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value='';});
+  stepsUnlocked=[true,false,false,false];
+  stepsDone=[false,false,false,false];
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(el.type==='radio') el.checked=(el.value==='30');
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value='';
+  });
+  document.querySelectorAll('.sel-card,.tono-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.tono-card').forEach(c=>{c.style.background='';c.style.borderColor='';c.style.color='';});
+  document.querySelectorAll('.complete-btn').forEach(b=>{b.disabled=false;const texts=['✅ Fase 1 completada — ir al guión','✅ Guión listo — crear la voz','✅ Voz lista — crear el jingle','🎉 ¡Anuncio completado! Descargar cuaderno'];b.textContent=texts[parseInt(b.closest('[id^="complete-"]').id.split('-')[1])];});
+  document.querySelectorAll('.complete-done').forEach(d=>d.classList.remove('show'));
+  document.getElementById('prompt_result_box').classList.remove('show');
+  document.getElementById('suno_result').classList.remove('show');
+  document.getElementById('suno_copy').classList.remove('show');
+  goToStep(0);
+  updateStepNav();
   hasUnsavedChanges=false;
-  document.getElementById('unsavedDot').classList.add('hidden');
   showToast('🗑️ Progreso borrado');
 }
 
-function closeWarnModal(){document.getElementById('warnModal').classList.remove('show');}
-document.getElementById('warnModal').addEventListener('click',function(e){if(e.target===this)closeWarnModal();});
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
+// ── PDF ───────────────────────────────────────────────────
 function downloadPDF(){
   try{
     const{jsPDF}=window.jspdf;
@@ -610,7 +776,7 @@ function downloadPDF(){
     const d=getAllData();
     const pW=210,pH=297,ml=15,mr=15,cW=pW-ml-mr;
     let y=0;
-    function ftr(){doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);const p=doc.internal.getNumberOfPages();doc.text('ChatGPT e IA · Lanbide · Sesion 12 · Audio con IA',ml,pH-3);doc.text(String(p),pW-mr,pH-3,{align:'right'});}
+    function ftr(){doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);doc.text('ChatGPT e IA · Lanbide · Sesion 12 · Anuncio de radio con IA',ml,pH-3);doc.text(String(doc.internal.getNumberOfPages()),pW-mr,pH-3,{align:'right'});}
     function np(){ftr();doc.addPage();y=14;}
     function need(h){if(y+h>pH-14)np();}
     function sHdr(t,s){need(22);doc.setFillColor(13,27,53);doc.rect(0,y-2,pW,18,'F');doc.setFillColor(13,148,136);doc.rect(0,y+16,pW,1.5,'F');doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(240,247,255);doc.text(t,ml,y+9);if(s){doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,160,200);doc.text(s,ml,y+15);}y+=24;}
@@ -619,42 +785,41 @@ function downloadPDF(){
     // COVER
     doc.setFillColor(8,14,26);doc.rect(0,0,pW,52,'F');doc.setFillColor(13,148,136);doc.rect(0,52,pW,2.5,'F');
     doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(94,234,212);doc.text('BLOQUE 3 · SESION 12 · LANBIDE',ml,14);
-    doc.setFontSize(20);doc.setFont('helvetica','bold');doc.setTextColor(240,247,255);doc.text('Audio con IA',ml,28);
-    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,160,200);doc.text('Cuaderno de trabajo · Martes 15:30-18:30',ml,40);
+    doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(240,247,255);doc.text('Mi anuncio de radio con IA',ml,27);
+    const nombreNegocio=(d['anuncio_nombre']||'').trim();
+    if(nombreNegocio){doc.setFontSize(13);doc.setFont('helvetica','normal');doc.setTextColor(94,234,212);doc.text(nombreNegocio,ml,38);}
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,160,200);doc.text('Cuaderno de trabajo · Martes 15:30-18:30',ml,48);
     y=62;
 
-    sHdr('1. WHISPER — Voz a texto','15:30 · Desde el movil');
-    fld('Que has grabado','w_que');
-    fld('Ha transcrito bien? Errores?','w_errores');
-    fld('Le has pedido algo mas?','w_extra');
+    sHdr('1. LA IDEA DEL ANUNCIO','15:30');
+    fld('Tipo de negocio','anuncio_tipo_sel');
+    fld('Nombre','anuncio_nombre');
+    fld('Que ofrece','anuncio_oferta');
+    fld('Tono','anuncio_tono_sel');
+    fld('Publico objetivo','anuncio_publico');
+    fld('Llamada a la accion','anuncio_cta');
+    fld('Duracion','anuncio_duracion');
 
-    sHdr('2. ELEVENLABS — Texto a voz','16:05 · Convierte texto en audio');
-    fld('El texto que has convertido','el_texto');
+    sHdr('2. EL GUION — Whisper + ChatGPT','16:00');
+    fld('Guion del anuncio','guion_texto');
+
+    sHdr('3. LA VOZ — ElevenLabs','16:45');
     fld('Voz elegida y por que','el_voz');
-    fld('Lo has escuchado en el movil? Que te ha parecido?','el_opinion');
 
-    sHdr('3. CHATGPT POR VOZ','16:35 · Sin teclado');
-    fld('De que has hablado con ChatGPT por voz','cv_pregunta');
-    fld('Que te ha sorprendido','cv_sorpresa');
-    fld('Para que lo usarias en tu dia a dia','cv_uso');
+    sHdr('4. EL JINGLE — Suno','17:15');
+    fld('El jingle que has creado','su_resultado');
 
-    sHdr('4. SUNO — Musica con IA','17:15 · Despues del descanso');
-    fld('De que trata la cancion que has creado','su_creacion');
-    fld('Que te ha parecido el resultado','su_opinion');
-    fld('La has compartido? Lo harias?','su_compartir');
-
-    sHdr('5. CIERRE','18:00');
-    fld('La cancion de Suno del grupo que mas te ha gustado','c_mejor_suno');
-    fld('El uso de Whisper o ElevenLabs que mas te ha sorprendido','c_sorpresa');
-    fld('Que te llevas al movil hoy','c_llevas');
-    fld('Para que usarias esto esta semana','c_uso_semana');
+    // Estado
+    const stDone=stepsDone.filter(Boolean).length;
+    need(16);
+    doc.setFillColor(13,27,53);doc.rect(ml,y,cW,12,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(94,234,212);
+    doc.text('Fases completadas: '+stDone+' / 4'+(stDone===4?' — Anuncio completo!':''),ml+6,y+8);
+    y+=16;
 
     const total=doc.internal.getNumberOfPages();
-    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);doc.text('ChatGPT e IA · Lanbide · Sesion 12 · Audio con IA',ml,pH-3);doc.text(p+' / '+total,pW-mr,pH-3,{align:'right'});}
-
-    doc.save('sesion12_audio_ia.pdf');
-    hasUnsavedChanges=false;
-    document.getElementById('unsavedDot').classList.add('hidden');
+    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);doc.text('ChatGPT e IA · Lanbide · Sesion 12 · Anuncio de radio con IA',ml,pH-3);doc.text(p+' / '+total,pW-mr,pH-3,{align:'right'});}
+    doc.save('sesion12_anuncio_radio.pdf');
     showToast('📄 PDF descargado');
   }catch(err){console.error(err);showToast('⚠ Error: '+err.message);}
 }
@@ -663,7 +828,7 @@ document.addEventListener('input',saveAll);
 document.addEventListener('change',saveAll);
 window.addEventListener('load',()=>{
   const r=loadAll();
-  if(!r) document.getElementById('saveText').textContent='Empieza a escribir — tu progreso se guardará automáticamente';
+  if(!r){document.getElementById('saveText').textContent='Tu progreso se guarda automáticamente';updateStepNav();}
 });
 </script>
 </body>
