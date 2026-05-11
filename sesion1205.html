@@ -610,11 +610,22 @@ function selectCard(card,group){
   saveAll();
 }
 function selectTono(card){
-  document.querySelectorAll('.tono-card').forEach(c=>{c.classList.remove('selected');c.style.color='';});
+  // Reset ALL cards fully to their original state
+  document.querySelectorAll('.tono-card').forEach(c=>{
+    c.classList.remove('selected');
+    c.style.background='';
+    c.style.borderColor='';
+    c.style.color='';
+    c.style.fontWeight='';
+    c.style.boxShadow='';
+  });
+  // Apply selected state only to clicked card
   card.classList.add('selected');
-  card.style.color='white';
   card.style.background=card.dataset.color;
   card.style.borderColor=card.dataset.color;
+  card.style.color='white';
+  card.style.fontWeight='700';
+  card.style.boxShadow='0 3px 12px '+card.dataset.color+'55';
   document.getElementById('tono_val').value=card.dataset.val;
   saveAll();
 }
@@ -704,7 +715,7 @@ function applyData(data){
   }
   if(data['anuncio_tono_sel']){
     const c=document.querySelector(`.tono-card[data-val="${data['anuncio_tono_sel']}"]`);
-    if(c){selectTono(c);}
+    if(c) selectTono(c);
   }
   // Restore done states
   stepsDone.forEach((done,i)=>{
