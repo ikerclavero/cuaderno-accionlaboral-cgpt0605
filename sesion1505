@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 14 · IA en tu vida diaria + Ética</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --night:#080e1a;--deep:#0d1b35;--navy:#132347;--steel:#2563a8;--sky:#3b82c4;
+  --ice:#7bb3e0;--frost:#bdd8f0;--mist:#deeef9;--white:#f0f7ff;--paper:#f8fbff;
+  --accent:#38bdf8;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--purple:#7c3aed;
+  --gemini:#4285f4;--text:#0f2040;--muted:#4a6b8a;--border:#c5ddf0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:var(--text);font-size:15px;line-height:1.7;}
+
+.header{background:var(--night);position:relative;overflow:hidden;}
+.header-bg{position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 70% at 10% 50%,rgba(66,133,244,0.3) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 60% at 90% 20%,rgba(52,168,83,0.12) 0%,transparent 55%),
+             radial-gradient(ellipse 40% 40% at 60% 90%,rgba(251,188,5,0.08) 0%,transparent 55%);}
+.header-bg::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(66,133,244,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(66,133,244,0.06) 1px,transparent 1px);background-size:32px 32px;}
+.header-inner{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:44px 48px 38px;}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
+.session-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(66,133,244,0.15);border:1px solid rgba(66,133,244,0.4);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;}
+.session-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#93c5fd;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.btn-classroom{display:inline-flex;align-items:center;gap:7px;background:#1a73e8;color:white;text-decoration:none;padding:8px 18px;border-radius:6px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;transition:background 0.2s;border:none;cursor:pointer;white-space:nowrap;}
+.btn-classroom:hover{background:#1557b0;}
+.header h1{font-family:'DM Serif Display',serif;font-size:clamp(24px,5vw,42px);font-weight:400;color:var(--white);line-height:1.15;margin-bottom:10px;}
+.header h1 em{font-style:italic;color:#93c5fd;}
+.header-sub{color:rgba(176,210,240,0.7);font-size:14px;margin-bottom:24px;}
+.header-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:5px 14px;border-radius:4px;font-size:12px;color:rgba(176,210,240,0.85);font-weight:500;}
+
+/* PROGRESS STEPS */
+.progress-steps{background:var(--deep);border-bottom:1px solid rgba(66,133,244,0.2);padding:0 48px;}
+.progress-steps-inner{max-width:860px;margin:0 auto;display:flex;align-items:stretch;overflow-x:auto;}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:13px 14px;cursor:pointer;min-width:80px;flex:1;transition:all 0.2s;border-bottom:2px solid transparent;user-select:none;}
+.step-item.active{border-bottom-color:#93c5fd;}
+.step-item.locked{opacity:0.35;cursor:not-allowed;}
+.step-item.done .step-circle{background:var(--green);border-color:var(--green);color:white;}
+.step-item.done .step-circle::after{content:'✓';font-weight:700;}
+.step-circle{width:26px;height:26px;border-radius:50%;border:2px solid rgba(176,210,240,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(176,210,240,0.5);transition:all 0.3s;background:transparent;font-weight:600;}
+.step-item.active .step-circle{border-color:#93c5fd;color:#93c5fd;}
+.step-label{font-size:10.5px;color:rgba(176,210,240,0.4);text-align:center;line-height:1.3;font-weight:500;}
+.step-item.active .step-label{color:#93c5fd;}
+.step-item.done .step-label{color:var(--green);}
+
+.save-bar{background:var(--night);border-bottom:1px solid rgba(66,133,244,0.15);padding:7px 48px;}
+.save-bar-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;transition:background 0.3s;}
+.save-text{font-size:11.5px;color:rgba(176,210,240,0.4);flex:1;}
+.btn-clear{background:none;border:1px solid rgba(255,100,100,0.25);color:rgba(255,130,130,0.5);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+.reload-banner{background:linear-gradient(90deg,#7c3700,#92400e);border-bottom:2px solid var(--gold);padding:9px 48px;}
+.reload-banner-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.reload-text{font-size:12.5px;color:rgba(255,237,180,0.95);line-height:1.4;flex:1;min-width:200px;}
+.reload-text strong{color:#fef3c7;display:block;margin-bottom:2px;}
+
+.main{max-width:860px;margin:0 auto;padding:36px 48px 110px;}
+.section{display:none;}
+.section.active{display:block;}
+
+.sec-head{margin-bottom:24px;}
+.sec-kicker{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gemini);margin-bottom:6px;}
+.sec-head h2{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;color:var(--text);margin-bottom:5px;}
+.sec-head p{color:var(--muted);font-size:14px;}
+
+.callout{background:linear-gradient(135deg,var(--deep),var(--navy));border-left:3px solid #93c5fd;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;color:var(--mist);font-size:13.5px;line-height:1.65;}
+.callout strong{display:block;color:#93c5fd;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-weight:600;}
+.callout.red{border-left-color:#fca5a5;}
+.callout.red strong{color:#fca5a5;}
+.callout.gold{border-left-color:var(--gold);}
+.callout.gold strong{color:#fde68a;}
+
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:24px 28px;margin-bottom:18px;}
+.card.blue-top{border-top:3px solid var(--gemini);}
+.card.blue-left{border-left:3px solid var(--gemini);}
+.card.green-left{border-left:3px solid var(--green);}
+.card.red-left{border-left:3px solid var(--red);}
+.card.gold-left{border-left:3px solid var(--gold);}
+.card-label{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gemini);margin-bottom:7px;}
+.card h3{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:7px;color:var(--text);}
+.card>p{color:var(--muted);font-size:13.5px;margin-bottom:12px;line-height:1.6;}
+
+.field-label{display:block;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;margin-top:16px;}
+.field-label:first-of-type{margin-top:0;}
+textarea,input[type="text"]{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--paper);resize:vertical;transition:border-color 0.2s,box-shadow 0.2s;line-height:1.6;}
+textarea:focus,input[type="text"]:focus{outline:none;border-color:var(--gemini);box-shadow:0 0 0 3px rgba(66,133,244,0.12);}
+textarea{min-height:90px;}
+
+/* TOOL BUTTON */
+.tool-btn{display:flex;align-items:center;gap:14px;color:white;text-decoration:none;padding:15px 18px;border-radius:10px;margin-bottom:10px;transition:all 0.2s;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:left;}
+.tool-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.2);}
+.tool-btn-icon{font-size:26px;flex-shrink:0;}
+.tool-btn-text{flex:1;}
+.tool-btn-title{font-size:14.5px;font-weight:700;display:block;margin-bottom:1px;}
+.tool-btn-desc{font-size:12px;opacity:0.75;display:block;}
+.tool-btn-arrow{font-size:20px;font-weight:700;flex-shrink:0;}
+
+/* DEMO CARDS */
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+@media(max-width:560px){.demo-grid{grid-template-columns:1fr;}}
+.demo-card{background:var(--deep);border:1.5px solid rgba(66,133,244,0.25);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all 0.2s;position:relative;}
+.demo-card:hover{border-color:#93c5fd;transform:translateY(-2px);}
+.demo-card.tried{border-color:var(--green);background:rgba(16,185,129,0.08);}
+.demo-card.tried::after{content:'✓';position:absolute;top:10px;right:12px;color:var(--green);font-size:16px;font-weight:700;}
+.demo-card-icon{font-size:20px;margin-bottom:6px;display:block;}
+.demo-card-text{font-size:13px;color:var(--frost);line-height:1.5;}
+.demo-card-prompt{font-size:12px;color:rgba(56,189,248,0.7);font-style:italic;margin-top:4px;display:block;}
+
+/* CAPABILITIES */
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+@media(max-width:560px){.cap-grid{grid-template-columns:1fr;}}
+.cap-card{background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:16px;}
+.cap-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.cap-icon{font-size:22px;}
+.cap-title{font-size:14px;font-weight:700;color:var(--text);}
+.cap-items{list-style:none;}
+.cap-items li{font-size:12.5px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--mist);display:flex;gap:8px;align-items:flex-start;}
+.cap-items li:last-child{border-bottom:none;}
+.cap-items li::before{content:'→';color:var(--gemini);font-weight:700;flex-shrink:0;}
+
+/* STEPS */
+.phone-box{background:var(--night);border:1.5px solid rgba(66,133,244,0.3);border-radius:10px;padding:16px 20px;margin:12px 0 16px;}
+.phone-box-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.ph-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;}
+.phone-step{display:flex;gap:11px;align-items:flex-start;margin-bottom:9px;}
+.phone-step:last-child{margin-bottom:0;}
+.step-num{width:20px;height:20px;border-radius:50%;background:rgba(66,133,244,0.2);border:1.5px solid #93c5fd;color:#93c5fd;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-text{font-size:13px;color:var(--frost);line-height:1.55;}
+.step-text strong{color:white;}
+
+/* CHECKLIST ETICA */
+.check-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--mist);}
+.check-row:last-child{border-bottom:none;}
+.chk{width:22px;height:22px;border:2px solid var(--border);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background:var(--white);transition:all 0.15s;}
+.chk:hover{border-color:var(--gemini);}
+.chk.on{background:var(--green);border-color:var(--green);}
+.chk.on::after{content:'✓';color:white;font-size:13px;font-weight:700;}
+.chk-content strong{font-size:14px;font-weight:600;display:block;margin-bottom:2px;}
+.chk-content span{font-size:12.5px;color:var(--muted);}
+
+/* ALUCINA GAME */
+.aluc-question{background:var(--deep);border:1.5px solid rgba(66,133,244,0.3);border-radius:8px;padding:18px 20px;margin-bottom:12px;}
+.aluc-q-text{font-size:14px;color:var(--white);font-weight:600;margin-bottom:12px;}
+.aluc-options{display:flex;flex-direction:column;gap:8px;}
+.aluc-option{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;padding:10px 14px;cursor:pointer;font-size:13.5px;color:var(--frost);transition:all 0.15s;text-align:left;font-family:'DM Sans',sans-serif;width:100%;}
+.aluc-option:hover{border-color:#93c5fd;background:rgba(66,133,244,0.1);}
+.aluc-option.correct{background:rgba(16,185,129,0.15);border-color:var(--green);color:#6ee7b7;}
+.aluc-option.wrong{background:rgba(239,68,68,0.12);border-color:var(--red);color:#fca5a5;}
+.aluc-feedback{margin-top:10px;font-size:13px;padding:10px 14px;border-radius:6px;display:none;}
+.aluc-feedback.show{display:block;}
+.aluc-feedback.ok{background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);}
+.aluc-feedback.fail{background:rgba(239,68,68,0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}
+.aluc-score{background:linear-gradient(135deg,var(--deep),var(--navy));border:2px solid rgba(66,133,244,0.3);border-radius:10px;padding:20px 24px;text-align:center;margin-top:16px;display:none;}
+.aluc-score.show{display:block;}
+.aluc-score-num{font-family:'DM Serif Display',serif;font-size:36px;color:#93c5fd;}
+.aluc-score-msg{font-size:13.5px;color:var(--frost);margin-top:6px;}
+
+/* COMPLETE BUTTON */
+.complete-section{background:linear-gradient(135deg,rgba(66,133,244,0.06),rgba(66,133,244,0.03));border:2px dashed rgba(66,133,244,0.3);border-radius:10px;padding:20px 24px;margin-top:24px;text-align:center;}
+.complete-section h4{font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);margin-bottom:5px;}
+.complete-section p{font-size:13px;color:var(--muted);margin-bottom:14px;}
+.complete-btn{background:var(--gemini);color:white;border:none;padding:12px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.complete-btn:hover{background:#2563c8;transform:translateY(-1px);}
+.complete-btn:disabled{background:var(--green);cursor:default;transform:none;}
+.complete-done{display:none;align-items:center;gap:10px;justify-content:center;color:var(--green);font-weight:700;font-size:15px;}
+.complete-done.show{display:flex;}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:24px 0;}
+
+.dl-bar{position:fixed;bottom:0;left:0;right:0;background:var(--night);border-top:1px solid rgba(66,133,244,0.2);padding:11px 48px;display:flex;align-items:center;justify-content:flex-end;gap:10px;z-index:200;}
+.dl-note{color:rgba(176,210,240,0.3);font-size:12px;margin-right:auto;}
+.btn-blue{background:var(--gemini);color:white;border:none;padding:10px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.btn-blue:hover{background:#2563c8;}
+
+.toast{position:fixed;top:20px;right:20px;background:var(--deep);border:1px solid var(--green);color:var(--frost);padding:12px 20px;border-radius:8px;font-size:13px;z-index:999;transform:translateY(-60px);opacity:0;transition:all 0.3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+@media(max-width:640px){
+  .header-inner,.main{padding-left:20px;padding-right:20px;}
+  .progress-steps,.save-bar,.reload-banner{padding-left:16px;padding-right:16px;}
+  .dl-bar{padding:11px 20px;flex-wrap:wrap;}
+  .dl-note{display:none;}
+  .demo-grid,.cap-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-bg"></div>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="session-badge">Bloque 3 · Sesión 14 · Jueves</div>
+      <a href="https://classroom.google.com/u/1/c/ODE5MzExOTc3MzAw" target="_blank" class="btn-classroom">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ir a Classroom
+      </a>
+    </div>
+    <h1>IA en tu vida diaria<br><em>+ Ética y privacidad</em></h1>
+    <div class="header-sub">Cuaderno de trabajo · Jueves 15:30–18:30</div>
+    <div class="header-chips">
+      <span class="chip">✨ Gemini + Google</span>
+      <span class="chip">📧 Gmail</span>
+      <span class="chip">📅 Calendar</span>
+      <span class="chip">🔒 Ética y privacidad</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-steps">
+  <div class="progress-steps-inner">
+    <div class="step-item active" id="step-nav-0" onclick="tryGoToStep(0)"><div class="step-circle">1</div><span class="step-label">Check-in</span></div>
+    <div class="step-item locked" id="step-nav-1" onclick="tryGoToStep(1)"><div class="step-circle">2</div><span class="step-label">Conectar</span></div>
+    <div class="step-item locked" id="step-nav-2" onclick="tryGoToStep(2)"><div class="step-circle">3</div><span class="step-label">Practicar</span></div>
+    <div class="step-item locked" id="step-nav-3" onclick="tryGoToStep(3)"><div class="step-circle">4</div><span class="step-label">Reflexión</span></div>
+    <div class="step-item locked" id="step-nav-4" onclick="tryGoToStep(4)"><div class="step-circle">5</div><span class="step-label">Ética</span></div>
+    <div class="step-item locked" id="step-nav-5" onclick="tryGoToStep(5)"><div class="step-circle">6</div><span class="step-label">Alucinaciones</span></div>
+    <div class="step-item locked" id="step-nav-6" onclick="tryGoToStep(6)"><div class="step-circle">7</div><span class="step-label">Checklist</span></div>
+  </div>
+</div>
+
+<div class="save-bar">
+  <div class="save-bar-inner">
+    <div class="save-dot" id="saveDot"></div>
+    <span class="save-text" id="saveText">Tu progreso se guarda automáticamente</span>
+    <button class="btn-clear" onclick="confirmClear()">Borrar todo</button>
+  </div>
+</div>
+
+<div class="reload-banner">
+  <div class="reload-banner-inner">
+    <span style="font-size:18px;flex-shrink:0;">💾</span>
+    <span class="reload-text"><strong>¿Vas a cerrar la página?</strong>Descarga el cuaderno antes de salir.</span>
+    <button class="btn-blue" onclick="downloadPDF()" style="padding:7px 14px;font-size:12px;white-space:nowrap;">⬇ Descargar</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══════ PASO 1: CHECK-IN ══════ -->
+<div id="tab-0" class="section active">
+  <div class="sec-head">
+    <div class="sec-kicker">15:30 — 10 minutos · Demo del docente</div>
+    <h2>¿Qué puede hacer Gemini conectado a Google?</h2>
+    <p>El docente muestra ejemplos en directo. Tú observas y anota lo que te llama la atención.</p>
+  </div>
+
+  <div class="callout">
+    <strong>Lo que vas a ver ahora</strong>
+    Gemini puede conectarse a tu Gmail, tu Google Calendar y tu Google Drive. En directo vais a ver cómo responde a preguntas sobre correos y agenda reales — sin buscar manualmente nada.
+  </div>
+
+  <div class="card blue-top">
+    <div class="card-label">Ejemplos que muestra el docente — ¿te serían útiles?</div>
+    <h3>Marca los que te parecen interesantes</h3>
+    <div class="demo-grid">
+      <div class="demo-card" id="demo-0" onclick="toggleDemo(this)">
+        <span class="demo-card-icon">📅</span>
+        <span class="demo-card-text">Ver el calendario</span>
+        <span class="demo-card-prompt">"¿Qué tengo mañana?"</span>
+      </div>
+      <div class="demo-card" id="demo-1" onclick="toggleDemo(this)">
+        <span class="demo-card-icon">📧</span>
+        <span class="demo-card-text">Resumir correos</span>
+        <span class="demo-card-prompt">"Resume mis correos importantes de hoy"</span>
+      </div>
+      <div class="demo-card" id="demo-2" onclick="toggleDemo(this)">
+        <span class="demo-card-icon">🔍</span>
+        <span class="demo-card-text">Buscar en correos</span>
+        <span class="demo-card-prompt">"¿A qué hora tengo la próxima reunión?"</span>
+      </div>
+      <div class="demo-card" id="demo-3" onclick="toggleDemo(this)">
+        <span class="demo-card-icon">✍️</span>
+        <span class="demo-card-text">Redactar respuestas</span>
+        <span class="demo-card-prompt">"Redacta una respuesta amable a este correo"</span>
+      </div>
+      <div class="demo-card" id="demo-4" onclick="toggleDemo(this)">
+        <span class="demo-card-icon">📄</span>
+        <span class="demo-card-text">Analizar documentos</span>
+        <span class="demo-card-prompt">"¿Qué dice mi contrato sobre las vacaciones?"</span>
+      </div>
+      <div class="demo-card" id="demo-5" onclick="toggleDemo(this)">
+        <span class="demo-card-icon">📆</span>
+        <span class="demo-card-text">Gestionar agenda</span>
+        <span class="demo-card-prompt">"¿Cuándo tengo la próxima tarde libre?"</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card blue-left">
+    <div class="card-label">Tu reacción</div>
+    <h3>Dos preguntas rápidas</h3>
+    <span class="field-label">¿Esto te sería útil en tu día a día? ¿Para qué?</span>
+    <input type="text" data-key="checkin_util" placeholder="Ej: sí, para no perderme correos importantes / para saber qué tengo sin abrir la app…">
+    <span class="field-label">¿Hay algo que te da reparo o no harías?</span>
+    <input type="text" data-key="checkin_reparo" placeholder="Ej: no le daría acceso al correo del trabajo / me preocupa que lea mis cosas personales…">
+  </div>
+
+  <div class="complete-section">
+    <h4>¿Has visto la demo y anotado tu reacción?</h4>
+    <p>Cuando estés listo para ver cómo conectar Gemini a tu cuenta, pasa al siguiente paso.</p>
+    <button class="complete-btn" onclick="completeStep(0)">✅ Siguiente — cómo conectarlo</button>
+    <div class="complete-done" id="done-0">✓ Completado</div>
+  </div>
+</div>
+
+<!-- ══════ PASO 2: CONECTAR ══════ -->
+<div id="tab-1" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">15:40 — 25 minutos · Todos juntos y despacio</div>
+    <h2>Conectar Gemini a tu cuenta de Google</h2>
+    <p>Lo hacemos todos al mismo tiempo, paso a paso. Sin prisa.</p>
+  </div>
+
+  <div class="callout">
+    <strong>Antes de empezar</strong>
+    Necesitas estar con la misma cuenta de Google con la que usas Gmail y Calendar. Si usas varias cuentas, usa la que tenga correos y agenda reales.
+  </div>
+
+  <a href="https://gemini.google.com" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#4285f4,#1a6bdc);">
+    <span class="tool-btn-icon">✨</span>
+    <div class="tool-btn-text">
+      <span class="tool-btn-title">Abrir Gemini</span>
+      <span class="tool-btn-desc">gemini.google.com — gratuito con tu cuenta de Google</span>
+    </div>
+    <span class="tool-btn-arrow">→</span>
+  </a>
+
+  <div class="phone-box">
+    <div class="phone-box-header"><span style="font-size:20px;">🖥️</span><span class="ph-label">Cómo conectar Gemini con Gmail y Calendar</span></div>
+    <div class="phone-step"><div class="step-num">1</div><div class="step-text">Abre <strong>gemini.google.com</strong> e inicia sesión con tu cuenta de Google</div></div>
+    <div class="phone-step"><div class="step-num">2</div><div class="step-text">Busca el icono de <strong>extensiones o conectores</strong> — suele aparecer como un puzzle 🧩 o en el menú lateral</div></div>
+    <div class="phone-step"><div class="step-num">3</div><div class="step-text">Activa la extensión de <strong>Gmail</strong> — haz clic en el botón de activar y acepta los permisos</div></div>
+    <div class="phone-step"><div class="step-num">4</div><div class="step-text">Activa la extensión de <strong>Google Calendar</strong> del mismo modo</div></div>
+    <div class="phone-step"><div class="step-num">5</div><div class="step-text">Activa también <strong>Google Drive</strong> si lo tienes y quieres usarlo</div></div>
+    <div class="phone-step"><div class="step-num">6</div><div class="step-text">Vuelve al chat y prueba: escribe <strong>"¿Qué tengo esta semana en el calendario?"</strong></div></div>
+  </div>
+
+  <div class="card blue-left">
+    <div class="card-label">Qué ha pasado</div>
+    <h3>¿Has conseguido conectarlo?</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 14px;">
+      <button class="aluc-option" id="conn-si" onclick="selectConexion('si')" style="width:auto;padding:9px 20px;">✅ Sí, conectado</button>
+      <button class="aluc-option" id="conn-parcial" onclick="selectConexion('parcial')" style="width:auto;padding:9px 20px;">⚠️ Solo parte</button>
+      <button class="aluc-option" id="conn-no" onclick="selectConexion('no')" style="width:auto;padding:9px 20px;">❌ No funciona</button>
+    </div>
+    <input type="hidden" data-key="conexion_estado" id="conexion_estado">
+    <span class="field-label">¿Qué servicios has conectado?</span>
+    <input type="text" data-key="conexion_servicios" placeholder="Ej: Gmail y Calendar / solo Gmail / los tres…">
+  </div>
+
+  <!-- QUÉ PUEDE HACER -->
+  <div class="card gold-left">
+    <div class="card-label">Para tener a mano</div>
+    <h3>¿Qué puede hacer Gemini con cada servicio?</h3>
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="cap-card-header"><span class="cap-icon">📧</span><span class="cap-title">Gmail</span></div>
+        <ul class="cap-items">
+          <li>Buscar datos en tus correos</li>
+          <li>Resumir hilos largos</li>
+          <li>Redactar respuestas y borradores</li>
+        </ul>
+      </div>
+      <div class="cap-card">
+        <div class="cap-card-header"><span class="cap-icon">📅</span><span class="cap-title">Google Calendar</span></div>
+        <ul class="cap-items">
+          <li>Consultar tu agenda por fecha</li>
+          <li>Crear y mover eventos</li>
+          <li>Encontrar huecos libres</li>
+        </ul>
+      </div>
+      <div class="cap-card">
+        <div class="cap-card-header"><span class="cap-icon">📁</span><span class="cap-title">Google Drive</span></div>
+        <ul class="cap-items">
+          <li>Analizar documentos y PDFs</li>
+          <li>Resumir archivos largos</li>
+          <li>Extraer datos de documentos</li>
+        </ul>
+      </div>
+      <div class="cap-card">
+        <div class="cap-card-header"><span class="cap-icon">📝</span><span class="cap-title">Google Docs / Sheets</span></div>
+        <ul class="cap-items">
+          <li>Crear contenido desde cero</li>
+          <li>Mejorar y formatear textos</li>
+          <li>Organizar datos en tablas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="complete-section">
+    <h4>¿Has conectado Gemini y probado la primera pregunta?</h4>
+    <button class="complete-btn" onclick="completeStep(1)">✅ Siguiente — practicar</button>
+    <div class="complete-done" id="done-1">✓ Completado</div>
+  </div>
+</div>
+
+<!-- ══════ PASO 3: PRACTICAR ══════ -->
+<div id="tab-2" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">16:15 — 25 minutos · Práctica libre</div>
+    <h2>Practica con tus datos reales</h2>
+    <p>Ahora explora con tu propio Gmail, Calendar y Drive. Sin guión fijo.</p>
+  </div>
+
+  <div class="callout">
+    <strong>Primero todos juntos — luego cada uno</strong>
+    Empezamos probando estos tres prompts en grupo. Luego tienes tiempo libre para explorar lo que quieras de tu cuenta real.
+  </div>
+
+  <!-- PROMPTS GUIADOS -->
+  <div class="card blue-top">
+    <div class="card-label">Prompts para empezar — pruébalos todos</div>
+    <h3>Primero en grupo</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px;">
+      <div style="background:var(--deep);border:1.5px solid rgba(66,133,244,0.3);border-radius:8px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="copyText(this,'Resume mis correos no leídos de los últimos 3 días')">
+        <span style="font-size:18px;">📧</span>
+        <div style="flex:1;">
+          <span style="font-size:13px;color:var(--white);font-weight:600;display:block;">"Resume mis correos no leídos de los últimos 3 días"</span>
+          <span style="font-size:11.5px;color:rgba(176,210,240,0.5);">Toca para copiar</span>
+        </div>
+        <span style="color:var(--accent);font-size:13px;font-weight:600;">COPIAR</span>
+      </div>
+      <div style="background:var(--deep);border:1.5px solid rgba(66,133,244,0.3);border-radius:8px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="copyText(this,'¿Tengo algo importante esta semana? Hazme un resumen de mi agenda.')">
+        <span style="font-size:18px;">📅</span>
+        <div style="flex:1;">
+          <span style="font-size:13px;color:var(--white);font-weight:600;display:block;">"¿Tengo algo importante esta semana? Hazme un resumen de mi agenda"</span>
+          <span style="font-size:11.5px;color:rgba(176,210,240,0.5);">Toca para copiar</span>
+        </div>
+        <span style="color:var(--accent);font-size:13px;font-weight:600;">COPIAR</span>
+      </div>
+      <div style="background:var(--deep);border:1.5px solid rgba(66,133,244,0.3);border-radius:8px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="copyText(this,'Hazme un resumen de mañana: qué tengo en el calendario y si hay correos pendientes relacionados.')">
+        <span style="font-size:18px;">🌅</span>
+        <div style="flex:1;">
+          <span style="font-size:13px;color:var(--white);font-weight:600;display:block;">"Hazme un resumen de mañana: agenda y correos pendientes"</span>
+          <span style="font-size:11.5px;color:rgba(176,210,240,0.5);">Toca para copiar</span>
+        </div>
+        <span style="color:var(--accent);font-size:13px;font-weight:600;">COPIAR</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRÁCTICA INDIVIDUAL -->
+  <div class="card green-left">
+    <div class="card-label">Tu exploración libre</div>
+    <h3>Ahora prueba lo que quieras</h3>
+    <p>Busca un correo real, añade un evento al calendario, analiza un documento de Drive. Lo que te sea más útil para tu vida.</p>
+
+    <span class="field-label">Lo más útil que has encontrado en tu cuenta</span>
+    <input type="text" data-key="practica_util" placeholder="Ej: encontró un correo del médico que había olvidado, resumió una cadena de correos larga…">
+
+    <span class="field-label">Un prompt tuyo que ha funcionado bien</span>
+    <input type="text" data-key="practica_prompt" placeholder="Escribe aquí el prompt que has usado tú — el que mejor resultado te ha dado…">
+  </div>
+
+  <div class="complete-section">
+    <h4>¿Has explorado con tus datos reales?</h4>
+    <button class="complete-btn" onclick="completeStep(2)">✅ Siguiente — reflexión</button>
+    <div class="complete-done" id="done-2">✓ Completado</div>
+  </div>
+</div>
+
+<!-- ══════ PASO 4: REFLEXIÓN ══════ -->
+<div id="tab-3" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">16:40 — 20 minutos · Lo útil y lo que da reparo</div>
+    <h2>Lo más útil y lo más peligroso</h2>
+    <p>Cuatro preguntas para pensar antes de entrar en la parte de ética.</p>
+  </div>
+
+  <div class="card blue-top">
+    <div class="card-label">Reflexión rápida</div>
+    <h3>Cuatro preguntas — sé honesto</h3>
+
+    <span class="field-label">¿Qué es lo que más útil te ha parecido?</span>
+    <input type="text" data-key="ref_util" placeholder="La función que más te ha gustado o que más tiempo te ahorraría…">
+
+    <span class="field-label">¿Qué es lo que más miedo o reparo te da?</span>
+    <input type="text" data-key="ref_miedo" placeholder="Algo que te incomoda de que la IA tenga acceso a tus datos…">
+
+    <span class="field-label">¿Le darías acceso al correo del trabajo? ¿Por qué sí o por qué no?</span>
+    <input type="text" data-key="ref_trabajo" placeholder="Piensa en las implicaciones: datos de clientes, información confidencial, privacidad de compañeros…">
+
+    <span class="field-label">¿Crees que te puede ahorrar tiempo de verdad?</span>
+    <input type="text" data-key="ref_tiempo" placeholder="¿Cuánto tiempo? ¿En qué tarea concreta?">
+  </div>
+
+  <div class="complete-section">
+    <h4>¿Has respondido las cuatro preguntas?</h4>
+    <button class="complete-btn" onclick="completeStep(3)">✅ Siguiente — ética y privacidad</button>
+    <div class="complete-done" id="done-3">✓ Completado</div>
+  </div>
+</div>
+
+<!-- ══════ PASO 5: ÉTICA ══════ -->
+<div id="tab-4" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">17:15 — Después del descanso</div>
+    <h2>Ética y privacidad</h2>
+    <p>No como clase teórica — como debate sobre cosas que acabas de hacer tú mismo.</p>
+  </div>
+
+  <div class="callout">
+    <strong>La pregunta de fondo</strong>
+    Acabas de darle acceso a tu Gmail y tu Calendar a una IA de Google. ¿Sabes exactamente qué puede ver? ¿Qué hace con esa información? ¿Quién más tiene acceso?
+  </div>
+
+  <!-- QUÉ DATOS COMPARTISTE -->
+  <div class="card red-left">
+    <div class="card-label">Lo que acabas de hacer — sin juzgar</div>
+    <h3>¿Qué datos has compartido hoy con Gemini?</h3>
+    <p>Marca todo lo que aplica a lo que has hecho esta tarde:</p>
+    <div class="check-row"><div class="chk" data-key="e_correos" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He dado acceso a mis correos de Gmail</strong><span>Gemini puede leer el contenido de tus emails</span></div></div>
+    <div class="check-row"><div class="chk" data-key="e_calendar" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He dado acceso a mi agenda de Google Calendar</strong><span>Gemini puede ver tus eventos, citas y compromisos</span></div></div>
+    <div class="check-row"><div class="chk" data-key="e_drive" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He dado acceso a mis archivos de Google Drive</strong><span>Gemini puede leer documentos, PDFs y hojas de cálculo</span></div></div>
+  </div>
+
+  <!-- DATOS SENSIBLES -->
+  <div class="card gold-left">
+    <div class="card-label">Datos que nunca deben ir a una IA gratuita</div>
+    <h3>La línea que no hay que cruzar</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+      <div style="display:flex;gap:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:11px 14px;align-items:center;"><span style="font-size:18px;flex-shrink:0;">🚫</span><span style="font-size:13.5px;color:var(--text);">DNI, número de la Seguridad Social, número de tarjeta</span></div>
+      <div style="display:flex;gap:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:11px 14px;align-items:center;"><span style="font-size:18px;flex-shrink:0;">🚫</span><span style="font-size:13.5px;color:var(--text);">Contraseñas y códigos PIN</span></div>
+      <div style="display:flex;gap:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:11px 14px;align-items:center;"><span style="font-size:18px;flex-shrink:0;">🚫</span><span style="font-size:13.5px;color:var(--text);">Datos médicos propios o de otras personas</span></div>
+      <div style="display:flex;gap:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:11px 14px;align-items:center;"><span style="font-size:18px;flex-shrink:0;">⚠️</span><span style="font-size:13.5px;color:var(--text);">Correos o documentos con datos confidenciales de tu empresa o clientes</span></div>
+      <div style="display:flex;gap:10px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:6px;padding:11px 14px;align-items:center;"><span style="font-size:18px;flex-shrink:0;">⚠️</span><span style="font-size:13.5px;color:var(--text);">Información personal de otras personas sin su consentimiento</span></div>
+    </div>
+  </div>
+
+  <div class="card blue-left">
+    <div class="card-label">Debate</div>
+    <h3>¿Dónde está el límite para ti?</h3>
+    <span class="field-label">¿Qué tipo de información nunca le darías a una IA?</span>
+    <input type="text" data-key="etica_limite" placeholder="Tu respuesta personal — no hay respuesta correcta…">
+    <span class="field-label">¿Crees que la gente sabe realmente qué datos comparte cuando usa estas herramientas?</span>
+    <input type="text" data-key="etica_conciencia" placeholder="Tu opinión sobre la consciencia que tiene la gente sobre su privacidad digital…">
+  </div>
+
+  <div class="complete-section">
+    <h4>¿Has reflexionado sobre la privacidad?</h4>
+    <button class="complete-btn" onclick="completeStep(4)">✅ Siguiente — el juego de las alucinaciones</button>
+    <div class="complete-done" id="done-4">✓ Completado</div>
+  </div>
+</div>
+
+<!-- ══════ PASO 6: ALUCINACIONES ══════ -->
+<div id="tab-5" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">17:45 — El juego más importante de la sesión</div>
+    <h2>Caza de alucinaciones</h2>
+    <p>La IA miente con total seguridad. Aquí lo vas a comprobar tú mismo.</p>
+  </div>
+
+  <div class="callout">
+    <strong>¿Qué es una alucinación?</strong>
+    Cuando la IA genera información completamente falsa presentada como si fuera verdad. No lo hace con mala intención — simplemente no sabe que se está equivocando. El peligro real son los errores que <em>parecen</em> correctos.
+  </div>
+
+  <div id="quiz-container">
+    <!-- Q1 -->
+    <div class="aluc-question" id="q-0">
+      <div class="aluc-q-text">¿En qué año fue fundada la empresa OpenAI, creadora de ChatGPT?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(0,0,1)">A) 2010</button>
+        <button class="aluc-option" onclick="answerQ(0,1,1)">B) 2015</button>
+        <button class="aluc-option" onclick="answerQ(0,2,1)">C) 2018</button>
+        <button class="aluc-option" onclick="answerQ(0,3,1)">D) 2020</button>
+      </div>
+      <div class="aluc-feedback" id="fb-0"></div>
+    </div>
+    <!-- Q2 -->
+    <div class="aluc-question" id="q-1">
+      <div class="aluc-q-text">Cuando le preguntas a una IA por un artículo de ley concreto, ¿qué riesgo existe?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(1,0,2)">A) Ninguno, las leyes son datos públicos y verificables</button>
+        <button class="aluc-option" onclick="answerQ(1,1,2)">B) Que la IA cite leyes reales pero con contenido inventado o desactualizado</button>
+        <button class="aluc-option" onclick="answerQ(1,2,2)">C) Que la IA se niegue a responder preguntas legales</button>
+        <button class="aluc-option" onclick="answerQ(1,3,2)">D) Que tarde demasiado en responder</button>
+      </div>
+      <div class="aluc-feedback" id="fb-1"></div>
+    </div>
+    <!-- Q3 -->
+    <div class="aluc-question" id="q-2">
+      <div class="aluc-q-text">Usas la IA para buscar el horario de atención de un médico. La IA te da un horario concreto. ¿Qué deberías hacer?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(2,0,3)">A) Fiarme — la IA tiene acceso a información actualizada</button>
+        <button class="aluc-option" onclick="answerQ(2,1,3)">B) Verificarlo llamando al centro o mirando su web oficial</button>
+        <button class="aluc-option" onclick="answerQ(2,2,3)">C) Solo verificarlo si tengo dudas sobre la respuesta</button>
+        <button class="aluc-option" onclick="answerQ(2,3,3)">D) No usar la IA para este tipo de consultas nunca</button>
+      </div>
+      <div class="aluc-feedback" id="fb-2"></div>
+    </div>
+    <!-- Q4 -->
+    <div class="aluc-question" id="q-3">
+      <div class="aluc-q-text">¿Cuál de estas situaciones es el mayor riesgo real de usar una IA con acceso a tu correo?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(3,0,0)">A) Que la IA borre accidentalmente tus correos</button>
+        <button class="aluc-option" onclick="answerQ(3,1,0)">B) Que la IA sea demasiado lenta para leer todos los mensajes</button>
+        <button class="aluc-option" onclick="answerQ(3,2,0)">C) Que datos de personas terceras (clientes, familiares) queden expuestos sin su consentimiento</button>
+        <button class="aluc-option" onclick="answerQ(3,3,0)">D) Que la IA no entienda correos en español</button>
+      </div>
+      <div class="aluc-feedback" id="fb-3"></div>
+    </div>
+    <!-- Q5 -->
+    <div class="aluc-question" id="q-4">
+      <div class="aluc-q-text">La IA te genera un contrato de alquiler completo. ¿Cuál sería el siguiente paso correcto?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(4,0,1)">A) Firmarlo directamente — la IA no comete errores en documentos legales</button>
+        <button class="aluc-option" onclick="answerQ(4,1,1)">B) Revisarlo cuidadosamente o consultarlo con un profesional antes de usarlo</button>
+        <button class="aluc-option" onclick="answerQ(4,2,1)">C) Usarlo si parece correcto visualmente</button>
+        <button class="aluc-option" onclick="answerQ(4,3,1)">D) No usar la IA para documentos legales bajo ningún concepto</button>
+      </div>
+      <div class="aluc-feedback" id="fb-4"></div>
+    </div>
+  </div>
+
+  <div class="aluc-score" id="aluc-score">
+    <div class="aluc-score-num" id="aluc-score-num">0 / 5</div>
+    <div class="aluc-score-msg" id="aluc-score-msg"></div>
+  </div>
+
+  <div class="complete-section" style="margin-top:20px;">
+    <h4>¿Has completado el quiz?</h4>
+    <button class="complete-btn" onclick="completeStep(5)">✅ Último paso — mi checklist personal</button>
+    <div class="complete-done" id="done-5">✓ Completado</div>
+  </div>
+</div>
+
+<!-- ══════ PASO 7: CHECKLIST ══════ -->
+<div id="tab-6" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">18:10 — Cierre de sesión y del bloque</div>
+    <h2>Mi checklist de uso responsable</h2>
+    <p>Tus propias reglas para usar la IA sin riesgos.</p>
+  </div>
+
+  <div class="card blue-top">
+    <div class="card-label">Compromisos personales</div>
+    <h3>Marca los que asumes como propios</h3>
+    <div class="check-row"><div class="chk" data-key="c1" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Verifico siempre los datos importantes que me da la IA</strong><span>Fechas, precios, leyes, horarios — siempre contrasto con la fuente original</span></div></div>
+    <div class="check-row"><div class="chk" data-key="c2" onclick="toggleChk(this)"></div><div class="chk-content"><strong>No comparto datos bancarios ni documentos de identidad con ninguna IA</strong><span>Ni en chats, ni adjuntando archivos, ni por voz</span></div></div>
+    <div class="check-row"><div class="chk" data-key="c3" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Soy consciente de que la IA puede ver mis correos cuando la conecto a Gmail</strong><span>Y decido qué permisos dar según lo que necesito en cada momento</span></div></div>
+    <div class="check-row"><div class="chk" data-key="c4" onclick="toggleChk(this)"></div><div class="chk-content"><strong>No uso la IA gratuita para trabajar con datos confidenciales de mi empresa</strong><span>Si tengo dudas sobre si algo es confidencial, mejor no compartirlo</span></div></div>
+    <div class="check-row"><div class="chk" data-key="c5" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Entiendo que la IA puede equivocarse incluso cuando suena muy segura</strong><span>La confianza no es señal de exactitud</span></div></div>
+    <div class="check-row"><div class="chk" data-key="c6" onclick="toggleChk(this)"></div><div class="chk-content"><strong>Uso la IA para ahorrar tiempo, no para dejar de pensar</strong><span>Ella propone, yo decido</span></div></div>
+  </div>
+
+  <div class="card green-left">
+    <div class="card-label">Cierre del bloque 3</div>
+    <h3>Me llevo esto de las últimas dos semanas</h3>
+    <span class="field-label">La herramienta o función que más vas a usar a partir de ahora</span>
+    <input type="text" data-key="cierre_herramienta" placeholder="Ej: Gemini con Gmail para resumir correos, Suno para crear música, ChatGPT para correos difíciles…">
+    <span class="field-label">Una cosa que harás diferente en cómo usas la IA</span>
+    <input type="text" data-key="cierre_cambio" placeholder="Ej: siempre verificaré los datos antes de usarlos, no le daré acceso al correo del trabajo…">
+  </div>
+
+  <div class="complete-section" style="border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.04);">
+    <h4>🎉 ¡Sesión completada!</h4>
+    <p>Descarga el cuaderno para guardar todo lo que has trabajado hoy.</p>
+    <button class="complete-btn" style="background:var(--green);" onclick="completeStep(6);downloadPDF()">🎉 Completado — descargar cuaderno</button>
+    <div class="complete-done" id="done-6">✓ Cuaderno descargado</div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<div class="toast" id="toast"></div>
+
+<div class="dl-bar">
+  <span class="dl-note">Sesión 14 · Bloque 3 · ChatGPT e IA · Lanbide</span>
+  <button class="btn-blue" onclick="downloadPDF()">⬇ Descargar cuaderno PDF</button>
+</div>
+
+<script>
+const STORAGE_KEY='sesion14_v1';
+let stepsUnlocked=[true,false,false,false,false,false,false];
+let stepsDone=[false,false,false,false,false,false,false];
+let currentStep=0;
+let hasUnsavedChanges=false,saveDebounce=null;
+let quizAnswers={};
+let quizCorrect=0;
+const CORRECT=[1,1,1,2,1]; // correct index for each Q
+const FEEDBACK=[
+  ['Incorrecto — OpenAI fue fundada en diciembre de 2015 por Sam Altman, Elon Musk y otros.','✓ Correcto — OpenAI fue fundada en diciembre de 2015.','Incorrecto — OpenAI fue fundada en 2015.','Incorrecto — OpenAI fue fundada en 2015, no en 2020.'],
+  ['Incorrecto — Las leyes son públicas pero la IA puede inventar contenido o citar versiones desactualizadas.','✓ Correcto — La IA puede citar artículos reales con contenido incorrecto o desactualizado. Siempre hay que verificar.','Incorrecto — La IA responde preguntas legales, pero con el riesgo de inventar o desactualizar información.','Incorrecto — La velocidad no es el problema; el riesgo es la precisión del contenido legal.'],
+  ['Incorrecto — La IA no tiene acceso a datos actualizados en tiempo real como horarios de consultas.','✓ Correcto — Los horarios cambian y la IA puede tener datos desactualizados. Siempre verifica llamando o mirando la web oficial.','Incorrecto — Con horarios médicos siempre hay que verificar, aunque la respuesta parezca correcta.','Incorrecto — Puedes usar la IA para este tipo de consultas, pero siempre verificando el resultado.'],
+  ['Incorrecto — La IA no puede borrar correos por sí sola.','Incorrecto — La velocidad no es el problema principal.','✓ Correcto — Cuando la IA accede a tu correo, puede leer mensajes con datos de clientes, familiares u otras personas que no han dado su consentimiento.','Incorrecto — Gemini está diseñado para funcionar en español sin problemas.'],
+  ['Incorrecto — La IA comete errores frecuentes en documentos legales y puede incluir cláusulas inventadas.','✓ Correcto — Un contrato generado por IA debe revisarse siempre con cuidado, y es recomendable consultarlo con un profesional antes de firmarlo.','Incorrecto — La apariencia visual no garantiza que el contenido sea correcto legalmente.','Incorrecto — La IA puede ser útil para generar borradores legales, pero siempre con revisión profesional posterior.'],
+];
+
+// ── NAVIGATION ─────────────────────────────────────────
+function tryGoToStep(i){
+  if(!stepsUnlocked[i]){showToast('🔒 Completa el paso anterior primero');return;}
+  goToStep(i);
+}
+function goToStep(i){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+i).classList.add('active');
+  currentStep=i;
+  updateStepNav();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateStepNav(){
+  for(let i=0;i<7;i++){
+    const el=document.getElementById('step-nav-'+i);
+    el.classList.remove('active','locked','done');
+    if(stepsDone[i]) el.classList.add('done');
+    else if(i===currentStep) el.classList.add('active');
+    else if(!stepsUnlocked[i]) el.classList.add('locked');
+  }
+}
+function completeStep(i){
+  stepsDone[i]=true;
+  if(i<6) stepsUnlocked[i+1]=true;
+  const btn=document.querySelector(`#tab-${i} .complete-btn`);
+  const done=document.getElementById('done-'+i);
+  if(btn){btn.disabled=true;btn.textContent='✓ Completado';}
+  if(done) done.classList.add('show');
+  updateStepNav();
+  saveAll();
+  if(i<6){showToast('✅ ¡Perfecto! Siguiente paso desbloqueado');setTimeout(()=>goToStep(i+1),1200);}
+  else showToast('🎉 ¡Sesión completada!');
+}
+
+// ── DEMOS ──────────────────────────────────────────────
+function toggleDemo(card){
+  card.classList.toggle('tried');
+  saveAll();
+}
+
+// ── CONEXION SELECTOR ──────────────────────────────────
+function selectConexion(val){
+  ['si','parcial','no'].forEach(v=>{
+    const btn=document.getElementById('conn-'+v);
+    btn.classList.remove('correct','wrong');
+    btn.style.background='';
+    btn.style.borderColor='';
+  });
+  const btn=document.getElementById('conn-'+val);
+  btn.classList.add(val==='no'?'wrong':'correct');
+  document.getElementById('conexion_estado').value=val;
+  saveAll();
+}
+
+// ── CHECKLIST ──────────────────────────────────────────
+function toggleChk(el){el.classList.toggle('on');saveAll();}
+
+// ── COPY TEXT ──────────────────────────────────────────
+function copyText(el,text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const arrow=el.querySelector('span:last-child');
+    if(arrow){arrow.textContent='✓';setTimeout(()=>arrow.textContent='COPIAR',2000);}
+    showToast('📋 Copiado — pégalo en Gemini');
+  });
+}
+
+// ── QUIZ ───────────────────────────────────────────────
+function answerQ(qIdx,aIdx,correct){
+  if(quizAnswers[qIdx]!==undefined) return;
+  quizAnswers[qIdx]=aIdx;
+  const opts=document.querySelectorAll(`#q-${qIdx} .aluc-option`);
+  opts.forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct) o.classList.add('correct');
+    else if(i===aIdx&&aIdx!==correct) o.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb-'+qIdx);
+  const isOk=aIdx===correct;
+  if(isOk) quizCorrect++;
+  fb.textContent=FEEDBACK[qIdx][aIdx];
+  fb.className='aluc-feedback show '+(isOk?'ok':'fail');
+  saveAll();
+  // Check if all answered
+  if(Object.keys(quizAnswers).length===5){
+    const score=document.getElementById('aluc-score');
+    document.getElementById('aluc-score-num').textContent=quizCorrect+' / 5';
+    const msgs=['Hay conceptos importantes que repasar — habla con el docente.','Vas bien pero hay errores clave. Repasa los que fallaste.','Bastante bien. Atención a los casos prácticos.','Muy bien — tienes el pensamiento crítico bien trabajado.','Perfecto — dominas todos los conceptos clave de uso responsable.'];
+    document.getElementById('aluc-score-msg').textContent=msgs[quizCorrect]||msgs[4];
+    score.classList.add('show');
+  }
+}
+
+// ── DATA ───────────────────────────────────────────────
+function getAllData(){
+  const data={steps_unlocked:[...stepsUnlocked],steps_done:[...stepsDone],current_step:currentStep,quiz_answers:{...quizAnswers},quiz_correct:quizCorrect};
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(el.classList.contains('chk')) data[k]=el.classList.contains('on');
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') data[k]=el.value||'';
+  });
+  // demos
+  const demos=[];
+  document.querySelectorAll('.demo-card').forEach((c,i)=>{if(c.classList.contains('tried'))demos.push(i);});
+  data['demos_tried']=demos;
+  data['conexion_val']=document.getElementById('conexion_estado')?.value||'';
+  return data;
+}
+function applyData(data){
+  if(data.steps_unlocked) stepsUnlocked=data.steps_unlocked;
+  if(data.steps_done) stepsDone=data.steps_done;
+  if(data.quiz_answers) quizAnswers=data.quiz_answers;
+  if(data.quiz_correct!==undefined) quizCorrect=data.quiz_correct;
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(!(k in data)) return;
+    if(el.classList.contains('chk')){if(data[k])el.classList.add('on');}
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value=data[k];
+  });
+  if(data['demos_tried']) data['demos_tried'].forEach(i=>{const c=document.getElementById('demo-'+i);if(c)c.classList.add('tried');});
+  if(data['conexion_val']) selectConexion(data['conexion_val']);
+  // Restore quiz
+  Object.entries(quizAnswers).forEach(([qIdx,aIdx])=>{
+    const correct=CORRECT[parseInt(qIdx)];
+    const opts=document.querySelectorAll(`#q-${qIdx} .aluc-option`);
+    opts.forEach((o,i)=>{
+      o.disabled=true;
+      if(i===correct) o.classList.add('correct');
+      else if(i===aIdx&&parseInt(aIdx)!==correct) o.classList.add('wrong');
+    });
+    const fb=document.getElementById('fb-'+qIdx);
+    const isOk=parseInt(aIdx)===correct;
+    fb.textContent=FEEDBACK[parseInt(qIdx)][parseInt(aIdx)];
+    fb.className='aluc-feedback show '+(isOk?'ok':'fail');
+  });
+  if(Object.keys(quizAnswers).length===5){
+    const score=document.getElementById('aluc-score');
+    document.getElementById('aluc-score-num').textContent=quizCorrect+' / 5';
+    const msgs=['Hay conceptos importantes que repasar.','Vas bien pero hay errores clave.','Bastante bien.','Muy bien.','Perfecto.'];
+    document.getElementById('aluc-score-msg').textContent=msgs[quizCorrect]||msgs[4];
+    score.classList.add('show');
+  }
+  // Restore done states
+  stepsDone.forEach((done,i)=>{
+    if(done){
+      const btn=document.querySelector(`#tab-${i} .complete-btn`);
+      const doneEl=document.getElementById('done-'+i);
+      if(btn){btn.disabled=true;btn.textContent='✓ Completado';}
+      if(doneEl) doneEl.classList.add('show');
+    }
+  });
+  const step=data['current_step']||0;
+  if(stepsUnlocked[step]) goToStep(step);
+  updateStepNav();
+}
+
+// ── SAVE ───────────────────────────────────────────────
+function saveAll(){
+  document.getElementById('saveDot').classList.add('saving');
+  hasUnsavedChanges=true;
+  clearTimeout(saveDebounce);
+  saveDebounce=setTimeout(()=>{
+    try{
+      const json=JSON.stringify(getAllData());
+      history.replaceState(null,'','#'+btoa(unescape(encodeURIComponent(json))));
+      try{sessionStorage.setItem(STORAGE_KEY,json);}catch(e){}
+      try{localStorage.setItem(STORAGE_KEY,json);}catch(e){}
+      document.getElementById('saveDot').classList.remove('saving');
+      document.getElementById('saveDot').style.background='var(--green)';
+      document.getElementById('saveText').textContent='✓ Guardado automáticamente';
+    }catch(e){}
+  },800);
+}
+function loadAll(){
+  try{const h=location.hash.replace('#','');if(h&&h.length>10){applyData(JSON.parse(decodeURIComponent(escape(atob(h)))));document.getElementById('saveText').textContent='✓ Progreso restaurado';document.getElementById('saveDot').style.background='var(--green)';return true;}}catch(e){}
+  try{const r=sessionStorage.getItem(STORAGE_KEY);if(r){applyData(JSON.parse(r));return true;}}catch(e){}
+  try{const r=localStorage.getItem(STORAGE_KEY);if(r){applyData(JSON.parse(r));return true;}}catch(e){}
+  return false;
+}
+function confirmClear(){
+  if(!confirm('¿Seguro que quieres borrar todo?')) return;
+  history.replaceState(null,'',location.pathname+location.search);
+  try{sessionStorage.removeItem(STORAGE_KEY);localStorage.removeItem(STORAGE_KEY);}catch(e){}
+  stepsUnlocked=[true,false,false,false,false,false,false];
+  stepsDone=[false,false,false,false,false,false,false];
+  quizAnswers={};quizCorrect=0;
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(el.classList.contains('chk'))el.classList.remove('on');
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value='';
+  });
+  document.querySelectorAll('.demo-card').forEach(c=>c.classList.remove('tried'));
+  document.querySelectorAll('.complete-btn').forEach(b=>{b.disabled=false;});
+  document.querySelectorAll('.complete-done').forEach(d=>d.classList.remove('show'));
+  document.querySelectorAll('.aluc-option').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong');});
+  document.querySelectorAll('.aluc-feedback').forEach(f=>{f.className='aluc-feedback';});
+  document.getElementById('aluc-score').classList.remove('show');
+  goToStep(0);updateStepNav();
+  showToast('🗑️ Progreso borrado');
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// ── PDF ────────────────────────────────────────────────
+function downloadPDF(){
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const d=getAllData();
+    const pW=210,pH=297,ml=15,mr=15,cW=pW-ml-mr;
+    let y=0;
+    function ftr(){doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);doc.text('ChatGPT e IA · Lanbide · Sesion 14 · IA en tu vida diaria + Etica',ml,pH-3);doc.text(String(doc.internal.getNumberOfPages()),pW-mr,pH-3,{align:'right'});}
+    function np(){ftr();doc.addPage();y=14;}
+    function need(h){if(y+h>pH-14)np();}
+    function sHdr(t,s){need(22);doc.setFillColor(13,27,53);doc.rect(0,y-2,pW,18,'F');doc.setFillColor(66,133,244);doc.rect(0,y+16,pW,1.5,'F');doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(240,247,255);doc.text(t,ml,y+9);if(s){doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,160,200);doc.text(s,ml,y+15);}y+=24;}
+    function fld(label,key,empty){const val=(d[key]||'').trim();const text=val||(empty||'(sin respuesta)');need(8);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(74,107,138);doc.text(label.toUpperCase(),ml,y);y+=5;const lines=doc.splitTextToSize(text,cW-4);const bh=lines.length*5+6;need(bh+2);doc.setFillColor(val?248:252,val?251:252,255);doc.setDrawColor(197,221,240);doc.rect(ml,y,cW,bh,'FD');doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(val?15:180,val?32:180,val?64:180);doc.text(lines,ml+3,y+5);y+=bh+5;}
+    function chk(label,key){need(8);const on=d[key]===true||d[key]==='true';doc.setFillColor(on?16:220,on?185:220,on?129:220);doc.rect(ml,y-3.5,5,5,'F');doc.setFont('helvetica',on?'bold':'normal');doc.setFontSize(9);doc.setTextColor(on?16:130,on?185:130,on?129:130);doc.text(on?'SI':'—',ml+1,y+0.5);doc.setTextColor(15,32,64);doc.setFont('helvetica','normal');const lines=doc.splitTextToSize(label,cW-12);doc.text(lines,ml+10,y+0.5);y+=lines.length*5+3;}
+
+    // COVER
+    doc.setFillColor(8,14,26);doc.rect(0,0,pW,52,'F');doc.setFillColor(66,133,244);doc.rect(0,52,pW,2.5,'F');
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(147,197,253);doc.text('BLOQUE 3 · SESION 14 · LANBIDE',ml,14);
+    doc.setFontSize(17);doc.setFont('helvetica','bold');doc.setTextColor(240,247,255);doc.text('IA en tu vida diaria + Etica y privacidad',ml,27);
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,160,200);doc.text('Cuaderno de trabajo · Jueves 15:30-18:30',ml,40);
+    y=62;
+
+    sHdr('1. CHECK-IN','15:30 · Demo de Gemini');
+    fld('Esto te seria util porque...','checkin_util');
+    fld('Algo que te da reparo','checkin_reparo');
+
+    sHdr('2. CONEXION','15:50 · Gemini + Gmail + Calendar');
+    fld('Estado de conexion','conexion_val');
+    fld('Servicios conectados','conexion_servicios');
+
+    sHdr('3. PRACTICA','16:15 · Con tus datos reales');
+    fld('Lo mas util que encontraste','practica_util');
+    fld('Prompt que mejor resultado te dio','practica_prompt');
+
+    sHdr('4. REFLEXION','16:40 · Lo util y lo peligroso');
+    fld('Lo que mas util te parecio','ref_util');
+    fld('Lo que mas miedo o reparo te da','ref_miedo');
+    fld('Le darias acceso al correo del trabajo?','ref_trabajo');
+    fld('Crees que puede ahorrarte tiempo?','ref_tiempo');
+
+    sHdr('5. ETICA Y PRIVACIDAD','17:15 · Despues del descanso');
+    chk('He dado acceso a Gmail','e_correos');
+    chk('He dado acceso a Google Calendar','e_calendar');
+    chk('He dado acceso a Google Drive','e_drive');
+    fld('Que informacion nunca le darias a una IA','etica_limite');
+    fld('Crees que la gente es consciente de lo que comparte?','etica_conciencia');
+
+    sHdr('6. CAZA DE ALUCINACIONES — Resultado','17:45');
+    need(14);
+    doc.setFillColor(13,27,53);doc.rect(ml,y,cW,12,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(147,197,253);
+    doc.text('Resultado del quiz: '+d.quiz_correct+' / 5 respuestas correctas',ml+5,y+8);
+    y+=18;
+
+    sHdr('7. MI CHECKLIST DE USO RESPONSABLE','18:10 · Cierre');
+    const checkItems=[['c1','Verifico siempre los datos importantes'],['c2','No comparto datos bancarios ni DNI'],['c3','Soy consciente de que la IA puede leer mis correos'],['c4','No uso IA gratuita para datos confidenciales del trabajo'],['c5','Entiendo que la IA puede equivocarse aunque suene segura'],['c6','Uso la IA para ahorrar tiempo, no para dejar de pensar']];
+    checkItems.forEach(([k,l])=>chk(l,k));
+    fld('La herramienta que mas usare a partir de ahora','cierre_herramienta');
+    fld('Una cosa que hare diferente','cierre_cambio');
+
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);doc.text('ChatGPT e IA · Lanbide · Sesion 14 · IA en tu vida diaria + Etica',ml,pH-3);doc.text(p+' / '+total,pW-mr,pH-3,{align:'right'});}
+    doc.save('sesion14_vida_diaria_etica.pdf');
+    showToast('📄 PDF descargado');
+  }catch(err){console.error(err);showToast('⚠ Error: '+err.message);}
+}
+
+document.addEventListener('input',saveAll);
+document.addEventListener('change',saveAll);
+window.addEventListener('load',()=>{
+  const r=loadAll();
+  if(!r){document.getElementById('saveText').textContent='Tu progreso se guarda automáticamente';updateStepNav();}
+});
+</script>
+</body>
+</html>
