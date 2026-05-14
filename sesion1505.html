@@ -544,63 +544,91 @@ textarea{min-height:90px;}
     <p>No hay trampa — piensa en qué harías tú de verdad.</p>
 
     <!-- CASO 1 -->
-    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
-        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">1</span>
-        <span style="font-size:14px;font-weight:600;color:var(--text);">Tu jefa te pide que uses ChatGPT para redactar la respuesta a un correo de un cliente que incluye su nombre, teléfono y datos de su pedido. Es más rápido y ella tiene prisa.</span>
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;">
+      <div style="background:linear-gradient(135deg,var(--deep),var(--navy));padding:16px 20px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="background:var(--gemini);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;">1</span>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;margin-bottom:6px;">Caso · Privacidad en el trabajo</div>
+          <div style="font-size:14px;color:var(--white);line-height:1.65;">Trabajas en la recepción de una clínica dental. Tu jefa te pide que uses ChatGPT para redactar las respuestas a los correos de los pacientes porque así vas más rápido. Uno de esos correos incluye el nombre completo del paciente, su fecha de nacimiento, el tratamiento que está recibiendo y el importe pendiente de pago. Tu jefa tiene prisa y dice que "no pasa nada, es solo para escribir mejor".</div>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;" id="caso1-opts">
-        <button class="aluc-option" onclick="answerCaso(1,0,1)" style="text-align:left;">A) Lo hago — es solo para redactar más rápido y mi jefa lo pide</button>
-        <button class="aluc-option" onclick="answerCaso(1,1,1)" style="text-align:left;">B) Elimino los datos personales del cliente antes de pegarlo en ChatGPT, redacto y luego añado los datos</button>
-        <button class="aluc-option" onclick="answerCaso(1,2,1)" style="text-align:left;">C) Me niego a usar IA para correos de clientes bajo ninguna circunstancia</button>
-        <button class="aluc-option" onclick="answerCaso(1,3,1)" style="text-align:left;">D) Lo hago pero no se lo digo al cliente</button>
+      <div style="padding:16px 20px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Para reflexionar antes de responder:</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Qué tipo de datos contiene ese correo? ¿Hay alguno especialmente sensible?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿El paciente ha dado permiso para que sus datos lleguen a un sistema de IA externo?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿El hecho de que "no pase nada visible" significa que está bien hacerlo?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Habría una forma de usar la IA para este caso sin comprometer la privacidad del paciente?</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px;">¿Qué harías tú? ¿Por qué?</span>
+        <textarea data-key="caso1_respuesta" placeholder="Escribe tu respuesta — no hay una única respuesta correcta, pero sí hay decisiones más éticas que otras. Explica tu razonamiento."></textarea>
       </div>
-      <div class="aluc-feedback" id="caso1-fb"></div>
     </div>
 
     <!-- CASO 2 -->
-    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
-        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">2</span>
-        <span style="font-size:14px;font-weight:600;color:var(--text);">Usas Gemini con Gmail y descubres que puede leer un correo muy personal que recibiste de un familiar sobre un problema de salud. No lo pediste expresamente pero Gemini lo menciona en un resumen.</span>
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;">
+      <div style="background:linear-gradient(135deg,var(--deep),var(--navy));padding:16px 20px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="background:var(--gemini);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;">2</span>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;margin-bottom:6px;">Caso · Información personal sin querer</div>
+          <div style="font-size:14px;color:var(--white);line-height:1.65;">Hoy en clase has conectado Gemini a tu Gmail para practicar. Al pedirle que te haga un resumen de los correos de la semana, Gemini te devuelve un resumen que incluye: que tu hermana le escribió sobre un problema económico serio que está pasando, que tu médico te citó para una revisión, y que hay un correo de tu banco sobre un movimiento inusual en tu cuenta. Tú no habías pensado en eso cuando activaste los permisos.</div>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;" id="caso2-opts">
-        <button class="aluc-option" onclick="answerCaso(2,0,2)" style="text-align:left;">A) No me preocupa — es mi propia cuenta y nadie más lo ve</button>
-        <button class="aluc-option" onclick="answerCaso(2,1,2)" style="text-align:left;">B) Desactivo la extensión de Gmail y reconsidero qué permisos quiero dar realmente</button>
-        <button class="aluc-option" onclick="answerCaso(2,2,2)" style="text-align:left;">C) Borro ese correo para que Gemini no pueda volver a leerlo</button>
-        <button class="aluc-option" onclick="answerCaso(2,3,2)" style="text-align:left;">D) Le pido a Gemini que olvide ese correo</button>
+      <div style="padding:16px 20px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Para reflexionar antes de responder:</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Tu hermana sabe que una IA ha leído el contenido de su correo?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Qué tipo de información ha visto Gemini sin que fuera tu intención?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>Cuando aceptas los permisos de una app, ¿sueles leer bien qué estás autorizando?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Cambiarías algo en cómo usas Gemini a partir de ahora?</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px;">¿Qué harías tú? ¿Por qué?</span>
+        <textarea data-key="caso2_respuesta" placeholder="Escribe tu respuesta — ¿cómo te sientes con esto? ¿Cambiarías algo? ¿Seguirías usando Gemini con Gmail?"></textarea>
       </div>
-      <div class="aluc-feedback" id="caso2-fb"></div>
     </div>
 
     <!-- CASO 3 -->
-    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
-        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">3</span>
-        <span style="font-size:14px;font-weight:600;color:var(--text);">Un compañero de trabajo te pide que le preguntes a ChatGPT algo sobre él — "¿qué sabe la IA sobre mí?" — usando su nombre real. Quiere saber si hay información suya en internet.</span>
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;">
+      <div style="background:linear-gradient(135deg,var(--deep),var(--navy));padding:16px 20px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="background:var(--gemini);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;">3</span>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;margin-bottom:6px;">Caso · La IA que "ayuda" demasiado</div>
+          <div style="font-size:14px;color:var(--white);line-height:1.65;">Estás buscando trabajo y llevas semanas enviando currículums sin éxito. Un amigo te dice que él consiguió entrevistas usando ChatGPT para escribir cartas de presentación muy elaboradas que exageraban bastante su experiencia — ponía que había "liderado equipos" cuando en realidad solo había trabajado en grupo, o que tenía "amplia experiencia en gestión" cuando había hecho algún curso. Dice que en la entrevista improvisa y que "total, si no lo saben, no pasa nada".</div>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;" id="caso3-opts">
-        <button class="aluc-option" onclick="answerCaso(3,0,3)" style="text-align:left;">A) Lo hago — es él quien me lo pide y no hay problema</button>
-        <button class="aluc-option" onclick="answerCaso(3,1,3)" style="text-align:left;">B) Le explico que él mismo puede hacerlo con su propia cuenta</button>
-        <button class="aluc-option" onclick="answerCaso(3,2,3)" style="text-align:left;">C) Me niego — nunca busco información sobre otras personas en la IA</button>
-        <button class="aluc-option" onclick="answerCaso(3,3,3)" style="text-align:left;">D) Le ayudo pero sin usar su nombre completo para proteger su privacidad</button>
+      <div style="padding:16px 20px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Para reflexionar antes de responder:</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Dónde está la diferencia entre "mejorar cómo te presentas" y "mentir sobre lo que eres"?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Qué podría pasar si consigues el trabajo gracias a esas exageraciones?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿La IA tiene responsabilidad en esto, o solo la tiene quien le da las instrucciones?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Cómo usarías TÚ la IA para preparar una candidatura de forma honesta y efectiva?</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px;">¿Qué harías tú? ¿Por qué?</span>
+        <textarea data-key="caso3_respuesta" placeholder="Escribe tu respuesta — ¿harías lo que hace tu amigo? ¿Cuál es la diferencia entre optimizar y mentir?"></textarea>
       </div>
-      <div class="aluc-feedback" id="caso3-fb"></div>
     </div>
 
     <!-- CASO 4 -->
-    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
-        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">4</span>
-        <span style="font-size:14px;font-weight:600;color:var(--text);">Usas la IA para preparar una entrevista de trabajo y le pides que genere respuestas muy elaboradas que en realidad no reflejan lo que tú sabes ni tu experiencia real.</span>
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,var(--deep),var(--navy));padding:16px 20px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="background:var(--gemini);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;">4</span>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;margin-bottom:6px;">Caso · Confiar demasiado en la IA</div>
+          <div style="font-size:14px;color:var(--white);line-height:1.65;">Tu vecina de 72 años te llama nerviosa. Le llegó una carta de Hacienda que no entiende y tiene miedo de que le estén reclamando dinero. Le ofreces ayudarla con la IA: le fotografías la carta, la subes a ChatGPT y el resultado es tranquilizador — la IA dice que "es solo una notificación informativa rutinaria, no hay ningún importe pendiente ni acción necesaria". Tu vecina se queda tranquila y guarda la carta. Dos semanas después recibe un aviso de embargo porque en realidad sí había que responder en un plazo de 10 días.</div>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;" id="caso4-opts">
-        <button class="aluc-option" onclick="answerCaso(4,0,0)" style="text-align:left;">A) Lo hago — todos lo hacen y en la entrevista improviso</button>
-        <button class="aluc-option" onclick="answerCaso(4,1,0)" style="text-align:left;">B) Uso la IA para estructurar y mejorar mis respuestas reales, no para inventar experiencias que no tengo</button>
-        <button class="aluc-option" onclick="answerCaso(4,2,0)" style="text-align:left;">C) No uso la IA para preparar entrevistas, prefiero hacerlo solo</button>
-        <button class="aluc-option" onclick="answerCaso(4,3,0)" style="text-align:left;">D) Lo hago pero memorizo las respuestas para que parezca auténtico</button>
+      <div style="padding:16px 20px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Para reflexionar antes de responder:</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Qué error se cometió al usar la IA en esta situación?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Tiene la IA responsabilidad legal en lo que ha pasado? ¿Y quien la usó?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Para qué tipos de documentos oficiales no deberías usar la IA como única fuente?</div>
+          <div style="font-size:13.5px;color:var(--text);display:flex;gap:8px;"><span style="color:var(--gemini);font-weight:700;flex-shrink:0;">→</span>¿Qué habrías hecho tú diferente para ayudar a tu vecina?</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px;">¿Qué harías tú? ¿Por qué?</span>
+        <textarea data-key="caso4_respuesta" placeholder="Escribe tu respuesta — ¿qué lección saca de esto? ¿Cómo usarías la IA de forma responsable para ayudar a alguien con un documento oficial?"></textarea>
       </div>
-      <div class="aluc-feedback" id="caso4-fb"></div>
     </div>
   </div>
 
@@ -824,14 +852,7 @@ const FEEDBACK=[
   ['Incorrecto — la IA puede equivocarse aunque formules la pregunta correctamente.','Incorrecto — la IA es útil para muchas cosas importantes, pero con verificación y criterio propio.','✓ Correcto — esta es la actitud correcta: usa la IA como herramienta de apoyo, pero tú eres responsable de verificar y decidir.','Incorrecto — tanto la versión gratuita como la de pago pueden cometer errores. El precio no garantiza la precisión.'],
 ];
 
-// Caso casuísticas
-const CASO_CORRECT=[1,1,1,1]; // correct index for each caso
-const CASO_FEEDBACK=[
-  ['Incorrecto — compartir datos personales de clientes con una IA gratuita puede violar el RGPD y la confianza del cliente.','✓ Correcto — esta es la opción más ética: eliminas los datos personales antes de usar la IA y los añades tú después manualmente.','Incorrecto — sí puedes usar la IA con correos de clientes, pero siempre eliminando sus datos antes.','Incorrecto — hacerlo sin transparencia y con datos de terceros sigue siendo problemático aunque nadie lo sepa.'],
-  ['Incorrecto — aunque sea tu cuenta, los datos de salud de otra persona son sensibles y merecen protección, incluso si los comparte contigo.','✓ Correcto — lo más prudente es reconsiderar qué permisos das. No toda la información de tu correo tiene que estar disponible para la IA.','Incorrecto — borrar el correo no resuelve el problema de fondo: qué permisos quieres dar realmente a la IA.','Incorrecto — la IA no puede "olvidar" datos de esa forma. La solución es gestionar los permisos.'],
-  ['Incorrecto — aunque él te lo pida, pasas datos suyos por tu cuenta de IA, lo que puede no ser lo más adecuado.','Incorrecto — si quiere buscar información sobre sí mismo, lo correcto es que lo haga él con su propia cuenta.','Incorrecto — puedes buscar información sobre personas en la IA en contextos adecuados, pero con criterio.','✓ Correcto — lo más ético y práctico es que él mismo haga la búsqueda, con control sobre sus propios datos.'],
-  ['Incorrecto — presentarte con habilidades o experiencias que no tienes puede llevar a problemas reales cuando empieces el trabajo.','✓ Correcto — la IA es una herramienta para mejorar cómo comunicas lo que ya sabes, no para inventar lo que no tienes.','Incorrecto — la IA puede ser muy útil para preparar entrevistas si se usa honestamente.','Incorrecto — memorizar respuestas inventadas sigue siendo presentar una imagen falsa de ti mismo.'],
-];
+// Caso casuísticas — now free-text responses, no feedback arrays needed
 
 // ── NAVIGATION ─────────────────────────────────────────
 function tryGoToStep(i){
@@ -936,23 +957,8 @@ function answerQ(qIdx,aIdx,correct){
   }
 }
 
-// ── CASUÍSTICAS ────────────────────────────────────────
-let casoAnswers={};
-function answerCaso(casoNum,aIdx,correct){
-  if(casoAnswers[casoNum]!==undefined) return;
-  casoAnswers[casoNum]=aIdx;
-  const opts=document.querySelectorAll(`#caso${casoNum}-opts .aluc-option`);
-  opts.forEach((o,i)=>{
-    o.disabled=true;
-    if(i===correct) o.classList.add('correct');
-    else if(i===aIdx&&aIdx!==correct) o.classList.add('wrong');
-  });
-  const fb=document.getElementById('caso'+casoNum+'-fb');
-  const isOk=aIdx===correct;
-  fb.textContent=CASO_FEEDBACK[casoNum-1][aIdx];
-  fb.className='aluc-feedback show '+(isOk?'ok':'fail');
-  saveAll();
-}
+// ── CASUÍSTICAS — free text, no function needed ────────
+let casoAnswers={}; // kept for save/restore compatibility
 
 // ── DATA ───────────────────────────────────────────────
 function getAllData(){
@@ -1001,19 +1007,7 @@ function applyData(data){
     document.getElementById('aluc-score-msg').textContent=msgs[quizCorrect]||'';
     document.getElementById('aluc-score').classList.add('show');
   }
-  // Restore casos
-  Object.entries(casoAnswers).forEach(([casoNum,aIdx])=>{
-    const correct=CASO_CORRECT[parseInt(casoNum)-1];
-    const opts=document.querySelectorAll(`#caso${casoNum}-opts .aluc-option`);
-    opts.forEach((o,i)=>{
-      o.disabled=true;
-      if(i===correct) o.classList.add('correct');
-      else if(i===parseInt(aIdx)&&parseInt(aIdx)!==correct) o.classList.add('wrong');
-    });
-    const fb=document.getElementById('caso'+casoNum+'-fb');
-    const isOk=parseInt(aIdx)===correct;
-    if(fb){fb.textContent=CASO_FEEDBACK[parseInt(casoNum)-1][parseInt(aIdx)];fb.className='aluc-feedback show '+(isOk?'ok':'fail');}
-  });
+  // casos are now free-text fields, restored via data-key inputs above
   // Restore done states
   stepsDone.forEach((done,i)=>{
     if(done){
@@ -1118,6 +1112,10 @@ function downloadPDF(){
     chk('He dado acceso a Gmail','e_correos');
     chk('He dado acceso a Google Calendar','e_calendar');
     chk('He dado acceso a Google Drive','e_drive');
+    fld('Caso 1 — Datos de pacientes en el trabajo: ¿que harias?','caso1_respuesta');
+    fld('Caso 2 — Gemini leyendo correos personales: ¿que harias?','caso2_respuesta');
+    fld('Caso 3 — La IA que ayuda a exagerar el CV: ¿que harias?','caso3_respuesta');
+    fld('Caso 4 — Confiar demasiado en la IA con un documento oficial: ¿que harias?','caso4_respuesta');
     fld('Que informacion nunca le darias a una IA','etica_limite');
     fld('Crees que la gente es consciente de lo que comparte?','etica_conciencia');
 
