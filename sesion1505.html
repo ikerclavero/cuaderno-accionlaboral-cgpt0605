@@ -517,7 +517,7 @@ textarea{min-height:90px;}
   <div class="card red-left">
     <div class="card-label">Lo que acabas de hacer — sin juzgar</div>
     <h3>¿Qué datos has compartido hoy con Gemini?</h3>
-    <p>Marca todo lo que aplica a lo que has hecho esta tarde:</p>
+    <p>Marca todo lo que aplica:</p>
     <div class="check-row"><div class="chk" data-key="e_correos" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He dado acceso a mis correos de Gmail</strong><span>Gemini puede leer el contenido de tus emails</span></div></div>
     <div class="check-row"><div class="chk" data-key="e_calendar" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He dado acceso a mi agenda de Google Calendar</strong><span>Gemini puede ver tus eventos, citas y compromisos</span></div></div>
     <div class="check-row"><div class="chk" data-key="e_drive" onclick="toggleChk(this)"></div><div class="chk-content"><strong>He dado acceso a mis archivos de Google Drive</strong><span>Gemini puede leer documentos, PDFs y hojas de cálculo</span></div></div>
@@ -536,6 +536,73 @@ textarea{min-height:90px;}
     </div>
   </div>
 
+  <!-- CASUÍSTICAS -->
+  <div class="card blue-top">
+    <div class="card-label">4 situaciones reales — ¿cómo actuarías tú?</div>
+    <h3>Lee cada caso y elige la respuesta más ética</h3>
+    <p>No hay trampa — piensa en qué harías tú de verdad.</p>
+
+    <!-- CASO 1 -->
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">1</span>
+        <span style="font-size:14px;font-weight:600;color:var(--text);">Tu jefa te pide que uses ChatGPT para redactar la respuesta a un correo de un cliente que incluye su nombre, teléfono y datos de su pedido. Es más rápido y ella tiene prisa.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;" id="caso1-opts">
+        <button class="aluc-option" onclick="answerCaso(1,0,1)" style="text-align:left;">A) Lo hago — es solo para redactar más rápido y mi jefa lo pide</button>
+        <button class="aluc-option" onclick="answerCaso(1,1,1)" style="text-align:left;">B) Elimino los datos personales del cliente antes de pegarlo en ChatGPT, redacto y luego añado los datos</button>
+        <button class="aluc-option" onclick="answerCaso(1,2,1)" style="text-align:left;">C) Me niego a usar IA para correos de clientes bajo ninguna circunstancia</button>
+        <button class="aluc-option" onclick="answerCaso(1,3,1)" style="text-align:left;">D) Lo hago pero no se lo digo al cliente</button>
+      </div>
+      <div class="aluc-feedback" id="caso1-fb"></div>
+    </div>
+
+    <!-- CASO 2 -->
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">2</span>
+        <span style="font-size:14px;font-weight:600;color:var(--text);">Usas Gemini con Gmail y descubres que puede leer un correo muy personal que recibiste de un familiar sobre un problema de salud. No lo pediste expresamente pero Gemini lo menciona en un resumen.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;" id="caso2-opts">
+        <button class="aluc-option" onclick="answerCaso(2,0,2)" style="text-align:left;">A) No me preocupa — es mi propia cuenta y nadie más lo ve</button>
+        <button class="aluc-option" onclick="answerCaso(2,1,2)" style="text-align:left;">B) Desactivo la extensión de Gmail y reconsidero qué permisos quiero dar realmente</button>
+        <button class="aluc-option" onclick="answerCaso(2,2,2)" style="text-align:left;">C) Borro ese correo para que Gemini no pueda volver a leerlo</button>
+        <button class="aluc-option" onclick="answerCaso(2,3,2)" style="text-align:left;">D) Le pido a Gemini que olvide ese correo</button>
+      </div>
+      <div class="aluc-feedback" id="caso2-fb"></div>
+    </div>
+
+    <!-- CASO 3 -->
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">3</span>
+        <span style="font-size:14px;font-weight:600;color:var(--text);">Un compañero de trabajo te pide que le preguntes a ChatGPT algo sobre él — "¿qué sabe la IA sobre mí?" — usando su nombre real. Quiere saber si hay información suya en internet.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;" id="caso3-opts">
+        <button class="aluc-option" onclick="answerCaso(3,0,3)" style="text-align:left;">A) Lo hago — es él quien me lo pide y no hay problema</button>
+        <button class="aluc-option" onclick="answerCaso(3,1,3)" style="text-align:left;">B) Le explico que él mismo puede hacerlo con su propia cuenta</button>
+        <button class="aluc-option" onclick="answerCaso(3,2,3)" style="text-align:left;">C) Me niego — nunca busco información sobre otras personas en la IA</button>
+        <button class="aluc-option" onclick="answerCaso(3,3,3)" style="text-align:left;">D) Le ayudo pero sin usar su nombre completo para proteger su privacidad</button>
+      </div>
+      <div class="aluc-feedback" id="caso3-fb"></div>
+    </div>
+
+    <!-- CASO 4 -->
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+        <span style="background:var(--gemini);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">4</span>
+        <span style="font-size:14px;font-weight:600;color:var(--text);">Usas la IA para preparar una entrevista de trabajo y le pides que genere respuestas muy elaboradas que en realidad no reflejan lo que tú sabes ni tu experiencia real.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;" id="caso4-opts">
+        <button class="aluc-option" onclick="answerCaso(4,0,0)" style="text-align:left;">A) Lo hago — todos lo hacen y en la entrevista improviso</button>
+        <button class="aluc-option" onclick="answerCaso(4,1,0)" style="text-align:left;">B) Uso la IA para estructurar y mejorar mis respuestas reales, no para inventar experiencias que no tengo</button>
+        <button class="aluc-option" onclick="answerCaso(4,2,0)" style="text-align:left;">C) No uso la IA para preparar entrevistas, prefiero hacerlo solo</button>
+        <button class="aluc-option" onclick="answerCaso(4,3,0)" style="text-align:left;">D) Lo hago pero memorizo las respuestas para que parezca auténtico</button>
+      </div>
+      <div class="aluc-feedback" id="caso4-fb"></div>
+    </div>
+  </div>
+
   <div class="card blue-left">
     <div class="card-label">Debate</div>
     <h3>¿Dónde está el límite para ti?</h3>
@@ -546,8 +613,8 @@ textarea{min-height:90px;}
   </div>
 
   <div class="complete-section">
-    <h4>¿Has reflexionado sobre la privacidad?</h4>
-    <button class="complete-btn" onclick="completeStep(4)">✅ Siguiente — el juego de las alucinaciones</button>
+    <h4>¿Has trabajado los casos y reflexionado?</h4>
+    <button class="complete-btn" onclick="completeStep(4)">✅ Siguiente — el quiz de alucinaciones</button>
     <div class="complete-done" id="done-4">✓ Completado</div>
   </div>
 </div>
@@ -557,7 +624,7 @@ textarea{min-height:90px;}
   <div class="sec-head">
     <div class="sec-kicker">17:45 — El juego más importante de la sesión</div>
     <h2>Caza de alucinaciones</h2>
-    <p>La IA miente con total seguridad. Aquí lo vas a comprobar tú mismo.</p>
+    <p>La IA miente con total seguridad. Aquí lo vas a comprobar tú mismo. Nota sobre 10.</p>
   </div>
 
   <div class="callout">
@@ -566,65 +633,119 @@ textarea{min-height:90px;}
   </div>
 
   <div id="quiz-container">
-    <!-- Q1 -->
     <div class="aluc-question" id="q-0">
-      <div class="aluc-q-text">¿En qué año fue fundada la empresa OpenAI, creadora de ChatGPT?</div>
+      <div class="aluc-q-text">1 / 10 · Le preguntas a ChatGPT cuál es el salario mínimo en España en 2025. Te da una cifra concreta. ¿Qué haces?</div>
       <div class="aluc-options">
-        <button class="aluc-option" onclick="answerQ(0,0,1)">A) 2010</button>
-        <button class="aluc-option" onclick="answerQ(0,1,1)">B) 2015</button>
-        <button class="aluc-option" onclick="answerQ(0,2,1)">C) 2018</button>
-        <button class="aluc-option" onclick="answerQ(0,3,1)">D) 2020</button>
+        <button class="aluc-option" onclick="answerQ(0,0,1)">A) Me lo creo — es una dato oficial y la IA es fiable con cifras legales</button>
+        <button class="aluc-option" onclick="answerQ(0,1,1)">B) Verifico en la web oficial del Ministerio de Trabajo antes de usarlo</button>
+        <button class="aluc-option" onclick="answerQ(0,2,1)">C) Lo uso solo si la cifra me parece razonable</button>
+        <button class="aluc-option" onclick="answerQ(0,3,1)">D) No uso la IA para este tipo de datos laborales</button>
       </div>
       <div class="aluc-feedback" id="fb-0"></div>
     </div>
-    <!-- Q2 -->
+
     <div class="aluc-question" id="q-1">
-      <div class="aluc-q-text">Cuando le preguntas a una IA por un artículo de ley concreto, ¿qué riesgo existe?</div>
+      <div class="aluc-q-text">2 / 10 · ¿Qué significa que una IA "alucina"?</div>
       <div class="aluc-options">
-        <button class="aluc-option" onclick="answerQ(1,0,2)">A) Ninguno, las leyes son datos públicos y verificables</button>
-        <button class="aluc-option" onclick="answerQ(1,1,2)">B) Que la IA cite leyes reales pero con contenido inventado o desactualizado</button>
-        <button class="aluc-option" onclick="answerQ(1,2,2)">C) Que la IA se niegue a responder preguntas legales</button>
-        <button class="aluc-option" onclick="answerQ(1,3,2)">D) Que tarde demasiado en responder</button>
+        <button class="aluc-option" onclick="answerQ(1,0,2)">A) Que la IA procesa imágenes o colores de forma incorrecta</button>
+        <button class="aluc-option" onclick="answerQ(1,1,2)">B) Que el servidor de la IA tiene un error técnico temporal</button>
+        <button class="aluc-option" onclick="answerQ(1,2,2)">C) Que genera información falsa con total confianza, como si fuera verdad</button>
+        <button class="aluc-option" onclick="answerQ(1,3,2)">D) Que la IA no entiende la pregunta y da una respuesta aleatoria</button>
       </div>
       <div class="aluc-feedback" id="fb-1"></div>
     </div>
-    <!-- Q3 -->
+
     <div class="aluc-question" id="q-2">
-      <div class="aluc-q-text">Usas la IA para buscar el horario de atención de un médico. La IA te da un horario concreto. ¿Qué deberías hacer?</div>
+      <div class="aluc-q-text">3 / 10 · Usas la IA para buscar el horario de atención de tu médico de cabecera. Te da un horario concreto. ¿Qué deberías hacer?</div>
       <div class="aluc-options">
-        <button class="aluc-option" onclick="answerQ(2,0,3)">A) Fiarme — la IA tiene acceso a información actualizada</button>
-        <button class="aluc-option" onclick="answerQ(2,1,3)">B) Verificarlo llamando al centro o mirando su web oficial</button>
-        <button class="aluc-option" onclick="answerQ(2,2,3)">C) Solo verificarlo si tengo dudas sobre la respuesta</button>
-        <button class="aluc-option" onclick="answerQ(2,3,3)">D) No usar la IA para este tipo de consultas nunca</button>
+        <button class="aluc-option" onclick="answerQ(2,0,1)">A) Fiarme — la IA tiene acceso a datos actualizados</button>
+        <button class="aluc-option" onclick="answerQ(2,1,1)">B) Verificarlo llamando al centro o mirando la web del centro de salud</button>
+        <button class="aluc-option" onclick="answerQ(2,2,1)">C) Solo verificarlo si el horario me parece raro</button>
+        <button class="aluc-option" onclick="answerQ(2,3,1)">D) No usar la IA para consultas de salud nunca</button>
       </div>
       <div class="aluc-feedback" id="fb-2"></div>
     </div>
-    <!-- Q4 -->
+
     <div class="aluc-question" id="q-3">
-      <div class="aluc-q-text">¿Cuál de estas situaciones es el mayor riesgo real de usar una IA con acceso a tu correo?</div>
+      <div class="aluc-q-text">4 / 10 · ¿Cuál de estos tipos de error de la IA es el más peligroso en la práctica?</div>
       <div class="aluc-options">
-        <button class="aluc-option" onclick="answerQ(3,0,0)">A) Que la IA borre accidentalmente tus correos</button>
-        <button class="aluc-option" onclick="answerQ(3,1,0)">B) Que la IA sea demasiado lenta para leer todos los mensajes</button>
-        <button class="aluc-option" onclick="answerQ(3,2,0)">C) Que datos de personas terceras (clientes, familiares) queden expuestos sin su consentimiento</button>
-        <button class="aluc-option" onclick="answerQ(3,3,0)">D) Que la IA no entienda correos en español</button>
+        <button class="aluc-option" onclick="answerQ(3,0,0)">A) Que la IA responda en un idioma equivocado</button>
+        <button class="aluc-option" onclick="answerQ(3,1,0)">B) Que la IA invente una fuente o cita académica que parece real pero no existe</button>
+        <button class="aluc-option" onclick="answerQ(3,2,0)">C) Que la IA tarde mucho en responder</button>
+        <button class="aluc-option" onclick="answerQ(3,3,0)">D) Que la IA repita la misma respuesta varias veces</button>
       </div>
       <div class="aluc-feedback" id="fb-3"></div>
     </div>
-    <!-- Q5 -->
+
     <div class="aluc-question" id="q-4">
-      <div class="aluc-q-text">La IA te genera un contrato de alquiler completo. ¿Cuál sería el siguiente paso correcto?</div>
+      <div class="aluc-q-text">5 / 10 · La IA te genera un contrato de alquiler completo. ¿Cuál sería el paso más correcto?</div>
       <div class="aluc-options">
         <button class="aluc-option" onclick="answerQ(4,0,1)">A) Firmarlo directamente — la IA no comete errores en documentos legales</button>
-        <button class="aluc-option" onclick="answerQ(4,1,1)">B) Revisarlo cuidadosamente o consultarlo con un profesional antes de usarlo</button>
-        <button class="aluc-option" onclick="answerQ(4,2,1)">C) Usarlo si parece correcto visualmente</button>
-        <button class="aluc-option" onclick="answerQ(4,3,1)">D) No usar la IA para documentos legales bajo ningún concepto</button>
+        <button class="aluc-option" onclick="answerQ(4,1,1)">B) Revisarlo con cuidado o consultarlo con un profesional antes de usarlo</button>
+        <button class="aluc-option" onclick="answerQ(4,2,1)">C) Usarlo si visualmente parece correcto y completo</button>
+        <button class="aluc-option" onclick="answerQ(4,3,1)">D) No usar nunca la IA para generar documentos legales</button>
       </div>
       <div class="aluc-feedback" id="fb-4"></div>
+    </div>
+
+    <div class="aluc-question" id="q-5">
+      <div class="aluc-q-text">6 / 10 · Le preguntas a una IA qué medicamento puedes tomar para el dolor de cabeza. Te da una recomendación. ¿Qué haces?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(5,0,2)">A) Lo tomo — es solo un medicamento de farmacia, no puede ir mal</button>
+        <button class="aluc-option" onclick="answerQ(5,1,2)">B) Lo tomo si ya lo he tomado antes sin problemas</button>
+        <button class="aluc-option" onclick="answerQ(5,2,2)">C) Consulto con un farmacéutico o médico, especialmente si tomo otros medicamentos</button>
+        <button class="aluc-option" onclick="answerQ(5,3,2)">D) No uso la IA para temas de salud bajo ningún concepto</button>
+      </div>
+      <div class="aluc-feedback" id="fb-5"></div>
+    </div>
+
+    <div class="aluc-question" id="q-6">
+      <div class="aluc-q-text">7 / 10 · Cuando la IA responde algo con mucha seguridad y detalle, eso significa que...</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(6,0,1)">A) La información es correcta — la IA solo es segura cuando sabe la respuesta</button>
+        <button class="aluc-option" onclick="answerQ(6,1,1)">B) No necesariamente — la IA puede ser igual de segura con información correcta que con información inventada</button>
+        <button class="aluc-option" onclick="answerQ(6,2,1)">C) Ha buscado en internet y ha encontrado fuentes fiables</button>
+        <button class="aluc-option" onclick="answerQ(6,3,1)">D) Ha consultado con expertos humanos antes de responder</button>
+      </div>
+      <div class="aluc-feedback" id="fb-6"></div>
+    </div>
+
+    <div class="aluc-question" id="q-7">
+      <div class="aluc-q-text">8 / 10 · ¿Cuál de estas tareas es más arriesgada si no verificas el resultado de la IA?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(7,0,3)">A) Pedirle que te sugiera una película para ver esta noche</button>
+        <button class="aluc-option" onclick="answerQ(7,1,3)">B) Pedirle que te resuma un artículo de noticias</button>
+        <button class="aluc-option" onclick="answerQ(7,2,3)">C) Pedirle que te ayude a escribir un poema de cumpleaños</button>
+        <button class="aluc-option" onclick="answerQ(7,3,3)">D) Pedirle que calcule cuánto te corresponde de indemnización por despido</button>
+      </div>
+      <div class="aluc-feedback" id="fb-7"></div>
+    </div>
+
+    <div class="aluc-question" id="q-8">
+      <div class="aluc-q-text">9 / 10 · Al usar Gemini con acceso a tu Gmail, el mayor riesgo real es...</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(8,0,2)">A) Que Gemini borre accidentalmente tus correos importantes</button>
+        <button class="aluc-option" onclick="answerQ(8,1,2)">B) Que Gemini sea demasiado lento para leer correos largos</button>
+        <button class="aluc-option" onclick="answerQ(8,2,2)">C) Que datos de terceras personas (clientes, familiares) queden expuestos sin su consentimiento</button>
+        <button class="aluc-option" onclick="answerQ(8,3,2)">D) Que Gemini no entienda correos escritos de forma informal</button>
+      </div>
+      <div class="aluc-feedback" id="fb-8"></div>
+    </div>
+
+    <div class="aluc-question" id="q-9">
+      <div class="aluc-q-text">10 / 10 · ¿Qué frase resume mejor cómo hay que usar la IA de forma responsable?</div>
+      <div class="aluc-options">
+        <button class="aluc-option" onclick="answerQ(9,0,2)">A) "La IA siempre tiene razón si le haces la pregunta correcta"</button>
+        <button class="aluc-option" onclick="answerQ(9,1,2)">B) "No hay que usar la IA para nada importante o que tenga consecuencias"</button>
+        <button class="aluc-option" onclick="answerQ(9,2,2)">C) "La IA es una herramienta muy útil, pero la decisión final y la verificación siempre son responsabilidad tuya"</button>
+        <button class="aluc-option" onclick="answerQ(9,3,2)">D) "La IA de pago es siempre fiable; la gratuita no"</button>
+      </div>
+      <div class="aluc-feedback" id="fb-9"></div>
     </div>
   </div>
 
   <div class="aluc-score" id="aluc-score">
-    <div class="aluc-score-num" id="aluc-score-num">0 / 5</div>
+    <div class="aluc-score-num" id="aluc-score-num">0 / 10</div>
     <div class="aluc-score-msg" id="aluc-score-msg"></div>
   </div>
 
@@ -688,13 +809,27 @@ let currentStep=0;
 let hasUnsavedChanges=false,saveDebounce=null;
 let quizAnswers={};
 let quizCorrect=0;
-const CORRECT=[1,1,1,2,1]; // correct index for each Q
+const CORRECT=[1,2,1,1,1,2,1,3,2,2]; // correct index for each of the 10 Qs
 const FEEDBACK=[
-  ['Incorrecto — OpenAI fue fundada en diciembre de 2015 por Sam Altman, Elon Musk y otros.','✓ Correcto — OpenAI fue fundada en diciembre de 2015.','Incorrecto — OpenAI fue fundada en 2015.','Incorrecto — OpenAI fue fundada en 2015, no en 2020.'],
-  ['Incorrecto — Las leyes son públicas pero la IA puede inventar contenido o citar versiones desactualizadas.','✓ Correcto — La IA puede citar artículos reales con contenido incorrecto o desactualizado. Siempre hay que verificar.','Incorrecto — La IA responde preguntas legales, pero con el riesgo de inventar o desactualizar información.','Incorrecto — La velocidad no es el problema; el riesgo es la precisión del contenido legal.'],
-  ['Incorrecto — La IA no tiene acceso a datos actualizados en tiempo real como horarios de consultas.','✓ Correcto — Los horarios cambian y la IA puede tener datos desactualizados. Siempre verifica llamando o mirando la web oficial.','Incorrecto — Con horarios médicos siempre hay que verificar, aunque la respuesta parezca correcta.','Incorrecto — Puedes usar la IA para este tipo de consultas, pero siempre verificando el resultado.'],
-  ['Incorrecto — La IA no puede borrar correos por sí sola.','Incorrecto — La velocidad no es el problema principal.','✓ Correcto — Cuando la IA accede a tu correo, puede leer mensajes con datos de clientes, familiares u otras personas que no han dado su consentimiento.','Incorrecto — Gemini está diseñado para funcionar en español sin problemas.'],
-  ['Incorrecto — La IA comete errores frecuentes en documentos legales y puede incluir cláusulas inventadas.','✓ Correcto — Un contrato generado por IA debe revisarse siempre con cuidado, y es recomendable consultarlo con un profesional antes de firmarlo.','Incorrecto — La apariencia visual no garantiza que el contenido sea correcto legalmente.','Incorrecto — La IA puede ser útil para generar borradores legales, pero siempre con revisión profesional posterior.'],
+  ['Incorrecto — la IA puede tener datos desactualizados. Verifica siempre cifras legales en la fuente oficial.','✓ Correcto — los datos laborales cambian. Siempre verifica en la web del Ministerio de Trabajo.','Incorrecto — verificar solo si parece raro no es suficiente. Los errores más peligrosos son los que parecen correctos.','Incorrecto — puedes usar la IA como punto de partida, pero verifica el dato oficial siempre.'],
+  ['Incorrecto — "alucinar" no tiene que ver con imágenes ni colores.','Incorrecto — las alucinaciones no son errores técnicos del servidor.','✓ Correcto — la IA genera información falsa con total convicción. No sabe que se equivoca, y eso la hace peligrosa.','Incorrecto — la IA puede entender perfectamente la pregunta y aun así inventarse la respuesta.'],
+  ['Incorrecto — la IA no tiene acceso a datos de horarios en tiempo real.','✓ Correcto — los horarios cambian y la IA puede tener datos desactualizados. Verifica siempre antes de ir.','Incorrecto — con datos de salud hay que verificar siempre, aunque la respuesta parezca razonable.','Incorrecto — puedes usar la IA para este tipo de búsquedas, pero verificando después.'],
+  ['Incorrecto — que responda en otro idioma es un problema menor y fácil de detectar.','✓ Correcto — una fuente inventada que parece real es el error más difícil de detectar y el que más daño puede causar.','Incorrecto — la lentitud es una molestia pero no un riesgo real.','Incorrecto — repetir respuestas es fácil de detectar y no tiene consecuencias graves.'],
+  ['Incorrecto — la IA comete errores frecuentes en textos legales y puede inventar cláusulas.','✓ Correcto — un contrato generado por IA debe revisarse siempre con cuidado y, idealmente, consultarse con un profesional.','Incorrecto — la apariencia visual no garantiza que el contenido sea jurídicamente correcto.','Incorrecto — la IA puede ser útil para generar borradores, pero con revisión profesional posterior.'],
+  ['Incorrecto — aunque sea medicamento de farmacia, puede haber contraindicaciones con otros fármacos que la IA desconoce.','Incorrecto — la tolerancia previa no garantiza que sea adecuado ahora, especialmente si tomas otros medicamentos.','✓ Correcto — para temas de salud siempre es mejor consultar con un profesional, especialmente si hay otros medicamentos de por medio.','Incorrecto — puedes usar la IA para informarte, pero consulta siempre con un profesional para decisiones de salud.'],
+  ['Incorrecto — la IA puede ser igual de segura y detallada con información correcta que con información inventada.','✓ Correcto — la seguridad en el tono no es indicador de precisión. La IA puede estar completamente equivocada y sonar totalmente convincente.','Incorrecto — la IA no busca en internet por defecto en muchas versiones, y aunque lo hiciera, puede malinterpretar las fuentes.','Incorrecto — la IA no consulta con humanos antes de responder.'],
+  ['Incorrecto — sugerir una película es una tarea de bajo riesgo; si falla, lo peor es que la película no te guste.','Incorrecto — resumir noticias tiene algo de riesgo pero las consecuencias suelen ser menores.','Incorrecto — escribir un poema no tiene consecuencias graves si la IA no es muy creativa.','✓ Correcto — calcular una indemnización laboral tiene consecuencias económicas y legales reales. Un error puede costarte dinero.'],
+  ['Incorrecto — la IA no puede borrar tus correos por sí sola.','Incorrecto — la velocidad no es el riesgo principal.','✓ Correcto — cuando la IA accede a tu correo, puede leer mensajes con datos de otras personas que no han dado su consentimiento.','Incorrecto — Gemini está diseñado para funcionar bien en español.'],
+  ['Incorrecto — la IA puede equivocarse aunque formules la pregunta correctamente.','Incorrecto — la IA es útil para muchas cosas importantes, pero con verificación y criterio propio.','✓ Correcto — esta es la actitud correcta: usa la IA como herramienta de apoyo, pero tú eres responsable de verificar y decidir.','Incorrecto — tanto la versión gratuita como la de pago pueden cometer errores. El precio no garantiza la precisión.'],
+];
+
+// Caso casuísticas
+const CASO_CORRECT=[1,1,1,1]; // correct index for each caso
+const CASO_FEEDBACK=[
+  ['Incorrecto — compartir datos personales de clientes con una IA gratuita puede violar el RGPD y la confianza del cliente.','✓ Correcto — esta es la opción más ética: eliminas los datos personales antes de usar la IA y los añades tú después manualmente.','Incorrecto — sí puedes usar la IA con correos de clientes, pero siempre eliminando sus datos antes.','Incorrecto — hacerlo sin transparencia y con datos de terceros sigue siendo problemático aunque nadie lo sepa.'],
+  ['Incorrecto — aunque sea tu cuenta, los datos de salud de otra persona son sensibles y merecen protección, incluso si los comparte contigo.','✓ Correcto — lo más prudente es reconsiderar qué permisos das. No toda la información de tu correo tiene que estar disponible para la IA.','Incorrecto — borrar el correo no resuelve el problema de fondo: qué permisos quieres dar realmente a la IA.','Incorrecto — la IA no puede "olvidar" datos de esa forma. La solución es gestionar los permisos.'],
+  ['Incorrecto — aunque él te lo pida, pasas datos suyos por tu cuenta de IA, lo que puede no ser lo más adecuado.','Incorrecto — si quiere buscar información sobre sí mismo, lo correcto es que lo haga él con su propia cuenta.','Incorrecto — puedes buscar información sobre personas en la IA en contextos adecuados, pero con criterio.','✓ Correcto — lo más ético y práctico es que él mismo haga la búsqueda, con control sobre sus propios datos.'],
+  ['Incorrecto — presentarte con habilidades o experiencias que no tienes puede llevar a problemas reales cuando empieces el trabajo.','✓ Correcto — la IA es una herramienta para mejorar cómo comunicas lo que ya sabes, no para inventar lo que no tienes.','Incorrecto — la IA puede ser muy útil para preparar entrevistas si se usa honestamente.','Incorrecto — memorizar respuestas inventadas sigue siendo presentar una imagen falsa de ti mismo.'],
 ];
 
 // ── NAVIGATION ─────────────────────────────────────────
@@ -779,25 +914,53 @@ function answerQ(qIdx,aIdx,correct){
   fb.textContent=FEEDBACK[qIdx][aIdx];
   fb.className='aluc-feedback show '+(isOk?'ok':'fail');
   saveAll();
-  // Check if all answered
-  if(Object.keys(quizAnswers).length===5){
-    const score=document.getElementById('aluc-score');
-    document.getElementById('aluc-score-num').textContent=quizCorrect+' / 5';
-    const msgs=['Hay conceptos importantes que repasar — habla con el docente.','Vas bien pero hay errores clave. Repasa los que fallaste.','Bastante bien. Atención a los casos prácticos.','Muy bien — tienes el pensamiento crítico bien trabajado.','Perfecto — dominas todos los conceptos clave de uso responsable.'];
-    document.getElementById('aluc-score-msg').textContent=msgs[quizCorrect]||msgs[4];
-    score.classList.add('show');
+  if(Object.keys(quizAnswers).length===10){
+    const pct=Math.round(quizCorrect/10*10); // score out of 10 = correct out of 10
+    document.getElementById('aluc-score-num').textContent=quizCorrect+' / 10';
+    const msgs={
+      0:'Muchos conceptos por repasar — habla con el docente.',
+      1:'Queda bastante por reforzar. Repasa los que fallaste.',
+      2:'Aún hay conceptos importantes que no quedaron claros.',
+      3:'Vas avanzando. Repasa las preguntas que fallaste.',
+      4:'Por la mitad. Algunos conceptos clave todavía no están del todo claros.',
+      5:'Bien. Tienes la base, pero hay margen de mejora.',
+      6:'Bastante bien. Solo algunos detalles por pulir.',
+      7:'Bien hecho. Tienes buen criterio sobre el uso responsable de la IA.',
+      8:'Muy bien — dominas casi todo. Solo algún detalle menor.',
+      9:'Excelente — casi perfecto. Muy buen pensamiento crítico.',
+      10:'Perfecto — dominas todos los conceptos de uso responsable. ¡10/10!'
+    };
+    document.getElementById('aluc-score-msg').textContent=msgs[quizCorrect]||'';
+    document.getElementById('aluc-score').classList.add('show');
   }
+}
+
+// ── CASUÍSTICAS ────────────────────────────────────────
+let casoAnswers={};
+function answerCaso(casoNum,aIdx,correct){
+  if(casoAnswers[casoNum]!==undefined) return;
+  casoAnswers[casoNum]=aIdx;
+  const opts=document.querySelectorAll(`#caso${casoNum}-opts .aluc-option`);
+  opts.forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct) o.classList.add('correct');
+    else if(i===aIdx&&aIdx!==correct) o.classList.add('wrong');
+  });
+  const fb=document.getElementById('caso'+casoNum+'-fb');
+  const isOk=aIdx===correct;
+  fb.textContent=CASO_FEEDBACK[casoNum-1][aIdx];
+  fb.className='aluc-feedback show '+(isOk?'ok':'fail');
+  saveAll();
 }
 
 // ── DATA ───────────────────────────────────────────────
 function getAllData(){
-  const data={steps_unlocked:[...stepsUnlocked],steps_done:[...stepsDone],current_step:currentStep,quiz_answers:{...quizAnswers},quiz_correct:quizCorrect};
+  const data={steps_unlocked:[...stepsUnlocked],steps_done:[...stepsDone],current_step:currentStep,quiz_answers:{...quizAnswers},quiz_correct:quizCorrect,caso_answers:{...casoAnswers}};
   document.querySelectorAll('[data-key]').forEach(el=>{
     const k=el.dataset.key;
     if(el.classList.contains('chk')) data[k]=el.classList.contains('on');
     else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') data[k]=el.value||'';
   });
-  // demos
   const demos=[];
   document.querySelectorAll('.demo-card').forEach((c,i)=>{if(c.classList.contains('tried'))demos.push(i);});
   data['demos_tried']=demos;
@@ -809,6 +972,7 @@ function applyData(data){
   if(data.steps_done) stepsDone=data.steps_done;
   if(data.quiz_answers) quizAnswers=data.quiz_answers;
   if(data.quiz_correct!==undefined) quizCorrect=data.quiz_correct;
+  if(data.caso_answers) casoAnswers=data.caso_answers;
   document.querySelectorAll('[data-key]').forEach(el=>{
     const k=el.dataset.key;
     if(!(k in data)) return;
@@ -817,27 +981,38 @@ function applyData(data){
   });
   if(data['demos_tried']) data['demos_tried'].forEach(i=>{const c=document.getElementById('demo-'+i);if(c)c.classList.add('tried');});
   if(data['conexion_val']) selectConexion(data['conexion_val']);
-  // Restore quiz
+  // Restore quiz (10 questions)
   Object.entries(quizAnswers).forEach(([qIdx,aIdx])=>{
     const correct=CORRECT[parseInt(qIdx)];
     const opts=document.querySelectorAll(`#q-${qIdx} .aluc-option`);
     opts.forEach((o,i)=>{
       o.disabled=true;
       if(i===correct) o.classList.add('correct');
-      else if(i===aIdx&&parseInt(aIdx)!==correct) o.classList.add('wrong');
+      else if(i===parseInt(aIdx)&&parseInt(aIdx)!==correct) o.classList.add('wrong');
     });
     const fb=document.getElementById('fb-'+qIdx);
     const isOk=parseInt(aIdx)===correct;
-    fb.textContent=FEEDBACK[parseInt(qIdx)][parseInt(aIdx)];
-    fb.className='aluc-feedback show '+(isOk?'ok':'fail');
+    if(fb){fb.textContent=FEEDBACK[parseInt(qIdx)][parseInt(aIdx)];fb.className='aluc-feedback show '+(isOk?'ok':'fail');}
   });
-  if(Object.keys(quizAnswers).length===5){
-    const score=document.getElementById('aluc-score');
-    document.getElementById('aluc-score-num').textContent=quizCorrect+' / 5';
-    const msgs=['Hay conceptos importantes que repasar.','Vas bien pero hay errores clave.','Bastante bien.','Muy bien.','Perfecto.'];
-    document.getElementById('aluc-score-msg').textContent=msgs[quizCorrect]||msgs[4];
-    score.classList.add('show');
+  if(Object.keys(quizAnswers).length===10){
+    const msgs={0:'Muchos conceptos por repasar.',1:'Queda bastante por reforzar.',2:'Aún hay conceptos por repasar.',3:'Vas avanzando.',4:'Por la mitad.',5:'Bien, con margen de mejora.',6:'Bastante bien.',7:'Bien hecho.',8:'Muy bien.',9:'Excelente.',10:'Perfecto — 10/10!'};
+    document.getElementById('aluc-score-num').textContent=quizCorrect+' / 10';
+    document.getElementById('aluc-score-msg').textContent=msgs[quizCorrect]||'';
+    document.getElementById('aluc-score').classList.add('show');
   }
+  // Restore casos
+  Object.entries(casoAnswers).forEach(([casoNum,aIdx])=>{
+    const correct=CASO_CORRECT[parseInt(casoNum)-1];
+    const opts=document.querySelectorAll(`#caso${casoNum}-opts .aluc-option`);
+    opts.forEach((o,i)=>{
+      o.disabled=true;
+      if(i===correct) o.classList.add('correct');
+      else if(i===parseInt(aIdx)&&parseInt(aIdx)!==correct) o.classList.add('wrong');
+    });
+    const fb=document.getElementById('caso'+casoNum+'-fb');
+    const isOk=parseInt(aIdx)===correct;
+    if(fb){fb.textContent=CASO_FEEDBACK[parseInt(casoNum)-1][parseInt(aIdx)];fb.className='aluc-feedback show '+(isOk?'ok':'fail');}
+  });
   // Restore done states
   stepsDone.forEach((done,i)=>{
     if(done){
@@ -881,7 +1056,7 @@ function confirmClear(){
   try{sessionStorage.removeItem(STORAGE_KEY);localStorage.removeItem(STORAGE_KEY);}catch(e){}
   stepsUnlocked=[true,false,false,false,false,false,false];
   stepsDone=[false,false,false,false,false,false,false];
-  quizAnswers={};quizCorrect=0;
+  quizAnswers={};quizCorrect=0;casoAnswers={};
   document.querySelectorAll('[data-key]').forEach(el=>{
     if(el.classList.contains('chk'))el.classList.remove('on');
     else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value='';
@@ -917,7 +1092,7 @@ function downloadPDF(){
     doc.setFillColor(8,14,26);doc.rect(0,0,pW,52,'F');doc.setFillColor(66,133,244);doc.rect(0,52,pW,2.5,'F');
     doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(147,197,253);doc.text('BLOQUE 3 · SESION 14 · LANBIDE',ml,14);
     doc.setFontSize(17);doc.setFont('helvetica','bold');doc.setTextColor(240,247,255);doc.text('IA en tu vida diaria + Etica y privacidad',ml,27);
-    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,160,200);doc.text('Cuaderno de trabajo · Viernes 15:30-18:30',ml,40);
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,160,200);doc.text('Cuaderno de trabajo · Jueves 15:30-18:30',ml,40);
     y=62;
 
     sHdr('1. CHECK-IN','15:30 · Demo de Gemini');
@@ -949,7 +1124,7 @@ function downloadPDF(){
     need(14);
     doc.setFillColor(13,27,53);doc.rect(ml,y,cW,12,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(147,197,253);
-    doc.text('Resultado del quiz: '+d.quiz_correct+' / 5 respuestas correctas',ml+5,y+8);
+    doc.text('Resultado del quiz: '+d.quiz_correct+' / 10 respuestas correctas',ml+5,y+8);
     y+=18;
 
     sHdr('7. MI CHECKLIST DE USO RESPONSABLE','18:10 · Cierre');
