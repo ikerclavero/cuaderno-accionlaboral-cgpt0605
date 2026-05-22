@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADIN - Cuando todos duermen… ADIN cuida de ti</title>
+    <link rel="preconnect" href="[fonts.googleapis.com](https://fonts.googleapis.com)">
+    <link rel="preconnect" href="[fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap)" rel="stylesheet">
+    <style>
+        :root {
+            --azul-noche: #243B6B;
+            --azul-suave: #4C5F8F;
+            --marron-arena: #B7925F;
+            --crema-calido: #F7F3EC;
+            --blanco-roto: #FFFDF9;
+            --texto-oscuro: #2D2D2D;
+            --texto-suave: #5A5A5A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--crema-calido);
+            color: var(--texto-oscuro);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* Navegación */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(255, 253, 249, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 40px rgba(36, 59, 107, 0.08);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 45px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--azul-noche);
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--azul-noche);
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--marron-arena);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background: var(--azul-noche);
+            transition: all 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 5% 4rem;
+            background: linear-gradient(135deg, var(--blanco-roto) 0%, var(--crema-calido) 50%, rgba(183, 146, 95, 0.1) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 70%;
+            height: 150%;
+            background: radial-gradient(ellipse, rgba(183, 146, 95, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-text {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: var(--azul-noche);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-text h1 span {
+            color: var(--marron-arena);
+            display: block;
+        }
+
+        .hero-text p {
+            font-size: 1.15rem;
+            color: var(--texto-suave);
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--azul-noche);
+            color: var(--blanco-roto);
+            box-shadow: 0 10px 30px rgba(36, 59, 107, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--azul-suave);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(36, 59, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--azul-noche);
+            border: 2px solid var(--marron-arena);
+        }
+
+        .btn-secondary:hover {
+            background: var(--marron-arena);
+            color: var(--blanco-roto);
+            transform: translateY(-3px);
+        }
+
+        .hero-image {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.6s;
+        }
+
+        .hero-image-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .glow-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(183, 146, 95, 0.4) 0%, transparent 70%);
+            filter: blur(40px);
+            z-index: 1;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Secciones generales */
+        section {
+            padding: 6rem 5%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--azul-noche);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            color: var(--texto-suave);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Qué es ADIN */
+        .que-es {
+            background: var(--blanco-roto);
+        }
+
+        .que-es-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .que-es-image {
+            position: relative;
+        }
+
+        .que-es-image img {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(36, 59, 107, 0.15);
+        }
+
+        .que-es-text h3 {
+            font-size: 2.2rem;
+            color: var(--azul-noche);
+            margin-bottom: 1.5rem;
+        }
+
+        .que-es-text p {
+            color: var(--texto-suave);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--texto-oscuro);
+        }
+
+        .feature-list li::before {
+            content: '✦';
+            color: var(--marron-arena);
+            font-size: 1.2rem;
+        }
+
+        /* Funciones */
+        .funciones {
+            background: var(--crema-calido);
+        }
+
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .funcion-card {
+            background: var(--blanco-roto);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(36, 59, 107, 0.05);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .funcion-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .funcion-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(36, 59, 107, 0.12);
+        }
+
+        .funcion-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--azul-noche), var(--azul-suave));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .funcion-card h4 {
+            font-size: 1.4rem;
+            color: var(--azul-noche);
+            margin-bottom: 1rem;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .funcion-card p {
+            color: var(--texto-suave);
+            font-size: 0.95rem;
+        }
+
+        /* Sección Emocional */
+        .emocional {
+            background: linear-gradient(180deg, var(--azul-noche) 0%, #1a2d52 100%);
+            color: var(--blanco-roto);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 8rem 5%;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .emocional-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .emocional h2 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            margin-bottom: 2rem;
+            color: var(--blanco-roto);
+        }
+
+        .emocional p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        /* Cómo funciona */
+        .como-funciona {
+            background: var(--blanco-roto);
+        }
+
+        .pasos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .paso {
+            text-align: center;
+            position: relative;
+        }
+
+        .paso-numero {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--marron-arena), #d4a96a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--blanco-roto);
+            box-shadow: 0 10px 30px rgba(183, 146, 95, 0.3);
+        }
+
+        .paso h4 {
+            font-size: 1.3rem;
+            color: var(--azul-noche);
+            margin-bottom: 0.75rem;
+        }
+
+        .paso p {
+            color: var(--texto-suave);
+            font-size: 0.95rem;
+        }
+
+        .paso:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            right: -1.5rem;
+            width: 3rem;
+            height: 2px;
+            background: linear-gradient(90deg, var(--marron-arena), transparent);
+        }
+
+        /* Sobre nosotros */
+        .sobre-nosotros {
+            background: var(--crema-calido);
+        }
+
+        .sobre-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .sobre-content h2 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            color: var(--azul-noche);
+            margin-bottom: 2rem;
+        }
+
+        .sobre-content p {
+            font-size: 1.1rem;
+            color: var(--texto-suave);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .significado {
+            background: var(--blanco-roto);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+            border-left: 4px solid var(--marron-arena);
+        }
+
+        .significado p {
+            font-style: italic;
+            margin-bottom: 0;
+        }
+
+        /* Testimonio */
+        .testimonio {
+            background: var(--blanco-roto);
+            padding: 8rem 5%;
+        }
+
+        .testimonio-card {
+            max-width: 700px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, var(--crema-calido), var(--blanco-roto));
+            padding: 3rem;
+            border-radius: 25px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(36, 59, 107, 0.08);
+        }
+
+        .testimonio-card::before {
+            content: '"';
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 8rem;
+            color: var(--marron-arena);
+            opacity: 0.2;
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            line-height: 1;
+        }
+
+        .testimonio-card blockquote {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--azul-noche);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+
+        .testimonio-autor {
+            color: var(--marron-arena);
+            font-weight: 600;
+        }
+
+        /* CTA Final */
+        .cta-final {
+            background: linear-gradient(135deg, var(--azul-noche) 0%, var(--azul-suave) 100%);
+            color: var(--blanco-roto);
+            text-align: center;
+            padding: 6rem 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-final::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse, rgba(183, 146, 95, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .cta-final h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1.5rem;
+            color: var(--blanco-roto);
+        }
+
+        .cta-final .btn {
+            margin-top: 1rem;
+            background: var(--marron-arena);
+            color: var(--blanco-roto);
+        }
+
+        .cta-final .btn:hover {
+            background: #c9a570;
+            transform: translateY(-3px);
+        }
+
+        .cta-email {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .cta-email a {
+            color: var(--marron-arena);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a2d52;
+            color: var(--blanco-roto);
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-logo span {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .footer-eslogan {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-info p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-info a {
+            color: var(--marron-arena);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-image {
+                order: -1;
+            }
+
+            .que-es-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .que-es-image {
+                order: -1;
+            }
+
+            .que-es-image img {
+                margin: 0 auto;
+                display: block;
+            }
+
+            .pasos {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .paso:not(:last-child)::after {
+                display: none;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: var(--blanco-roto);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: right 0.4s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+                z-index: 1001;
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            section {
+                padding: 4rem 5%;
+            }
+
+            .hero {
+                padding: 6rem 5% 3rem;
+            }
+
+            .funciones-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                text-align: center;
+            }
+        }
+
+        /* Animaciones scroll */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación -->
+    <nav id="navbar">
+        <a href="#" class="logo">
+            <span class="logo-text">ADIN</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#que-es">Qué es ADIN</a></li>
+            <li><a href="#funciones">Funciones</a></li>
+            <li><a href="#como-funciona">Cómo funciona</a></li>
+            <li><a href="#nosotros">Nosotros</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>La compañía que <span>ilumina las noches</span></h1>
+                <p>ADIN ayuda a las personas mayores que viven solas a sentirse acompañadas, tranquilas y conectadas con quienes más quieren.</p>
+                <div class="hero-buttons">
+                    <a href="#que-es" class="btn btn-primary">Descubrir ADIN</a>
+                    <a href="#como-funciona" class="btn btn-secondary">Ver cómo funciona</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-container">
+                    <div class="glow-effect"></div>
+                    <img src="[images.unsplash.com](https://images.unsplash.com/photo-1581579438747-104c53d7fbc4?w=600&h=700&fit=crop&crop=center)" alt="Persona mayor disfrutando de un momento tranquilo en su hogar iluminado cálidamente" style="object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Qué es ADIN -->
+    <section class="que-es" id="que-es">
+        <div class="section-title animate-on-scroll">
+            <h2>Mucho más que un asistente virtual</h2>
+            <p>ADIN es un compañero nocturno diseñado para transformar las noches en momentos de calma y bienestar.</p>
+        </div>
+        <div class="que-es-content">
+            <div class="que-es-image animate-on-scroll">
+                <img src="[images.unsplash.com](https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=600&fit=crop)" alt="Dispositivo ADIN con luz cálida ambiental">
+            </div>
+            <div class="que-es-text animate-on-scroll">
+                <h3>Un abrazo de luz cuando más lo necesitas</h3>
+                <p>ADIN combina tecnología inteligente con diseño emocional para crear un espacio de tranquilidad en tu hogar. Su forma cilíndrica elegante se integra perfectamente en cualquier ambiente, irradiando calidez y compañía.</p>
+                <p>Funciona como lámpara ambiental, asistente de voz, reproductor de música y mucho más. Todo pensado para que las noches sean más serenas y reconfortantes.</p>
+                <ul class="feature-list">
+                    <li>Luz ambiental cálida y regulable</li>
+                    <li>Música y sonidos relajantes</li>
+                    <li>Historias y audiolibros</li>
+                    <li>Conexión con familiares</li>
+                    <li>Asistencia siempre disponible</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Funciones -->
+    <section class="funciones" id="funciones">
+        <div class="section-title animate-on-scroll">
+            <h2>Pensado para tu bienestar</h2>
+            <p>Cada función de ADIN ha sido diseñada para ofrecer compañía, entretenimiento y tranquilidad.</p>
+        </div>
+        <div class="funciones-grid">
+            <div class="funcion-card">
+                <div class="funcion-icon">💡</div>
+                <h4>Luz relajante</h4>
+                <p>Iluminación cálida y suave que crea un ambiente acogedor, perfecta para acompañarte durante la noche.</p>
+            </div>
+            <div class="funcion-card">
+                <div class="funcion-icon">🎵</div>
+                <h4>Música y recuerdos</h4>
+                <p>Tu música favorita, canciones de tu época y sonidos de la naturaleza para relajarte y recordar buenos momentos.</p>
+            </div>
+            <div class="funcion-card">
+                <div class="funcion-icon">💬</div>
+                <h4>Compañía inteligente</h4>
+                <p>Conversaciones naturales, historias narradas y un oído atento cuando necesitas hablar con alguien.</p>
+            </div>
+            <div class="funcion-card">
+                <div class="funcion-icon">🔔</div>
+                <h4>Atención inmediata</h4>
+                <p>Conecta con tus familiares o servicios de asistencia cuando lo necesites, con total facilidad.</p>
+            </div>
+            <div class="funcion-card">
+                <div class="funcion-icon">✨</div>
+                <h4>Fácil de usar</h4>
+                <p>Solo tienes que hablar con naturalidad. Sin botones complicados ni configuraciones difíciles.</p>
+            </div>
+            <div class="funcion-card">
+                <div class="funcion-icon">🏠</div>
+                <h4>Diseño elegante</h4>
+                <p>Estética minimalista y premium que se integra perfectamente en la decoración de tu hogar.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Emocional -->
+    <section class="emocional">
+        <div class="stars" id="stars"></div>
+        <div class="emocional-content animate-on-scroll">
+            <h2>Pensado para acompañar</h2>
+            <p>La noche puede ser el momento más silencioso del día. ADIN transforma ese silencio en calma, compañía y bienestar. Porque nadie debería sentirse solo cuando todos duermen.</p>
+        </div>
+    </section>
+
+    <!-- Cómo funciona -->
+    <section class="como-funciona" id="como-funciona">
+        <div class="section-title animate-on-scroll">
+            <h2>Así de sencillo</h2>
+            <p>ADIN está diseñado para que usarlo sea tan natural como hablar con un amigo.</p>
+        </div>
+        <div class="pasos">
+            <div class="paso animate-on-scroll">
+                <div class="paso-numero">1</div>
+                <h4>Colócalo junto a la cama</h4>
+                <p>Solo necesita una conexión eléctrica. Sin instalaciones complicadas.</p>
+            </div>
+            <div class="paso animate-on-scroll">
+                <div class="paso-numero">2</div>
+                <h4>Habla con naturalidad</h4>
+                <p>Di "Hola ADIN" y pide lo que necesites: música, luz, una historia o hablar con tu familia.</p>
+            </div>
+            <div class="paso animate-on-scroll">
+                <div class="paso-numero">3</div>
+                <h4>Descansa acompañado</h4>
+                <p>ADIN estará ahí toda la noche, cuidando de ti mientras duermes tranquilo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre nosotros -->
+    <section class="sobre-nosotros" id="nosotros">
+        <div class="sobre-content animate-on-scroll">
+            <h2>Creado con el corazón en Vitoria</h2>
+            <p>ADIN ha sido creado por cuatro personas de Vitoria-Gasteiz preocupadas por el bienestar y la tranquilidad de nuestros mayores. Creemos que la tecnología debe servir para acercar a las personas, no para alejarlas.</p>
+            <p>Nuestro objetivo es que las personas mayores que viven solas puedan disfrutar de noches más serenas, sintiéndose acompañadas y conectadas con quienes más quieren.</p>
+            <div class="significado">
+                <p><strong>¿Sabías que...?</strong> "Adin" significa "edad" en euskera, y también corresponde a las iniciales de los cuatro creadores del proyecto. Un nombre que representa nuestro compromiso con el cuidado de nuestros mayores.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonio -->
+    <section class="testimonio">
+        <div class="testimonio-card animate-on-scroll">
+            <blockquote>
+                "Ahora las noches son más tranquilas. Me gusta escuchar música antes de dormir y saber que mi familia está conectada conmigo."
+            </blockquote>
+            <p class="testimonio-autor">— María, 74 años</p>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="cta-final" id="contacto">
+        <h2>Una nueva forma de acompañar</h2>
+        <p style="max-width: 500px; margin: 0 auto 1.5rem; opacity: 0.9;">Descubre cómo ADIN puede transformar las noches de tus seres queridos en momentos de calma y conexión.</p>
+        <a href="mailto:soporte@adin.es" class="btn">Solicitar información</a>
+        <p class="cta-email">O escríbenos a <a href="mailto:soporte@adin.es">soporte@adin.es</a></p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>ADIN</span>
+            </div>
+            <p class="footer-eslogan">"Cuando todos duermen… ADIN cuida de ti"</p>
+            <div class="footer-info">
+                <p>Vitoria-Gasteiz</p>
+                <p><a href="mailto:soporte@adin.es">soporte@adin.es</a></p>
+                <p style="margin-top: 1.5rem; font-size: 0.8rem;">© 2025 ADIN. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navegación scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Menú móvil
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Animaciones al scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll, .funcion-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Generar estrellas
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.animationDuration = (2 + Math.random() * 2) + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Smooth scroll para los enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Efecto parallax suave en el hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (scrolled < window.innerHeight) {
+                hero.style.backgroundPositionY = scrolled * 0.3 + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
