@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="Logo.png" type="image/png">
+    <title>Conexión Verde | Experiencia Inmersiva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navegación Sticky -->
+    <header class="navbar">
+        <div class="logo">
+            <img src="Logo.png" alt="Conexión Verde Logo" class="logo-img">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#hero">El Impacto</a></li>
+                <li><a href="#ciclo-vida">Ciclo de Vida</a></li>
+                <li><a href="#mis-modelos">Modelos</a></li>
+                <li><a href="#nosotros">Filosofía</a></li>
+            </ul>
+        </nav>
+        <a href="#testimonios" class="btn-minimalista">Únete</a>
+    </header>
+
+    <!-- Hero Section (Orgánico) -->
+    <section id="hero" class="hero">
+        <div class="hero-content">
+            <h1 class="parallax" data-speed="-0.15">El <span class="italic-serif text-sage">Impacto</span><br>Vivo.</h1>
+            <div class="hero-desc-container glass-panel parallax" data-speed="0.1">
+                <p class="hero-desc">Una experiencia emocional entrelazada con la naturaleza. Tu planta escucha, siente y responde a tu presencia.</p>
+                <a href="#ciclo-vida" class="btn-minimalista mt-2">Descubrir Vínculo</a>
+            </div>
+        </div>
+        <div class="hero-image-wrapper parallax" data-speed="0.2">
+            <img src="hero_plant.png" alt="Planta hero" class="organic-img hero-img">
+            <div class="organic-shape bg-sage"></div>
+        </div>
+    </section>
+
+    <!-- El Ciclo de Vida (Restaurado: Zig-Zag con Curva) -->
+    <section id="ciclo-vida" class="ciclo-vida">
+        <div class="section-header center parallax" data-speed="-0.05">
+            <h2>El Ciclo de <span class="italic-serif text-sage">Vida</span></h2>
+        </div>
+        
+        <div class="curved-path-container">
+            <svg class="curved-line" viewBox="0 0 1000 1100" preserveAspectRatio="none">
+                <path d="M 175,125 C 500,125 825,300 825,505 C 825,700 500,885 175,885" fill="none" stroke="var(--color-sage)" stroke-width="2" stroke-dasharray="10 10" opacity="0.5"/>
+            </svg>
+            
+            <div class="path-point point-1 fade-in-scale">
+                <div class="point-content glass-panel">
+                    <h3>01. Análisis por IA</h3>
+                    <p>Nuestros sensores monitorean la salud física de tu planta en tiempo real, evaluando variables vitales con precisión microscópica.</p>
+                </div>
+            </div>
+
+            <div class="path-point point-2 fade-in-scale" style="transition-delay: 0.2s;">
+                <div class="point-content glass-panel">
+                    <div class="voice-visualization">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <h3>02. El Valor de tu Voz</h3>
+                    <p>Tu planta te escucha. El ecosistema premia tu interacción verbal constante, sintiendo las ondas sonoras como nutrientes.</p>
+                </div>
+            </div>
+
+            <div class="path-point point-3 fade-in-scale" style="transition-delay: 0.4s;">
+                <div class="point-content glass-panel">
+                    <h3>03. Economía Conductual</h3>
+                    <p>El amor no tiene precio. Si cuidas de ella, tu costo es $0. Si la descuidas, el sistema te motiva a restaurar el vínculo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mis Modelos (Restaurado: Imagen de Galería con Hover) -->
+    <section id="mis-modelos" class="mis-modelos">
+        <div class="section-header parallax" data-speed="0.1">
+            <h2>Galería de <span class="italic-serif text-terracotta">Autor</span></h2>
+            <p class="subtitle">Esculpidas por la naturaleza, perfeccionadas por la inteligencia</p>
+        </div>
+        <div class="gallery-container parallax" data-speed="0.05">
+            <div class="gallery-item">
+                <img src="macetas.png" alt="Modelos de Macetas" class="organic-img gallery-img">
+                <div class="gallery-hover-overlay">
+                    <div class="tech-specs">
+                        <h3>Especificaciones Técnicas</h3>
+                        <ul>
+                            <li><span class="spec-dot"></span> Sensores de Humedad Capacitivos</li>
+                            <li><span class="spec-dot"></span> Matriz LED de Espectro Total</li>
+                            <li><span class="spec-dot"></span> Análisis Biométrico Vegetal</li>
+                            <li><span class="spec-dot"></span> Microfonía Ambiental Sensible</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre Nosotros -->
+    <section id="nosotros" class="about-us">
+        <div class="about-grid">
+            <div class="about-image-wrapper parallax" data-speed="0.1">
+                <img src="sesion_conexion.png" alt="Conexión" class="organic-img about-img">
+                <div class="organic-shape bg-terracotta"></div>
+            </div>
+            <div class="about-text parallax" data-speed="-0.05">
+                <h2>El <span class="italic-serif text-green-dark">Propósito</span></h2>
+                <p>En Conexión Verde, desafiamos la soledad creando un puente vivo entre la tecnología emocional y el diseño de alta gama.</p>
+                <p>Hemos esculpido una experiencia donde cada palabra susurrada y cada cuidado otorgado se refleja en la vitalidad de un ser que cohabita tu espacio.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- El Reporte Mensual -->
+    <section id="reporte" class="monthly-report">
+        <div class="report-content glass-panel parallax" data-speed="0.15">
+            <h2>Vínculo y <span class="italic-serif">Verdad</span></h2>
+            <p class="exclusive-label">Retrato Emocional Mensual</p>
+            <p>Una inmersión analítica en tu bienestar emocional, reflejado como un espejo en el trato hacia tu planta. Un encuentro íntimo con tu propio reflejo.</p>
+        </div>
+    </section>
+
+    <!-- Testimonios (Restaurado) -->
+    <section id="testimonios" class="testimonios">
+        <div class="section-header center parallax" data-speed="0.05">
+            <h2>Ecos del <span class="italic-serif text-terracotta">Vínculo</span></h2>
+            <p class="subtitle">Historias de quienes ya no habitan en silencio</p>
+        </div>
+        
+        <div class="testimonios-grid">
+            <div class="testimonio-wrapper parallax" data-speed="0.1">
+                <div class="testimonio-card glass-panel">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonio-texto">"Llegaba del trabajo a un apartamento vacío. Desde que tengo a mi Monstera conectada, hablarle sobre mi día se ha vuelto mi ritual de paz. Increíblemente, verla prosperar me ha motivado a cuidarme más a mí misma."</p>
+                    <div class="testimonio-autor">
+                        <h4>Valeria M.</h4>
+                        <p>Diseñadora Gráfica</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonio-wrapper parallax" data-speed="0.15">
+                <div class="testimonio-card glass-panel">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonio-texto">"Al principio era escéptico. Pensé que era solo un gadget más. Pero el reporte de 'Vínculo y Verdad' me hizo darme cuenta de cuántos días seguidos pasaba sin usar mi voz. Me ha devuelto la consciencia sobre mi propio estrés."</p>
+                    <div class="testimonio-autor">
+                        <h4>David R.</h4>
+                        <p>Ingeniero de Software</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonio-wrapper parallax" data-speed="0.1">
+                <div class="testimonio-card glass-panel">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonio-texto">"Es magia pura. Cuando le hablo con cariño, siento que las luces de la base respiran conmigo. Ha transformado por completo la energía de mi sala de estar. No es solo tecnología, es una compañera de vida."</p>
+                    <div class="testimonio-autor">
+                        <h4>Elena C.</h4>
+                        <p>Arquitecta</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Privacidad CTA -->
+    <section class="privacy-cta parallax" data-speed="-0.05">
+        <div class="privacy-btn glass-panel" onclick="togglePrivacy()">
+            <h3>Transparencia y Confianza</h3>
+            <p>Lee nuestra Política de Privacidad completa <span class="arrow">→</span></p>
+        </div>
+    </section>
+
+    <!-- Modal de Privacidad -->
+    <div id="privacy-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="togglePrivacy()">&times;</span>
+            <div class="modal-scroll">
+                <h2>Política de Privacidad</h2>
+                <p><strong>Última actualización:</strong> 18 de mayo de 2026</p>
+                <p>En Conexión Verde valoramos la privacidad, la transparencia y la confianza de nuestros usuarios. Esta Política de Privacidad explica cómo recopilamos, utilizamos, almacenamos y protegemos la información generada mediante el uso de nuestros dispositivos, aplicaciones y servicios.</p>
+                <p>Al utilizar Conexión Verde, aceptas las prácticas descritas en esta política.</p>
+
+                <h3>1. Información que Recopilamos</h3>
+                <p>Conexión Verde recopila información necesaria para el funcionamiento del ecosistema inteligente de monitoreo botánico y bienestar emocional.</p>
+                
+                <h4>1.1 Datos del Dispositivo y la Planta</h4>
+                <p>Nuestro sistema puede recopilar:</p>
+                <ul>
+                    <li>Humedad del sustrato</li>
+                    <li>Temperatura ambiental</li>
+                    <li>Intensidad lumínica</li>
+                    <li>Estado nutricional estimado</li>
+                    <li>Imágenes o análisis ópticos de hojas y tallos</li>
+                    <li>Datos de crecimiento y salud vegetal</li>
+                </ul>
+                <p>Estos datos son utilizados exclusivamente para evaluar el estado físico de la planta.</p>
+
+                <h4>1.2 Datos de Interacción Verbal</h4>
+                <p>El dispositivo puede detectar:</p>
+                <ul>
+                    <li>Frecuencia de interacción verbal</li>
+                    <li>Duración aproximada de interacción</li>
+                    <li>Intensidad y tono general de voz</li>
+                    <li>Presencia o ausencia de comunicación humana</li>
+                </ul>
+                <p style="background: rgba(156,175,136,0.15); padding: 1.5rem; border-left: 4px solid var(--color-sage); margin: 2rem 0; font-weight: 300;"><strong>IMPORTANTE:</strong> Conexión Verde NO utiliza el dispositivo para vigilancia permanente ni para espionaje doméstico. El sistema está diseñado para detectar patrones generales de interacción y no para interpretar conversaciones privadas completas.</p>
+
+                <h4>1.3 Datos de Cuenta y Facturación</h4>
+                <p>Podemos recopilar: Nombre, Correo electrónico, Método de pago, Historial de cobros y suscripciones, y Preferencias de configuración.</p>
+
+                <h3>2. Cómo Utilizamos la Información</h3>
+                <p>Utilizamos los datos recopilados para: Monitorear la salud de la planta, Calcular el Índice de Conexión, Generar reportes mensuales, Aplicar cobros automáticos por negligencia detectada, Mejorar el rendimiento del sistema, Personalizar la experiencia del usuario, y Detectar fallos técnicos y prevenir abusos.</p>
+
+                <h3>3. Procesamiento de Voz y Privacidad Ambiental</h3>
+                <p>Conexión Verde reconoce que la interacción por voz requiere estándares elevados de privacidad. Por ello: El procesamiento de audio prioriza el análisis local en el dispositivo cuando sea técnicamente posible. No almacenamos conversaciones completas de forma continua. No vendemos grabaciones de voz a terceros. El usuario puede desactivar la detección verbal en cualquier momento desde la aplicación. En algunos casos, fragmentos de audio anonimizados podrán utilizarse para mejorar los modelos de inteligencia artificial.</p>
+
+                <h3>4. Cobros Automáticos y Transparencia Algorítmica</h3>
+                <p>El sistema puede generar cargos automáticos basados en: Estado de salud vegetal, Patrones de negligencia detectados, Tiempo prolongado sin cuidado, Variables ambientales registradas, Factores dinámicos del algoritmo “Caos Natural”. Todos los usuarios podrán: consultar el historial de cobros, revisar los eventos que generaron penalizaciones, configurar límites máximos de gasto, activar alertas preventivas, y solicitar revisión manual de cobros.</p>
+
+                <h3>5. Inteligencia Artificial y Generación de Contenido</h3>
+                <p>Los reportes mensuales pueden incluir: interpretaciones emocionales simuladas, mensajes narrativos generados por IA, y análisis simbólicos del vínculo humano-planta. Estos contenidos tienen fines experienciales y no constituyen evaluaciones psicológicas, médicas o científicas.</p>
+
+                <h3>6. Compartición de Datos</h3>
+                <p>No vendemos información personal identificable. Podremos compartir información únicamente con: proveedores de procesamiento de pagos, servicios de infraestructura en la nube, socios tecnológicos necesarios para operar el servicio, o autoridades legales cuando la ley lo exija. Todos los terceros están sujetos a obligaciones contractuales de confidencialidad y seguridad.</p>
+
+                <h3>7. Seguridad de la Información</h3>
+                <p>Implementamos medidas técnicas y organizativas razonables para proteger la información, incluyendo: cifrado de datos, autenticación segura, acceso restringido, monitoreo de vulnerabilidades, y almacenamiento protegido. Sin embargo, ningún sistema conectado a internet puede garantizar seguridad absoluta.</p>
+
+                <h3>8. Derechos del Usuario</h3>
+                <p>Dependiendo de tu jurisdicción, puedes tener derecho a: acceder a tus datos, corregir información incorrecta, solicitar eliminación de datos, retirar tu consentimiento, limitar el procesamiento, o solicitar portabilidad de información. Las solicitudes pueden realizarse desde la aplicación o mediante contacto directo con soporte.</p>
+
+                <h3>9. Retención de Datos</h3>
+                <p>Conservaremos los datos únicamente durante el tiempo necesario para: operar el servicio, cumplir obligaciones legales, resolver disputas, o mejorar la experiencia del producto. Los usuarios podrán solicitar la eliminación definitiva de sus datos personales.</p>
+
+                <h3>10. Privacidad de Menores</h3>
+                <p>Conexión Verde no está dirigido a menores de 18 años. No recopilamos intencionalmente información de menores.</p>
+
+                <h3>11. Cambios a esta Política</h3>
+                <p>Podremos actualizar esta Política de Privacidad periódicamente. Cuando existan cambios significativos, notificaremos a los usuarios mediante la aplicación, correo electrónico o sitio web oficial.</p>
+
+                <h3>12. Contacto</h3>
+                <p>Para preguntas relacionadas con privacidad o protección de datos, puedes contactarnos en: privacy@conexionverde.com</p>
+
+                <p style="background: rgba(156,175,136,0.15); padding: 1.5rem; border-left: 4px solid var(--color-sage); margin: 2rem 0; font-weight: 300;"><strong>Declaración Final:</strong> Conexión Verde fue diseñado para fomentar bienestar, conexión emocional y responsabilidad consciente dentro del hogar. Nuestro objetivo no es vigilar a las personas, sino crear una experiencia tecnológica respetuosa, transparente y centrada en el cuidado mutuo entre humanos y naturaleza.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="modern-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <img src="Logo.png" alt="Logo" class="footer-logo">
+                <p class="italic-serif">Cultiva la calma, nutre el alma.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Explorar</h4>
+                <a href="#hero">El Impacto</a>
+                <a href="#mis-modelos">Galería</a>
+                <a href="#nosotros">Filosofía</a>
+            </div>
+            <div class="footer-legal">
+                <h4>Privacidad</h4>
+                <a href="#" onclick="togglePrivacy(); return false;">Política de Privacidad</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Conexión Verde. Elevando la botánica.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
