@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<title>Sesión Final · Crea tu app con IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --night:#080e1a;--deep:#0d1b35;--navy:#132347;--steel:#2563a8;--sky:#3b82c4;
+  --ice:#7bb3e0;--frost:#bdd8f0;--mist:#deeef9;--white:#f0f7ff;--paper:#f8fbff;
+  --accent:#38bdf8;--gold:#f59e0b;--green:#10b981;--purple:#7c3aed;--pink:#ec4899;
+  --text:#0f2040;--muted:#4a6b8a;--border:#c5ddf0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:var(--text);font-size:15px;line-height:1.7;}
+
+/* HEADER */
+.header{background:var(--night);position:relative;overflow:hidden;}
+.header-bg{position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 60% at 20% 40%,rgba(124,58,237,0.35) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 50% at 80% 30%,rgba(236,72,153,0.2) 0%,transparent 50%),
+             radial-gradient(ellipse 40% 40% at 50% 90%,rgba(56,189,248,0.15) 0%,transparent 50%);}
+.header-bg::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(124,58,237,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.06) 1px,transparent 1px);background-size:32px 32px;}
+.header-inner{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:44px 48px 38px;}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
+.session-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.4);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#c4b5fd;}
+.session-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#c4b5fd;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.btn-classroom{display:inline-flex;align-items:center;gap:7px;background:#1a73e8;color:white;text-decoration:none;padding:8px 18px;border-radius:6px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;transition:background 0.2s;border:none;cursor:pointer;white-space:nowrap;}
+.btn-classroom:hover{background:#1557b0;}
+.header h1{font-family:'DM Serif Display',serif;font-size:clamp(26px,5vw,44px);font-weight:400;color:var(--white);line-height:1.15;margin-bottom:10px;}
+.header h1 em{font-style:italic;color:#c4b5fd;}
+.header-sub{color:rgba(176,210,240,0.7);font-size:14px;margin-bottom:24px;}
+.header-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:5px 14px;border-radius:4px;font-size:12px;color:rgba(176,210,240,0.85);font-weight:500;}
+
+/* SAVE BAR */
+.save-bar{background:var(--night);border-bottom:1px solid rgba(124,58,237,0.15);padding:7px 48px;}
+.save-bar-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;transition:background 0.3s;}
+.save-text{font-size:11.5px;color:rgba(176,210,240,0.4);flex:1;}
+.btn-clear{background:none;border:1px solid rgba(255,100,100,0.25);color:rgba(255,130,130,0.5);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* NAV */
+.nav-wrapper{background:var(--deep);border-bottom:1px solid rgba(124,58,237,0.25);padding:0 48px;overflow-x:auto;}
+.nav-tabs{display:flex;max-width:860px;margin:0 auto;}
+.tab-btn{padding:14px 16px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:rgba(176,210,240,0.5);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all 0.2s;}
+.tab-btn:hover{color:var(--ice);}
+.tab-btn.active{color:#c4b5fd;border-bottom-color:#c4b5fd;}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:36px 48px 110px;}
+.section{display:none;}.section.active{display:block;}
+.sec-head{margin-bottom:24px;}
+.sec-kicker{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--purple);margin-bottom:6px;}
+.sec-head h2{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;color:var(--text);margin-bottom:5px;}
+.sec-head p{color:var(--muted);font-size:14px;}
+
+/* CALLOUT */
+.callout{background:linear-gradient(135deg,var(--deep),var(--navy));border-left:3px solid #c4b5fd;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;color:var(--mist);font-size:13.5px;line-height:1.65;}
+.callout strong{display:block;color:#c4b5fd;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-weight:600;}
+.callout.gold{border-left-color:var(--gold);}.callout.gold strong{color:#fde68a;}
+.callout.green{border-left-color:var(--green);}.callout.green strong{color:#6ee7b7;}
+.callout.pink{border-left-color:var(--pink);}.callout.pink strong{color:#f9a8d4;}
+
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:24px 28px;margin-bottom:18px;}
+.card.purple-top{border-top:3px solid var(--purple);}
+.card.purple-left{border-left:3px solid var(--purple);}
+.card.green-left{border-left:3px solid var(--green);}
+.card.gold-left{border-left:3px solid var(--gold);}
+.card.pink-left{border-left:3px solid var(--pink);}
+.card-label{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--purple);margin-bottom:7px;}
+.card h3{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:7px;color:var(--text);}
+.card>p{color:var(--muted);font-size:13.5px;margin-bottom:12px;line-height:1.6;}
+
+/* FIELDS */
+.field-label{display:block;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;margin-top:16px;}
+.field-label:first-of-type{margin-top:0;}
+textarea,input[type="text"]{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--paper);resize:vertical;transition:border-color 0.2s,box-shadow 0.2s;line-height:1.6;}
+textarea:focus,input[type="text"]:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,0.12);}
+textarea{min-height:90px;}
+
+/* TOOL BUTTON */
+.tool-btn{display:flex;align-items:center;gap:14px;color:white;text-decoration:none;padding:15px 18px;border-radius:10px;margin-bottom:10px;transition:all 0.2s;width:100%;}
+.tool-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.2);}
+.tool-btn-icon{font-size:26px;flex-shrink:0;}
+.tool-btn-text{flex:1;text-align:left;}
+.tool-btn-title{font-size:14.5px;font-weight:700;display:block;margin-bottom:1px;}
+.tool-btn-desc{font-size:12px;opacity:0.75;display:block;}
+.tool-btn-arrow{font-size:20px;font-weight:700;flex-shrink:0;}
+
+/* IDEA CARDS */
+.idea-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0;}
+.idea-card{background:var(--deep);border:2px solid rgba(124,58,237,0.25);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:center;transition:all 0.2s;user-select:none;color:var(--frost);}
+.idea-card:hover{border-color:#c4b5fd;transform:translateY(-3px);box-shadow:0 4px 16px rgba(124,58,237,0.2);}
+.idea-card.selected{border-color:var(--purple);background:rgba(124,58,237,0.15);box-shadow:0 0 0 3px rgba(124,58,237,0.25);}
+.idea-card span:first-child{font-size:28px;display:block;margin-bottom:6px;}
+.idea-card span:last-child{font-size:12.5px;font-weight:600;line-height:1.3;}
+
+/* PROMPT BOX */
+.prompt-box{background:var(--night);border:1.5px solid rgba(124,58,237,0.35);border-radius:10px;padding:18px 22px;margin:14px 0;position:relative;font-size:13.5px;color:var(--frost);line-height:1.75;white-space:pre-wrap;}
+.prompt-box::before{content:'PROMPT — COPIA Y PEGA EN LOVABLE';display:block;font-size:9px;font-weight:700;letter-spacing:2px;color:#c4b5fd;margin-bottom:10px;white-space:normal;}
+.copy-btn{position:absolute;top:12px;right:14px;background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.4);color:#c4b5fd;padding:5px 12px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.copy-btn:hover{background:rgba(124,58,237,0.35);}
+.bracket{color:var(--gold);}
+
+/* PROMPT BUILDER */
+.pb-field{margin-bottom:12px;}
+.pb-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;display:block;}
+.pb-input{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(124,58,237,0.25);border-radius:6px;padding:10px 13px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:13.5px;line-height:1.5;}
+.pb-input::placeholder{color:rgba(176,210,240,0.3);}
+.pb-input:focus{outline:none;border-color:#c4b5fd;background:rgba(255,255,255,0.09);}
+.pb-gen{background:var(--purple);color:white;border:none;padding:12px 26px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:4px;display:block;width:100%;}
+.pb-gen:hover{background:#6d28d9;transform:translateY(-1px);}
+.pb-result{margin-top:14px;background:var(--night);border:1.5px solid rgba(124,58,237,0.35);border-radius:8px;padding:18px 22px;font-size:13.5px;color:var(--frost);line-height:1.75;display:none;white-space:pre-wrap;}
+.pb-result::before{content:'TU PROMPT PERSONALIZADO';display:block;font-size:9px;font-weight:700;letter-spacing:2px;color:#c4b5fd;margin-bottom:10px;}
+.pb-result.show{display:block;}
+.pb-copy{background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.4);color:#c4b5fd;padding:7px 16px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;display:none;}
+.pb-copy.show{display:inline-block;}
+.pb-copy:hover{background:rgba(124,58,237,0.32);}
+
+/* IMPROVEMENT IDEAS */
+.improve-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:12px 0;}
+.improve-card{background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:8px;user-select:none;}
+.improve-card:hover{border-color:var(--purple);}
+.improve-card.used{border-color:var(--green);background:rgba(16,185,129,0.06);}
+.improve-card.used::after{content:'✓';color:var(--green);font-weight:700;margin-left:auto;}
+.improve-card span:first-child{font-size:18px;}
+.improve-card span:last-child{font-size:12.5px;font-weight:600;color:var(--text);}
+
+/* AWARD CARDS */
+.award-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:14px 0;}
+.award-card{background:linear-gradient(135deg,var(--deep),var(--navy));border:1.5px solid rgba(245,158,11,0.3);border-radius:10px;padding:16px 14px;text-align:center;}
+.award-card span:first-child{font-size:32px;display:block;margin-bottom:8px;}
+.award-card span:nth-child(2){font-size:13px;font-weight:700;color:var(--gold);display:block;margin-bottom:4px;}
+.award-card span:last-child{font-size:12px;color:rgba(176,210,240,0.5);}
+
+/* PHONE BOX */
+.phone-box{background:var(--night);border:1.5px solid rgba(124,58,237,0.3);border-radius:10px;padding:16px 20px;margin:12px 0 16px;}
+.phone-box-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.ph-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c4b5fd;}
+.phone-step{display:flex;gap:11px;align-items:flex-start;margin-bottom:9px;}
+.phone-step:last-child{margin-bottom:0;}
+.step-num{width:22px;height:22px;border-radius:50%;background:rgba(124,58,237,0.25);border:1.5px solid #c4b5fd;color:#c4b5fd;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-text{font-size:13px;color:var(--frost);line-height:1.55;}
+.step-text strong{color:white;}
+
+/* REFLECTION */
+.reflection{background:var(--mist);border:1px solid var(--frost);border-radius:8px;padding:22px 26px;margin-bottom:18px;}
+.reflection h3{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:12px;color:var(--deep);}
+
+/* DL BAR */
+.dl-bar{position:fixed;bottom:0;left:0;right:0;background:var(--night);border-top:1px solid rgba(124,58,237,0.2);padding:11px 48px;display:flex;align-items:center;justify-content:flex-end;gap:10px;z-index:200;}
+.dl-note{color:rgba(176,210,240,0.3);font-size:12px;margin-right:auto;}
+.btn-purple{background:var(--purple);color:white;border:none;padding:10px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.btn-purple:hover{background:#6d28d9;}
+.btn-accent{background:var(--accent);color:var(--night);border:none;padding:10px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+
+.toast{position:fixed;top:20px;right:20px;background:var(--deep);border:1px solid var(--green);color:var(--frost);padding:12px 20px;border-radius:8px;font-size:13px;z-index:999;transform:translateY(-60px);opacity:0;transition:all 0.3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* QUOTE */
+.big-quote{background:linear-gradient(135deg,var(--deep),var(--navy));border:2px solid rgba(124,58,237,0.3);border-radius:12px;padding:28px 30px;margin:20px 0;text-align:center;}
+.big-quote p{font-family:'DM Serif Display',serif;font-size:20px;color:var(--white);line-height:1.5;font-style:italic;margin-bottom:8px;}
+.big-quote span{font-size:12px;color:rgba(176,210,240,0.45);}
+
+@media(max-width:640px){
+  .header-inner,.main{padding-left:20px;padding-right:20px;}
+  .nav-wrapper,.save-bar{padding-left:16px;padding-right:16px;}
+  .dl-bar{padding:11px 20px;flex-wrap:wrap;}
+  .dl-note{display:none;}
+  .idea-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-bg"></div>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="session-badge">Sesión final · Bonus</div>
+      <a href="https://classroom.google.com/u/1/c/ODE5MzExOTc3MzAw" target="_blank" class="btn-classroom">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4L4 8l8 4 8-4-8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ir a Classroom
+      </a>
+    </div>
+    <h1>Crea tu <em>app</em> con IA</h1>
+    <div class="header-sub">Sesión especial de cierre · 3 horas</div>
+    <div class="header-chips">
+      <span class="chip">🚀 Programar sin programar</span>
+      <span class="chip">💡 De la idea a la app</span>
+      <span class="chip">🎪 Shark Tank final</span>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-bar-inner">
+    <div class="save-dot" id="saveDot"></div>
+    <span class="save-text" id="saveText">Tu progreso se guarda automáticamente</span>
+    <button class="btn-clear" onclick="confirmClear()">Borrar todo</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-wrapper">
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('reto',this)">🤔 El reto</button>
+    <button class="tab-btn" onclick="showTab('idea',this)">💡 Tu idea</button>
+    <button class="tab-btn" onclick="showTab('construye',this)">🔨 Construye</button>
+    <button class="tab-btn" onclick="showTab('mejora',this)">✨ Mejora</button>
+    <button class="tab-btn" onclick="showTab('presenta',this)">🎪 Shark Tank</button>
+    <button class="tab-btn" onclick="showTab('cierre',this)">🎓 Cierre</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══ EL RETO ═══ -->
+<div id="tab-reto" class="section active">
+  <div class="sec-head">
+    <div class="sec-kicker">15:30 — Empezamos fuerte</div>
+    <h2>¿Quién puede crear estas cosas?</h2>
+  </div>
+
+  <div class="callout">
+    <strong>La pregunta</strong>
+    Una app de recetas. Una calculadora de gastos. Una web para aprender idiomas. Un recomendador de películas. Una herramienta para organizar viajes. ¿Quién puede crear eso?
+  </div>
+
+  <div class="card purple-top">
+    <div class="card-label">Tu respuesta honesta</div>
+    <h3>¿Quién crees que puede crear una aplicación?</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;">
+      <button class="idea-card" style="flex:1;min-width:160px;" data-val="programadores" onclick="selectReto(this)"><span>👩‍💻</span><span>Solo programadores</span></button>
+      <button class="idea-card" style="flex:1;min-width:160px;" data-val="cualquiera" onclick="selectReto(this)"><span>🤖</span><span>Cualquiera con IA</span></button>
+      <button class="idea-card" style="flex:1;min-width:160px;" data-val="nosé" onclick="selectReto(this)"><span>🤷</span><span>No tengo ni idea</span></button>
+    </div>
+    <input type="hidden" data-key="reto_respuesta" id="reto_respuesta">
+  </div>
+
+  <div class="big-quote">
+    <p>"Hoy vamos a comprobar si eso sigue siendo verdad."</p>
+    <span>En tres horas habrás creado tu propia aplicación. Sin escribir ni una línea de código.</span>
+  </div>
+
+  <div class="card gold-left">
+    <div class="card-label">Antes → Ahora</div>
+    <h3>Programar sin programar</h3>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:12px 0;">
+      <div style="background:var(--mist);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">ANTES</div>
+        <div style="font-size:13.5px;color:var(--text);line-height:1.6;">Persona → <strong>Código</strong> → App</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;">Había que saber programar</div>
+      </div>
+      <div style="font-size:24px;color:var(--purple);">→</div>
+      <div style="background:rgba(124,58,237,0.08);border:1.5px solid rgba(124,58,237,0.25);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">AHORA</div>
+        <div style="font-size:13.5px;color:var(--text);line-height:1.6;">Persona → <strong>Idea</strong> → IA → App</div>
+        <div style="font-size:12px;color:var(--purple);margin-top:6px;">Solo necesitas una buena idea</div>
+      </div>
+    </div>
+    <p style="margin-top:8px;">Programar es dar instrucciones. Un prompt también es una instrucción. La IA traduce lo que tú dices a código. <strong>Eso también es programar.</strong></p>
+  </div>
+</div>
+
+<!-- ═══ TU IDEA ═══ -->
+<div id="tab-idea" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">15:50 — Elige o inventa</div>
+    <h2>¿Qué app vas a crear?</h2>
+    <p>Elige una idea de la lista o inventa la tuya. Lo importante es que te haga gracia.</p>
+  </div>
+
+  <div class="callout pink">
+    <strong>La única regla</strong>
+    En dos horas esto tiene que existir. Elige algo que te motive — cuanto más loca la idea, mejor.
+  </div>
+
+  <div class="card purple-top">
+    <div class="card-label">Ideas locas — elige una o inventa</div>
+    <h3>Toca la que más te guste</h3>
+    <div class="idea-grid">
+      <div class="idea-card" data-val="Generador de excusas absurdas" onclick="selectIdea(this)"><span>🤥</span><span>Generador de excusas absurdas</span></div>
+      <div class="idea-card" data-val="App de música según tu humor" onclick="selectIdea(this)"><span>🎵</span><span>Música según tu humor</span></div>
+      <div class="idea-card" data-val="Traductor de ladridos de perro" onclick="selectIdea(this)"><span>🐕</span><span>Traductor de ladridos</span></div>
+      <div class="idea-card" data-val="Generador de cenas con lo que tienes" onclick="selectIdea(this)"><span>🍳</span><span>Cenas con lo que tienes en casa</span></div>
+      <div class="idea-card" data-val="Calculadora de gasto en cafés" onclick="selectIdea(this)"><span>☕</span><span>¿Cuánto gastas en cafés?</span></div>
+      <div class="idea-card" data-val="Organizador de viajes" onclick="selectIdea(this)"><span>✈️</span><span>Organizador de viajes</span></div>
+      <div class="idea-card" data-val="Quiz de preguntas para niños" onclick="selectIdea(this)"><span>🧒</span><span>Preguntas para niños</span></div>
+      <div class="idea-card" data-val="Detector de red flags" onclick="selectIdea(this)"><span>🚩</span><span>Detector de red flags</span></div>
+      <div class="idea-card" data-val="Recomendador de pelis" onclick="selectIdea(this)"><span>🎬</span><span>Recomendador de pelis</span></div>
+      <div class="idea-card" data-val="Planificador de gimnasio" onclick="selectIdea(this)"><span>💪</span><span>Planificador de gimnasio</span></div>
+      <div class="idea-card" data-val="Mi propia idea" onclick="selectIdea(this)" style="border-style:dashed;"><span>✨</span><span>Mi propia idea</span></div>
+    </div>
+    <input type="hidden" data-key="idea_seleccionada" id="idea_seleccionada">
+
+    <div id="idea-custom-wrap" style="display:none;margin-top:14px;">
+      <span class="field-label">Describe tu idea propia</span>
+      <input type="text" data-key="idea_custom" id="idea_custom" placeholder="Ej: una app que te dice qué ponerte según el tiempo que hace…">
+    </div>
+  </div>
+
+  <div id="idea-display" style="display:none;" class="big-quote">
+    <p id="idea-display-text"></p>
+    <span>Esta es tu app. En dos horas existirá.</span>
+  </div>
+</div>
+
+<!-- ═══ CONSTRUYE ═══ -->
+<div id="tab-construye" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">16:10 — El taller · Manos a la obra</div>
+    <h2>Construye tu aplicación</h2>
+    <p>Abre Lovable, pega el prompt y deja que la magia ocurra.</p>
+  </div>
+
+  <div class="callout gold">
+    <strong>Antes de generar</strong>
+    Piensa 30 segundos qué vas a pedir. Los créditos son limitados — no regeneres continuamente. Escríbelo bien a la primera.
+  </div>
+
+  <!-- HERRAMIENTAS -->
+  <a href="https://lovable.dev" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
+    <span class="tool-btn-icon">💜</span>
+    <div class="tool-btn-text">
+      <span class="tool-btn-title">Abrir Lovable</span>
+      <span class="tool-btn-desc">lovable.dev — la herramienta principal. Crea cuenta gratuita con Google.</span>
+    </div>
+    <span class="tool-btn-arrow">→</span>
+  </a>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+    <a href="https://bolt.new" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#1a1a2e,#333);font-size:13px;padding:12px 14px;">
+      <span class="tool-btn-icon" style="font-size:20px;">⚡</span>
+      <div class="tool-btn-text"><span class="tool-btn-title" style="font-size:13px;">Bolt (alternativa)</span><span class="tool-btn-desc">bolt.new</span></div>
+      <span class="tool-btn-arrow">→</span>
+    </a>
+    <a href="https://codepen.io/pen/" target="_blank" class="tool-btn" style="background:linear-gradient(135deg,#1a1a2e,#333);font-size:13px;padding:12px 14px;">
+      <span class="tool-btn-icon" style="font-size:20px;">📝</span>
+      <div class="tool-btn-text"><span class="tool-btn-title" style="font-size:13px;">CodePen (Plan B)</span><span class="tool-btn-desc">codepen.io</span></div>
+      <span class="tool-btn-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- INSTRUCCIONES -->
+  <div class="phone-box">
+    <div class="phone-box-header"><span style="font-size:20px;">🖥️</span><span class="ph-label">Cómo usar Lovable — paso a paso</span></div>
+    <div class="phone-step"><div class="step-num">1</div><div class="step-text">Abre <strong>lovable.dev</strong> y crea una cuenta gratuita con Google</div></div>
+    <div class="phone-step"><div class="step-num">2</div><div class="step-text">Haz clic en <strong>"Start building"</strong> o <strong>"New project"</strong></div></div>
+    <div class="phone-step"><div class="step-num">3</div><div class="step-text"><strong>Pega el prompt</strong> que has generado en la pestaña anterior (o usa el constructor de abajo)</div></div>
+    <div class="phone-step"><div class="step-num">4</div><div class="step-text">Espera a que Lovable genere tu app. Puede tardar 30-60 segundos</div></div>
+    <div class="phone-step"><div class="step-num">5</div><div class="step-text">Verás tu aplicación en la pantalla. <strong>Pruébala</strong> — haz clic en los botones, escribe en los campos</div></div>
+    <div class="phone-step"><div class="step-num">6</div><div class="step-text">Para hacer cambios, escribe en el chat de la derecha: <strong>"Cambia los colores"</strong>, <strong>"Hazlo más grande"</strong>, <strong>"Añade un botón"</strong>…</div></div>
+  </div>
+
+  <!-- PROMPT BUILDER -->
+  <div class="card purple-left" style="background:var(--night);border-color:rgba(124,58,237,0.3);">
+    <div class="card-label" style="color:#c4b5fd;">Constructor de prompt para tu app</div>
+    <h3 style="color:var(--white);">Rellena los campos y genera el prompt perfecto</h3>
+    <div class="pb-field">
+      <span class="pb-label">📱 ¿Qué app quieres crear?</span>
+      <input class="pb-input" id="pb_que" type="text" placeholder="Ej: un generador de excusas absurdas para llegar tarde">
+    </div>
+    <div class="pb-field">
+      <span class="pb-label">👥 ¿Quién la usaría?</span>
+      <input class="pb-input" id="pb_quien" type="text" placeholder="Ej: cualquier persona que necesite una excusa rápida y divertida">
+    </div>
+    <div class="pb-field">
+      <span class="pb-label">🎨 ¿Cómo quieres que se vea?</span>
+      <input class="pb-input" id="pb_estilo" type="text" placeholder="Ej: colorida y divertida, con emojis, estilo moderno">
+    </div>
+    <div class="pb-field">
+      <span class="pb-label">⚙️ ¿Qué tiene que hacer exactamente?</span>
+      <input class="pb-input" id="pb_funcion" type="text" placeholder="Ej: un botón grande que al pulsarlo genera una excusa aleatoria graciosa">
+    </div>
+    <button class="pb-gen" onclick="generateAppPrompt()">🚀 Generar prompt para Lovable</button>
+    <div class="pb-result" id="pb_result"></div>
+    <button class="pb-copy" id="pb_copy" onclick="copyAppPrompt()">📋 Copiar prompt</button>
+  </div>
+
+  <div class="card green-left">
+    <div class="card-label">Tu progreso</div>
+    <h3>¿Qué nombre tiene tu app?</h3>
+    <input type="text" data-key="app_nombre" placeholder="El nombre que has elegido para tu creación…">
+    <span class="field-label">¿Qué hace en una frase?</span>
+    <input type="text" data-key="app_descripcion" placeholder="Ej: genera excusas absurdas con un botón gigante…">
+  </div>
+</div>
+
+<!-- ═══ MEJORA ═══ -->
+<div id="tab-mejora" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">Durante el taller — experimenta</div>
+    <h2>Mejora tu app</h2>
+    <p>Pide cambios a Lovable escribiendo en el chat. Marca las mejoras que vayas probando.</p>
+  </div>
+
+  <div class="callout">
+    <strong>Esto es jugar</strong>
+    No hay forma incorrecta de hacerlo. Pide lo que quieras — si no funciona, pide otra cosa. La gracia está en descubrir qué puedes hacer.
+  </div>
+
+  <div class="card purple-top">
+    <div class="card-label">Ideas de mejoras — toca las que pruebes</div>
+    <h3>Escribe estas frases en el chat de Lovable</h3>
+    <div class="improve-grid">
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_colores"><span>🎨</span><span>"Cambia los colores"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_botones"><span>👆</span><span>"Haz los botones más grandes"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_imagenes"><span>🖼️</span><span>"Añade imágenes"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_pantalla"><span>📱</span><span>"Quiero otra pantalla"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_contador"><span>🔢</span><span>"Añade un contador"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_divertido"><span>😂</span><span>"Hazlo más divertido"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_animacion"><span>✨</span><span>"Añade animaciones"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_sonido"><span>🔊</span><span>"Añade un sonido"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_oscuro"><span>🌙</span><span>"Modo oscuro"</span></div>
+      <div class="improve-card" onclick="toggleImprove(this)" data-key="imp_emoji"><span>😎</span><span>"Más emojis"</span></div>
+    </div>
+  </div>
+
+  <div class="card gold-left">
+    <div class="card-label">Tu mejor mejora</div>
+    <h3>¿Qué cambio ha sido el más impactante?</h3>
+    <input type="text" data-key="mejor_mejora" placeholder="Ej: cuando le pedí animaciones y los botones empezaron a moverse…">
+  </div>
+</div>
+
+<!-- ═══ SHARK TANK ═══ -->
+<div id="tab-presenta" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">17:45 — La feria tecnológica</div>
+    <h2>Shark Tank — Presenta tu app</h2>
+    <p>Cada persona presenta su creación al grupo. Convéncenos de que tu app merece ganar.</p>
+  </div>
+
+  <div class="card purple-top">
+    <div class="card-label">Tu pitch — prepáralo en 2 minutos</div>
+    <h3>¿Qué vas a decir?</h3>
+    <span class="field-label" style="margin-top:0;">Nombre de la app</span>
+    <input type="text" data-key="pitch_nombre" placeholder="El nombre de tu creación…">
+    <span class="field-label">¿Qué hace?</span>
+    <input type="text" data-key="pitch_hace" placeholder="En una frase…">
+    <span class="field-label">¿Para quién es útil?</span>
+    <input type="text" data-key="pitch_para_quien" placeholder="¿Quién la usaría en la vida real?">
+    <span class="field-label">¿Qué fue lo más difícil?</span>
+    <input type="text" data-key="pitch_dificil" placeholder="¿Dónde te atascaste o qué no salió a la primera?">
+    <span class="field-label">¿Qué mejorarías si tuvieras más tiempo?</span>
+    <input type="text" data-key="pitch_mejoraria" placeholder="La función o el detalle que te habría gustado añadir…">
+  </div>
+
+  <!-- PREMIOS -->
+  <div class="card gold-left">
+    <div class="card-label">Premios del grupo</div>
+    <h3>Votamos las mejores apps</h3>
+    <div class="award-grid">
+      <div class="award-card"><span>🏆</span><span>App más útil</span><span>La que más gente usaría</span></div>
+      <div class="award-card"><span>🤪</span><span>App más loca</span><span>La idea más absurda</span></div>
+      <div class="award-card"><span>🎨</span><span>Mejor diseño</span><span>La más bonita</span></div>
+      <div class="award-card"><span>💰</span><span>Mejor negocio</span><span>La que más dinero haría</span></div>
+      <div class="award-card"><span>🤯</span><span>¿Cómo se te ocurrió?</span><span>La más original</span></div>
+    </div>
+    <span class="field-label" style="margin-top:14px;">¿Has ganado algún premio?</span>
+    <input type="text" data-key="premio_ganado" placeholder="Ej: App más loca 🤪">
+  </div>
+</div>
+
+<!-- ═══ CIERRE ═══ -->
+<div id="tab-cierre" class="section">
+  <div class="sec-head">
+    <div class="sec-kicker">18:10 — El cierre del curso</div>
+    <h2>Reflexión final</h2>
+  </div>
+
+  <div class="card purple-top">
+    <div class="card-label">Antes y después</div>
+    <h3>Tres preguntas para terminar</h3>
+    <span class="field-label" style="margin-top:0;">¿Qué pensabas hace 3 horas?</span>
+    <input type="text" data-key="cierre_antes" placeholder="Lo que creías que iba a pasar hoy…">
+    <span class="field-label">¿Qué piensas ahora?</span>
+    <input type="text" data-key="cierre_ahora" placeholder="Lo que ha pasado en realidad…">
+    <span class="field-label">¿Qué harías con esto en tu vida real?</span>
+    <input type="text" data-key="cierre_real" placeholder="¿Crearías algo? ¿Para qué? ¿Para quién?">
+  </div>
+
+  <div class="big-quote" style="border-color:rgba(124,58,237,0.5);">
+    <p>"Hace unas semanas aprendisteis a hablar con la IA. Hoy habéis aprendido a crear con ella."</p>
+    <span>Gracias por estas semanas. Ha sido un placer.</span>
+  </div>
+
+  <div class="reflection">
+    <h3>🎓 Fin del curso</h3>
+    <p style="color:var(--muted);font-size:13.5px;">Descarga el cuaderno para guardar tu trabajo de hoy como recuerdo.</p>
+    <button class="btn-purple" onclick="downloadPDF()" style="font-size:14px;padding:13px 28px;margin-top:8px;">🎓 Descargar cuaderno PDF</button>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<div class="toast" id="toast"></div>
+
+<div class="dl-bar">
+  <span class="dl-note">Sesión Final · ChatGPT e IA · Lanbide</span>
+  <button class="btn-purple" onclick="downloadPDF()">⬇ Descargar cuaderno PDF</button>
+</div>
+
+<script>
+const STORAGE_KEY='sesion_final_app_v1';
+let hasUnsavedChanges=false, saveDebounce=null;
+
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// RETO
+function selectReto(el){
+  document.querySelectorAll('#tab-reto .idea-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('reto_respuesta').value=el.dataset.val;
+  saveAll();
+}
+
+// IDEAS
+function selectIdea(el){
+  document.querySelectorAll('#tab-idea .idea-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const val=el.dataset.val;
+  document.getElementById('idea_seleccionada').value=val;
+  const custom=document.getElementById('idea-custom-wrap');
+  custom.style.display=val==='Mi propia idea'?'block':'none';
+  const display=document.getElementById('idea-display');
+  const displayText=document.getElementById('idea-display-text');
+  if(val!=='Mi propia idea'){
+    display.style.display='block';
+    displayText.textContent=val;
+  } else {
+    display.style.display='none';
+  }
+  saveAll();
+}
+
+// IMPROVE
+function toggleImprove(el){ el.classList.toggle('used'); saveAll(); }
+
+// PROMPT BUILDER
+function generateAppPrompt(){
+  const que=document.getElementById('pb_que').value.trim()||'[tu idea de app]';
+  const quien=document.getElementById('pb_quien').value.trim()||'cualquier persona';
+  const estilo=document.getElementById('pb_estilo').value.trim()||'moderna, limpia y atractiva';
+  const funcion=document.getElementById('pb_funcion').value.trim()||'la funcionalidad principal de la app';
+  const prompt=`Quiero crear una aplicación web sencilla.\n\nObjetivo:\n${que}\n\nUsuarios:\n${quien}\n\nLa aplicación debe:\n- Tener un título grande y atractivo\n- Diseño ${estilo}\n- Botones claros y fáciles de usar\n- Funcionalidad principal: ${funcion}\n- Aspecto moderno y profesional\n- Ser responsive (que se vea bien en móvil y ordenador)\n\nGenera la aplicación completa y funcional.`;
+  document.getElementById('pb_result').textContent=prompt;
+  document.getElementById('pb_result').classList.add('show');
+  document.getElementById('pb_copy').classList.add('show');
+  saveAll();
+  showToast('✨ Prompt generado — cópialo en Lovable');
+}
+function copyAppPrompt(){
+  navigator.clipboard.writeText(document.getElementById('pb_result').textContent).then(()=>{
+    showToast('📋 Prompt copiado — pégalo en Lovable');
+    const btn=document.getElementById('pb_copy');
+    btn.textContent='✓ Copiado';
+    setTimeout(()=>btn.textContent='📋 Copiar prompt',2000);
+  });
+}
+function copyPrompt(btn){
+  const box=btn.closest('.prompt-box');
+  const text=box.innerText.replace('COPIAR','').replace(/^PROMPT.*\n/,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='COPIAR',2000);});
+}
+
+// DATA
+function getAllData(){
+  const d={};
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(el.classList.contains('improve-card')) d[k]=el.classList.contains('used');
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') d[k]=el.value||'';
+  });
+  const reto=document.querySelector('#tab-reto .idea-card.selected');
+  if(reto) d['reto_sel']=reto.dataset.val;
+  const idea=document.querySelector('#tab-idea .idea-card.selected');
+  if(idea) d['idea_sel']=idea.dataset.val;
+  return d;
+}
+function applyData(d){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(!(k in d)) return;
+    if(el.classList.contains('improve-card')){ if(d[k]) el.classList.add('used'); }
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value=d[k];
+  });
+  if(d['reto_sel']){
+    document.querySelectorAll('#tab-reto .idea-card').forEach(c=>{
+      if(c.dataset.val===d['reto_sel']) c.classList.add('selected');
+    });
+  }
+  if(d['idea_sel']){
+    const card=document.querySelector(`#tab-idea .idea-card[data-val="${d['idea_sel']}"]`);
+    if(card) selectIdea(card);
+  }
+}
+
+// SAVE
+function saveAll(){
+  document.getElementById('saveDot').classList.add('saving');
+  hasUnsavedChanges=true;
+  clearTimeout(saveDebounce);
+  saveDebounce=setTimeout(()=>{
+    try{
+      const json=JSON.stringify(getAllData());
+      history.replaceState(null,'','#'+btoa(unescape(encodeURIComponent(json))));
+      try{sessionStorage.setItem(STORAGE_KEY,json);}catch(e){}
+      try{localStorage.setItem(STORAGE_KEY,json);}catch(e){}
+      document.getElementById('saveDot').style.background='var(--green)';
+      document.getElementById('saveText').textContent='✓ Guardado automáticamente';
+    }catch(e){}
+  },800);
+}
+function loadAll(){
+  try{const h=location.hash.replace('#','');if(h&&h.length>10){applyData(JSON.parse(decodeURIComponent(escape(atob(h)))));document.getElementById('saveText').textContent='✓ Progreso restaurado';document.getElementById('saveDot').style.background='var(--green)';return true;}}catch(e){}
+  try{const r=sessionStorage.getItem(STORAGE_KEY);if(r){applyData(JSON.parse(r));return true;}}catch(e){}
+  try{const r=localStorage.getItem(STORAGE_KEY);if(r){applyData(JSON.parse(r));return true;}}catch(e){}
+  return false;
+}
+function confirmClear(){
+  if(!confirm('¿Seguro?')) return;
+  history.replaceState(null,'',location.pathname+location.search);
+  try{sessionStorage.removeItem(STORAGE_KEY);localStorage.removeItem(STORAGE_KEY);}catch(e){}
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(el.classList.contains('improve-card')) el.classList.remove('used');
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value='';
+  });
+  document.querySelectorAll('.idea-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('idea-display').style.display='none';
+  document.getElementById('idea-custom-wrap').style.display='none';
+  document.getElementById('pb_result').classList.remove('show');
+  document.getElementById('pb_copy').classList.remove('show');
+  showToast('🗑️ Borrado');
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// PDF
+function downloadPDF(){
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const d=getAllData();
+    const pW=210,pH=297,ml=15,mr=15,cW=pW-ml-mr;
+    let y=0;
+    function np(){doc.addPage();y=14;}
+    function need(h){if(y+h>pH-14)np();}
+    function sHdr(t,s){need(22);doc.setFillColor(13,27,53);doc.rect(0,y-2,pW,18,'F');doc.setFillColor(124,58,237);doc.rect(0,y+16,pW,1.5,'F');doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(240,247,255);doc.text(t,ml,y+9);if(s){doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(196,181,253);doc.text(s,ml,y+15);}y+=24;}
+    function fld(label,key){const val=(d[key]||'').trim()||'(sin respuesta)';need(8);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(74,107,138);doc.text(label.toUpperCase(),ml,y);y+=5;const lines=doc.splitTextToSize(val,cW-4);const bh=lines.length*5+6;need(bh+2);doc.setFillColor(248,251,255);doc.setDrawColor(197,221,240);doc.rect(ml,y,cW,bh,'FD');doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(15,32,64);doc.text(lines,ml+3,y+5);y+=bh+5;}
+
+    // COVER
+    doc.setFillColor(8,14,26);doc.rect(0,0,pW,52,'F');
+    doc.setFillColor(124,58,237);doc.rect(0,52,pW,2.5,'F');
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(196,181,253);
+    doc.text('SESION FINAL · LANBIDE',ml,14);
+    doc.setFontSize(20);doc.setFont('helvetica','bold');doc.setTextColor(240,247,255);
+    doc.text('Crea tu app con IA',ml,28);
+    const appName=(d['app_nombre']||d['pitch_nombre']||'').trim();
+    if(appName){doc.setFontSize(13);doc.setTextColor(196,181,253);doc.text(appName,ml,38);}
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,160,200);
+    doc.text('Cuaderno de trabajo · Sesion especial de cierre',ml,48);
+    y=62;
+
+    sHdr('1. EL RETO','Quien puede crear una app?');
+    fld('Tu respuesta inicial','reto_sel');
+
+    sHdr('2. TU IDEA','La app que vas a crear');
+    fld('Idea seleccionada','idea_sel');
+    if(d['idea_custom']) fld('Idea propia','idea_custom');
+
+    sHdr('3. TU APP','Lo que has construido');
+    fld('Nombre de la app','app_nombre');
+    fld('Que hace','app_descripcion');
+    fld('Mejor mejora que has probado','mejor_mejora');
+
+    // Mejoras probadas
+    const mejoras=['Colores','Botones','Imagenes','Pantalla','Contador','Divertido','Animacion','Sonido','Modo oscuro','Emojis'];
+    const mKeys=['imp_colores','imp_botones','imp_imagenes','imp_pantalla','imp_contador','imp_divertido','imp_animacion','imp_sonido','imp_oscuro','imp_emoji'];
+    need(14);
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(74,107,138);
+    doc.text('MEJORAS PROBADAS',ml,y);y+=5;
+    const tried=mKeys.filter(k=>d[k]).map((k,i)=>mejoras[mKeys.indexOf(k)]);
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(15,32,64);
+    doc.text(tried.length?tried.join(', '):'(ninguna marcada)',ml+3,y);y+=10;
+
+    sHdr('4. SHARK TANK','Tu presentacion');
+    fld('Nombre','pitch_nombre');
+    fld('Que hace','pitch_hace');
+    fld('Para quien','pitch_para_quien');
+    fld('Lo mas dificil','pitch_dificil');
+    fld('Que mejorarias','pitch_mejoraria');
+    fld('Premio ganado','premio_ganado');
+
+    sHdr('5. REFLEXION FINAL','');
+    fld('Que pensabas hace 3 horas','cierre_antes');
+    fld('Que piensas ahora','cierre_ahora');
+    fld('Que harias con esto en tu vida real','cierre_real');
+
+    // Quote
+    need(20);
+    doc.setFillColor(13,27,53);doc.rect(ml,y,cW,16,'F');
+    doc.setFont('helvetica','italic');doc.setFontSize(10);doc.setTextColor(196,181,253);
+    doc.text('Hace unas semanas aprendisteis a hablar con la IA. Hoy habeis aprendido a crear con ella.',ml+6,y+10);
+    y+=22;
+
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFillColor(8,14,26);doc.rect(0,pH-9,pW,9,'F');doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,160,200);doc.text('ChatGPT e IA · Lanbide · Sesion Final · Crea tu app con IA',ml,pH-3);doc.text(p+' / '+total,pW-mr,pH-3,{align:'right'});}
+    doc.save('sesion_final_crea_tu_app.pdf');
+    showToast('📄 PDF descargado');
+  }catch(err){console.error(err);showToast('Error: '+err.message);}
+}
+
+document.addEventListener('input',saveAll);
+document.addEventListener('change',saveAll);
+window.addEventListener('load',()=>{
+  const r=loadAll();
+  if(!r) document.getElementById('saveText').textContent='Tu progreso se guarda automáticamente';
+});
+</script>
+</body>
+</html>
